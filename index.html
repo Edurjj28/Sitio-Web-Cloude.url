@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudStock | Computación en la Nube</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="hero" id="inicio">
+    <nav class="navbar">
+      <a href="#inicio" class="logo">☁ CloudStock</a>
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="#cloud">Cloud</a>
+        <a href="#modelos">Modelos</a>
+        <a href="#comparacion">Local vs Cloud</a>
+        <a href="#conceptos">Conceptos</a>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+      <span class="tag">COMPUTACIÓN EN LA NUBE</span>
+      <h1>CloudStock</h1>
+      <h2>Mi primer sistema Cloud</h2>
+      <p>Sistema de inventario de Computación en la Nube.</p>
+      <a href="#cloud" class="btn">Ingresar al sistema</a>
+    </div>
+
+    <div class="cloud-decoration">☁</div>
+  </header>
+
+  <main>
+    <section class="intro" id="cloud">
+      <div class="section-title">
+        <span>01</span>
+        <div>
+          <p class="eyebrow">CONCEPTO PRINCIPAL</p>
+          <h2>¿Qué es Cloud Computing?</h2>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <article class="card large">
+          <h3>Computar</h3>
+          <p>Computar es procesar información mediante recursos tecnológicos. Un computador recibe datos, los procesa, puede almacenarlos y entrega un resultado.</p>
+          <div class="resource-list">
+            <span>CPU</span>
+            <span>RAM</span>
+            <span>Almacenamiento</span>
+            <span>SO</span>
+            <span>Aplicaciones</span>
+            <span>Red</span>
+          </div>
+        </article>
+
+        <article class="card highlight">
+          <h3>☁ Cloud Computing</h3>
+          <p>Es el uso bajo demanda de recursos informáticos a través de una red, normalmente Internet.</p>
+          <p>Puede incluir almacenamiento, servidores, bases de datos, aplicaciones, procesamiento y redes.</p>
+        </article>
+      </div>
+
+      <div class="note">
+        <strong>Idea clave:</strong> la nube utiliza infraestructura física real. Existen servidores físicos en centros de datos, pero el usuario no necesita poseer ni administrar toda esa infraestructura.
+      </div>
+    </section>
+
+    <section class="dark-section" id="modelos">
+      <div class="section-title light">
+        <span>02</span>
+        <div>
+          <p class="eyebrow">MODELOS DE SERVICIO</p>
+          <h2>SaaS, PaaS e IaaS</h2>
+        </div>
+      </div>
+
+      <div class="service-grid">
+        <article class="service-card">
+          <div class="service-icon">S</div>
+          <h3>SaaS</h3>
+          <h4>Software como servicio</h4>
+          <p>Usamos una aplicación lista para funcionar.</p>
+          <p class="example">Ejemplo: Microsoft 365.</p>
+        </article>
+
+        <article class="service-card">
+          <div class="service-icon">P</div>
+          <h3>PaaS</h3>
+          <h4>Plataforma como servicio</h4>
+          <p>Desplegamos aplicaciones sobre una plataforma administrada.</p>
+          <p class="example">La plataforma administra parte de la infraestructura.</p>
+        </article>
+
+        <article class="service-card">
+          <div class="service-icon">I</div>
+          <h3>IaaS</h3>
+          <h4>Infraestructura como servicio</h4>
+          <p>Utilizamos máquinas virtuales, redes y almacenamiento virtual.</p>
+          <p class="example">Ejemplo: una máquina virtual Ubuntu contratada en Cloud.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="comparacion">
+      <div class="section-title">
+        <span>03</span>
+        <div>
+          <p class="eyebrow">DÓNDE ESTÁN LOS RECURSOS</p>
+          <h2>Computación Local vs Cloud</h2>
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <article class="compare-card local">
+          <div class="compare-head">💻 LOCAL</div>
+          <ul>
+            <li>Los recursos están en nuestro equipo.</li>
+            <li>Dependemos directamente del hardware y su disponibilidad.</li>
+            <li>Para aumentar la capacidad normalmente debemos mejorar o reemplazar el equipo.</li>
+            <li>Ejemplo: <code>index.html</code> guardado en el computador.</li>
+          </ul>
+        </article>
+
+        <article class="compare-card cloud">
+          <div class="compare-head">☁ CLOUD</div>
+          <ul>
+            <li>Los recursos son accesibles mediante Internet.</li>
+            <li>Pueden estar disponibles desde distintos dispositivos.</li>
+            <li>Puede facilitar escalabilidad, colaboración, respaldo y despliegue.</li>
+            <li>Presenta desafíos de conectividad, seguridad, costos, privacidad y dependencia del proveedor.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="flow-section">
+      <div class="section-title">
+        <span>04</span>
+        <div>
+          <p class="eyebrow">CÓMO LLEGARÁ A INTERNET</p>
+          <h2>De un archivo local a un sitio público</h2>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div>💻<br><span>Notebook</span></div>
+        <b>→</b>
+        <div>⌘<br><span>Git / GitHub</span></div>
+        <b>→</b>
+        <div>☁<br><span>Hosting</span></div>
+        <b>→</b>
+        <div>🌐<br><span>Internet</span></div>
+        <b>→</b>
+        <div>📱<br><span>Celular</span></div>
+      </div>
+
+      <div class="question-box">
+        <h3>¿Qué ocurrió con una página HTML local?</h3>
+        <p>Si la dirección comienza con <code>file://</code>, el archivo está almacenado en el computador. Crear una página web no significa automáticamente publicarla en la nube: para que otras personas accedan sin recibir el archivo, se necesita una infraestructura que entregue la página públicamente.</p>
+      </div>
+    </section>
+
+    <section class="concepts" id="conceptos">
+      <div class="section-title light">
+        <span>05</span>
+        <div>
+          <p class="eyebrow">CONCEPTOS FUNDAMENTALES</p>
+          <h2>Conceptos que nacen del problema</h2>
+        </div>
+      </div>
+
+      <div class="concept-grid">
+        <article><h3>Hosting</h3><p>Servicio que aloja y publica recursos de una aplicación o sitio.</p></article>
+        <article><h3>HTTP / HTTPS</h3><p>Protocolos utilizados para intercambiar recursos web.</p></article>
+        <article><h3>IP</h3><p>Identifica un dispositivo o interfaz en una red.</p></article>
+        <article><h3>DNS</h3><p>Relaciona nombres fáciles de recordar con direcciones utilizadas en la red.</p></article>
+        <article><h3>Deploy</h3><p>Proceso de publicar una versión de una aplicación para que pueda utilizarse.</p></article>
+      </div>
+    </section>
+
+    <section class="roadmap">
+      <p class="eyebrow">PROYECTO TRANSVERSAL</p>
+      <h2>El camino de CloudStock</h2>
+      <div class="roadmap-list">
+        <span>1. HTML local</span>
+        <span>2. Git / GitHub</span>
+        <span>3. Sitio público</span>
+        <span>4. App Web</span>
+        <span>5. Base de datos Cloud</span>
+        <span>6. VM</span>
+        <span>7. API</span>
+      </div>
+      <p class="roadmap-text">La meta es terminar con una arquitectura Cloud que se pueda demostrar y explicar.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>CloudStock</strong> · Proyecto de Computación en la Nube</p>
+    <p>HTML · CSS · GitHub</p>
+  </footer>
+
+  <script>
+    const menuBtn = document.getElementById("menuBtn");
+    const navLinks = document.getElementById("navLinks");
+
+    menuBtn.addEventListener("click", () => {
+      navLinks.classList.toggle("show");
+    });
+
+    document.querySelectorAll(".nav-links a").forEach(link => {
+      link.addEventListener("click", () => navLinks.classList.remove("show"));
+    });
+  </script>
+</body>
+</html>
