@@ -1,0 +1,26 @@
+[
+  {
+    "id": "notebook-001",
+    "nombre": "Notebook",
+    "descripcion": "Notebook para trabajo y estudio",
+    "precio": 599990,
+    "stock": 10,
+    "categoria": "Computadores"
+  },
+  {
+    "id": "mouse-001",
+    "nombre": "Mouse inalámbrico",
+    "descripcion": "Mouse inalámbrico para uso diario",
+    "precio": 19990,
+    "stock": 25,
+    "categoria": "Periféricos"
+  },
+  {
+    "id": "teclado-001",
+    "nombre": "Teclado mecánico",
+    "descripcion": "Teclado mecánico para computador",
+    "precio": 29990,
+    "stock": 15,
+    "categoria": "Periféricos"
+  }
+]
