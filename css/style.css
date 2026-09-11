@@ -910,57 +910,8 @@ footer strong {
     padding: 10px 20px;
   }
 }
-[12:34 p. m., 11/9/2026] maxi58673: <!-- ==================================================
-     MODAL AGREGAR PRODUCTO
-=================================================== -->
 
-<div
-  id="productModal"
-  class="product-modal"
-  aria-hidden="true"
->
-
-  <div class="product-modal-content">
-
-    <button
-      type="button"
-      id="closeModalBtn"
-      class="modal-close"
-      aria-label="Cerrar"
-    >
-      ×
-    </button>
-
-
-    <div class="modal-header">
-
-      <span class="modal-icon">
-        📦
-      </span>
-
-      <div>
-
-        <p class="eyebrow">
-          CLOUDSTOCK
-        </p>
-
-        <h2>
-          Agregar producto
-        </h2>
-
-        <p>
-          Completa los datos del nuevo producto.
-        </p>
-
-      </div>
-
-    </div>
-
-
-    <form id="productForm">
-
-      <div class="form-g…
-[12:34 p. m., 11/9/2026] maxi58673: /* ==================================================
+/* ==================================================
    BOTONES INVENTARIO
 ================================================== */
 
