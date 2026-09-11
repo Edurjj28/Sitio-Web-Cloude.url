@@ -2,13 +2,17 @@ import { db } from "./firebase.js";
 
 import {
   collection,
-  getDocs
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
-// ================================
+// ======================================================
 // VARIABLES
-// ================================
+// ======================================================
 
 let productos = [];
 let carrito = [];
@@ -23,31 +27,53 @@ const refreshBtn = document.getElementById("refreshBtn");
 const clearCartBtn = document.getElementById("clearCartBtn");
 
 
-// ================================
+// ======================================================
+// REFERENCIA A FIRESTORE
+// ======================================================
+
+const productosRef = collection(db, "productos");
+
+
+// ======================================================
 // CARGAR CARRITO
-// ================================
+// ======================================================
 
 function cargarCarrito() {
 
-  const carritoGuardado = localStorage.getItem("cloudstock_carrito");
+  const carritoGuardado =
+    localStorage.getItem("cloudstock_carrito");
 
   if (carritoGuardado) {
 
     try {
-      carrito = JSON.parse(carritoGuardado);
+
+      const carritoParseado =
+        JSON.parse(carritoGuardado);
+
+      if (Array.isArray(carritoParseado)) {
+        carrito = carritoParseado;
+      } else {
+        carrito = [];
+      }
+
     } catch (error) {
+
+      console.error(
+        "Error leyendo el carrito:",
+        error
+      );
+
       carrito = [];
     }
-
   }
 
   actualizarCarrito();
 }
 
 
-// ================================
+// ======================================================
 // GUARDAR CARRITO
-// ================================
+// ======================================================
 
 function guardarCarrito() {
 
@@ -55,13 +81,12 @@ function guardarCarrito() {
     "cloudstock_carrito",
     JSON.stringify(carrito)
   );
-
 }
 
 
-// ================================
-// CARGAR PRODUCTOS FIRESTORE
-// ================================
+// ======================================================
+// CARGAR PRODUCTOS DESDE FIRESTORE
+// ======================================================
 
 async function cargarProductos() {
 
@@ -80,11 +105,11 @@ async function cargarProductos() {
 
   try {
 
-    const productosRef = collection(db, "productos");
-
-    const snapshot = await getDocs(productosRef);
+    const snapshot =
+      await getDocs(productosRef);
 
     productos = [];
+
 
     snapshot.forEach((documento) => {
 
@@ -96,7 +121,10 @@ async function cargarProductos() {
     });
 
 
-    console.log("Productos cargados:", productos);
+    console.log(
+      "Productos cargados desde Firestore:",
+      productos
+    );
 
 
     connectionStatus.textContent =
@@ -108,6 +136,8 @@ async function cargarProductos() {
 
     mostrarProductos(productos);
 
+    actualizarStockCarrito();
+
   } catch (error) {
 
     console.error(
@@ -115,8 +145,9 @@ async function cargarProductos() {
       error
     );
 
+
     connectionStatus.textContent =
-      "✕ No fue posible conectar con Firestore";
+      "✕ Error de conexión con Firestore";
 
     connectionStatus.className =
       "connection-status error";
@@ -124,23 +155,50 @@ async function cargarProductos() {
 
     productsContainer.innerHTML = `
       <div class="no-products">
+
         <h3>Error al cargar los productos</h3>
 
         <p>
-          Revisa la configuración de Firebase
+          No fue posible obtener los productos desde Firebase.
+        </p>
+
+        <p>
+          Revisa la conexión a Internet,
+          la configuración de Firebase
           y las reglas de Firestore.
         </p>
+
+        <button
+          id="retryBtn"
+          class="inventory-refresh"
+        >
+          ↻ Intentar nuevamente
+        </button>
+
       </div>
     `;
+
+
+    const retryBtn =
+      document.getElementById("retryBtn");
+
+    if (retryBtn) {
+
+      retryBtn.addEventListener(
+        "click",
+        cargarProductos
+      );
+
+    }
 
   }
 
 }
 
 
-// ================================
+// ======================================================
 // MOSTRAR PRODUCTOS
-// ================================
+// ======================================================
 
 function mostrarProductos(lista) {
 
@@ -151,7 +209,13 @@ function mostrarProductos(lista) {
 
     productsContainer.innerHTML = `
       <div class="no-products">
-        No se encontraron productos.
+
+        <h3>No hay productos</h3>
+
+        <p>
+          No se encontraron productos en el inventario.
+        </p>
+
       </div>
     `;
 
@@ -161,30 +225,41 @@ function mostrarProductos(lista) {
 
   lista.forEach((producto) => {
 
-    const stock = Number(producto.stock) || 0;
-    const precio = Number(producto.precio) || 0;
+    const stock =
+      convertirStock(producto.stock);
+
+    const precio =
+      convertirPrecio(producto.precio);
 
 
     let stockClass = "";
-    let stockTexto = `Stock disponible: ${stock}`;
+
+    let stockTexto =
+      `Stock disponible: ${stock}`;
 
 
     if (stock === 0) {
 
       stockClass = "out";
-      stockTexto = "Sin stock";
+
+      stockTexto =
+        "Sin stock";
 
     } else if (stock <= 5) {
 
       stockClass = "low";
-      stockTexto = `Últimas unidades: ${stock}`;
+
+      stockTexto =
+        `Últimas unidades: ${stock}`;
 
     }
 
 
-    const card = document.createElement("article");
+    const card =
+      document.createElement("article");
 
-    card.className = "product-card";
+    card.className =
+      "product-card";
 
 
     card.innerHTML = `
@@ -194,15 +269,22 @@ function mostrarProductos(lista) {
       </div>
 
       <p class="product-category">
-        ${producto.categoria || "General"}
+        ${escaparHTML(
+          producto.categoria || "General"
+        )}
       </p>
 
       <h3>
-        ${producto.nombre || "Producto"}
+        ${escaparHTML(
+          producto.nombre || "Producto"
+        )}
       </h3>
 
       <p class="product-description">
-        ${producto.descripcion || "Sin descripción disponible."}
+        ${escaparHTML(
+          producto.descripcion ||
+          "Sin descripción disponible."
+        )}
       </p>
 
       <p class="product-price">
@@ -218,8 +300,30 @@ function mostrarProductos(lista) {
         data-id="${producto.id}"
         ${stock === 0 ? "disabled" : ""}
       >
-        ${stock === 0 ? "Sin stock" : "🛒 Agregar al carrito"}
+        ${
+          stock === 0
+            ? "Sin stock"
+            : "🛒 Agregar al carrito"
+        }
       </button>
+
+      <div class="product-admin-buttons">
+
+        <button
+          class="edit-product-btn"
+          data-id="${producto.id}"
+        >
+          ✏️ Editar
+        </button>
+
+        <button
+          class="delete-product-btn"
+          data-id="${producto.id}"
+        >
+          🗑️ Eliminar
+        </button>
+
+      </div>
 
     `;
 
@@ -229,13 +333,65 @@ function mostrarProductos(lista) {
   });
 
 
+  agregarEventosProductos();
+}
+
+
+// ======================================================
+// EVENTOS DE PRODUCTOS
+// ======================================================
+
+function agregarEventosProductos() {
+
   document
     .querySelectorAll(".add-cart-btn")
     .forEach((boton) => {
 
       boton.addEventListener(
         "click",
-        () => agregarAlCarrito(boton.dataset.id)
+        () => {
+
+          agregarAlCarrito(
+            boton.dataset.id
+          );
+
+        }
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(".edit-product-btn")
+    .forEach((boton) => {
+
+      boton.addEventListener(
+        "click",
+        () => {
+
+          editarProducto(
+            boton.dataset.id
+          );
+
+        }
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(".delete-product-btn")
+    .forEach((boton) => {
+
+      boton.addEventListener(
+        "click",
+        () => {
+
+          eliminarProducto(
+            boton.dataset.id
+          );
+
+        }
       );
 
     });
@@ -243,14 +399,439 @@ function mostrarProductos(lista) {
 }
 
 
-// ================================
+// ======================================================
+// CREAR PRODUCTO
+// ======================================================
+
+async function crearProducto() {
+
+  const nombre =
+    prompt("Nombre del producto:");
+
+  if (nombre === null) {
+    return;
+  }
+
+
+  const nombreLimpio =
+    nombre.trim();
+
+
+  if (!nombreLimpio) {
+
+    alert(
+      "El nombre del producto es obligatorio."
+    );
+
+    return;
+  }
+
+
+  const categoria =
+    prompt(
+      "Categoría del producto:",
+      "General"
+    );
+
+  if (categoria === null) {
+    return;
+  }
+
+
+  const categoriaLimpia =
+    categoria.trim() || "General";
+
+
+  const descripcion =
+    prompt(
+      "Descripción del producto:",
+      "Sin descripción"
+    );
+
+  if (descripcion === null) {
+    return;
+  }
+
+
+  const descripcionLimpia =
+    descripcion.trim() ||
+    "Sin descripción";
+
+
+  const precioTexto =
+    prompt(
+      "Precio del producto:",
+      "0"
+    );
+
+  if (precioTexto === null) {
+    return;
+  }
+
+
+  const precio =
+    Number(
+      precioTexto
+        .replace(/\./g, "")
+        .replace(",", ".")
+    );
+
+
+  if (
+    !Number.isFinite(precio) ||
+    precio < 0
+  ) {
+
+    alert(
+      "El precio debe ser un número válido mayor o igual a 0."
+    );
+
+    return;
+  }
+
+
+  const stockTexto =
+    prompt(
+      "Stock disponible:",
+      "0"
+    );
+
+  if (stockTexto === null) {
+    return;
+  }
+
+
+  const stock =
+    Number(stockTexto);
+
+
+  if (
+    !Number.isInteger(stock) ||
+    stock < 0
+  ) {
+
+    alert(
+      "El stock debe ser un número entero mayor o igual a 0."
+    );
+
+    return;
+  }
+
+
+  try {
+
+    await addDoc(
+      productosRef,
+      {
+        nombre: nombreLimpio,
+        categoria: categoriaLimpia,
+        descripcion: descripcionLimpia,
+        precio: precio,
+        stock: stock
+      }
+    );
+
+
+    alert(
+      "✓ Producto creado correctamente."
+    );
+
+
+    await cargarProductos();
+
+  } catch (error) {
+
+    console.error(
+      "Error creando producto:",
+      error
+    );
+
+
+    alert(
+      "No fue posible crear el producto. Revisa tu conexión y las reglas de Firestore."
+    );
+
+  }
+
+}
+
+
+// ======================================================
+// EDITAR PRODUCTO
+// ======================================================
+
+async function editarProducto(id) {
+
+  const producto =
+    productos.find(
+      (item) => item.id === id
+    );
+
+
+  if (!producto) {
+
+    alert(
+      "No se encontró el producto."
+    );
+
+    return;
+  }
+
+
+  const nombre =
+    prompt(
+      "Nombre del producto:",
+      producto.nombre || ""
+    );
+
+  if (nombre === null) {
+    return;
+  }
+
+
+  const nombreLimpio =
+    nombre.trim();
+
+
+  if (!nombreLimpio) {
+
+    alert(
+      "El nombre del producto es obligatorio."
+    );
+
+    return;
+  }
+
+
+  const categoria =
+    prompt(
+      "Categoría:",
+      producto.categoria || "General"
+    );
+
+  if (categoria === null) {
+    return;
+  }
+
+
+  const categoriaLimpia =
+    categoria.trim() || "General";
+
+
+  const descripcion =
+    prompt(
+      "Descripción:",
+      producto.descripcion || ""
+    );
+
+  if (descripcion === null) {
+    return;
+  }
+
+
+  const descripcionLimpia =
+    descripcion.trim() ||
+    "Sin descripción";
+
+
+  const precioTexto =
+    prompt(
+      "Precio:",
+      String(producto.precio ?? 0)
+    );
+
+  if (precioTexto === null) {
+    return;
+  }
+
+
+  const precio =
+    Number(
+      precioTexto
+        .replace(/\./g, "")
+        .replace(",", ".")
+    );
+
+
+  if (
+    !Number.isFinite(precio) ||
+    precio < 0
+  ) {
+
+    alert(
+      "El precio debe ser un número válido mayor o igual a 0."
+    );
+
+    return;
+  }
+
+
+  const stockTexto =
+    prompt(
+      "Stock:",
+      String(producto.stock ?? 0)
+    );
+
+  if (stockTexto === null) {
+    return;
+  }
+
+
+  const stock =
+    Number(stockTexto);
+
+
+  if (
+    !Number.isInteger(stock) ||
+    stock < 0
+  ) {
+
+    alert(
+      "El stock debe ser un número entero mayor o igual a 0."
+    );
+
+    return;
+  }
+
+
+  try {
+
+    const productoRef =
+      doc(
+        db,
+        "productos",
+        id
+      );
+
+
+    await updateDoc(
+      productoRef,
+      {
+        nombre: nombreLimpio,
+        categoria: categoriaLimpia,
+        descripcion: descripcionLimpia,
+        precio: precio,
+        stock: stock
+      }
+    );
+
+
+    alert(
+      "✓ Producto actualizado correctamente."
+    );
+
+
+    await cargarProductos();
+
+  } catch (error) {
+
+    console.error(
+      "Error actualizando producto:",
+      error
+    );
+
+
+    alert(
+      "No fue posible actualizar el producto. Revisa la conexión y las reglas de Firestore."
+    );
+
+  }
+
+}
+
+
+// ======================================================
+// ELIMINAR PRODUCTO
+// ======================================================
+
+async function eliminarProducto(id) {
+
+  const producto =
+    productos.find(
+      (item) => item.id === id
+    );
+
+
+  if (!producto) {
+
+    alert(
+      "No se encontró el producto."
+    );
+
+    return;
+  }
+
+
+  const confirmar =
+    confirm(
+      `¿Seguro que quieres eliminar "${producto.nombre}"?`
+    );
+
+
+  if (!confirmar) {
+    return;
+  }
+
+
+  try {
+
+    const productoRef =
+      doc(
+        db,
+        "productos",
+        id
+      );
+
+
+    await deleteDoc(
+      productoRef
+    );
+
+
+    carrito =
+      carrito.filter(
+        (item) => item.id !== id
+      );
+
+
+    guardarCarrito();
+
+    actualizarCarrito();
+
+
+    alert(
+      "✓ Producto eliminado correctamente."
+    );
+
+
+    await cargarProductos();
+
+  } catch (error) {
+
+    console.error(
+      "Error eliminando producto:",
+      error
+    );
+
+
+    alert(
+      "No fue posible eliminar el producto. Revisa la conexión y las reglas de Firestore."
+    );
+
+  }
+
+}
+
+
+// ======================================================
 // ICONOS
-// ================================
+// ======================================================
 
 function obtenerIcono(categoria) {
 
   const categoriaTexto =
-    String(categoria || "").toLowerCase();
+    String(categoria || "")
+      .toLowerCase();
 
 
   if (categoriaTexto.includes("comput")) {
@@ -273,28 +854,53 @@ function obtenerIcono(categoria) {
     return "🖥️";
   }
 
+  if (categoriaTexto.includes("celular")) {
+    return "📱";
+  }
+
+  if (categoriaTexto.includes("mouse")) {
+    return "🖱️";
+  }
+
   return "📦";
 
 }
 
 
-// ================================
+// ======================================================
 // AGREGAR AL CARRITO
-// ================================
+// ======================================================
 
 function agregarAlCarrito(id) {
 
-  const producto = productos.find(
-    (item) => item.id === id
-  );
+  const producto =
+    productos.find(
+      (item) => item.id === id
+    );
 
 
   if (!producto) {
+
+    alert(
+      "No se encontró el producto."
+    );
+
     return;
   }
 
 
-  const stock = Number(producto.stock) || 0;
+  const stock =
+    convertirStock(producto.stock);
+
+
+  if (stock <= 0) {
+
+    alert(
+      "Este producto no tiene stock disponible."
+    );
+
+    return;
+  }
 
 
   const productoCarrito =
@@ -305,7 +911,9 @@ function agregarAlCarrito(id) {
 
   if (productoCarrito) {
 
-    if (productoCarrito.cantidad < stock) {
+    if (
+      productoCarrito.cantidad < stock
+    ) {
 
       productoCarrito.cantidad++;
 
@@ -315,30 +923,94 @@ function agregarAlCarrito(id) {
         "No puedes agregar más unidades que el stock disponible."
       );
 
+      return;
     }
 
   } else {
 
     carrito.push({
+
       id: producto.id,
-      nombre: producto.nombre,
-      precio: Number(producto.precio) || 0,
+
+      nombre:
+        producto.nombre ||
+        "Producto",
+
+      precio:
+        convertirPrecio(
+          producto.precio
+        ),
+
       stock: stock,
+
       cantidad: 1
+
     });
 
   }
 
 
   guardarCarrito();
+
   actualizarCarrito();
 
 }
 
 
-// ================================
+// ======================================================
+// ACTUALIZAR STOCK DEL CARRITO
+// ======================================================
+
+function actualizarStockCarrito() {
+
+  carrito =
+    carrito.filter((item) => {
+
+      const producto =
+        productos.find(
+          (producto) =>
+            producto.id === item.id
+        );
+
+
+      if (!producto) {
+        return false;
+      }
+
+
+      const stock =
+        convertirStock(
+          producto.stock
+        );
+
+
+      item.stock = stock;
+
+
+      if (
+        item.cantidad > stock
+      ) {
+
+        item.cantidad = stock;
+
+      }
+
+
+      return item.cantidad > 0;
+
+    });
+
+
+  guardarCarrito();
+
+  actualizarCarrito();
+
+}
+
+
+// ======================================================
 // ACTUALIZAR CARRITO
-// ================================
+// ======================================================
 
 function actualizarCarrito() {
 
@@ -364,17 +1036,26 @@ function actualizarCarrito() {
 
 
   let total = 0;
+
   let cantidadTotal = 0;
 
 
   carrito.forEach((item) => {
 
+    const precio =
+      convertirPrecio(item.precio);
+
+    const cantidad =
+      Number(item.cantidad) || 0;
+
+
     const subtotal =
-      item.precio * item.cantidad;
+      precio * cantidad;
 
 
     total += subtotal;
-    cantidadTotal += item.cantidad;
+
+    cantidadTotal += cantidad;
 
 
     const elemento =
@@ -390,15 +1071,16 @@ function actualizarCarrito() {
       <div class="cart-item-info">
 
         <h4>
-          ${item.nombre}
+          ${escaparHTML(
+            item.nombre
+          )}
         </h4>
 
         <p>
-          $${formatearPrecio(item.precio)} cada uno
+          $${formatearPrecio(precio)} cada uno
         </p>
 
       </div>
-
 
       <div class="quantity-controls">
 
@@ -410,7 +1092,7 @@ function actualizarCarrito() {
         </button>
 
         <span class="quantity">
-          ${item.cantidad}
+          ${cantidad}
         </span>
 
         <button
@@ -422,13 +1104,11 @@ function actualizarCarrito() {
 
       </div>
 
-
       <div class="cart-item-price">
 
         $${formatearPrecio(subtotal)}
 
       </div>
-
 
       <button
         class="remove-item"
@@ -463,9 +1143,9 @@ function actualizarCarrito() {
 }
 
 
-// ================================
+// ======================================================
 // EVENTOS DEL CARRITO
-// ================================
+// ======================================================
 
 function agregarEventosCarrito() {
 
@@ -488,11 +1168,15 @@ function agregarEventosCarrito() {
 
             aumentarCantidad(id);
 
-          } else if (action === "minus") {
+          } else if (
+            action === "minus"
+          ) {
 
             disminuirCantidad(id);
 
-          } else if (action === "remove") {
+          } else if (
+            action === "remove"
+          ) {
 
             eliminarDelCarrito(id);
 
@@ -506,15 +1190,16 @@ function agregarEventosCarrito() {
 }
 
 
-// ================================
+// ======================================================
 // AUMENTAR CANTIDAD
-// ================================
+// ======================================================
 
 function aumentarCantidad(id) {
 
   const item =
     carrito.find(
-      (producto) => producto.id === id
+      (producto) =>
+        producto.id === id
     );
 
 
@@ -523,7 +1208,33 @@ function aumentarCantidad(id) {
   }
 
 
-  if (item.cantidad < item.stock) {
+  const producto =
+    productos.find(
+      (producto) =>
+        producto.id === id
+    );
+
+
+  if (!producto) {
+
+    eliminarDelCarrito(id);
+
+    return;
+  }
+
+
+  const stock =
+    convertirStock(
+      producto.stock
+    );
+
+
+  item.stock = stock;
+
+
+  if (
+    item.cantidad < stock
+  ) {
 
     item.cantidad++;
 
@@ -533,24 +1244,27 @@ function aumentarCantidad(id) {
       "Has alcanzado el stock disponible."
     );
 
+    return;
   }
 
 
   guardarCarrito();
+
   actualizarCarrito();
 
 }
 
 
-// ================================
+// ======================================================
 // DISMINUIR CANTIDAD
-// ================================
+// ======================================================
 
 function disminuirCantidad(id) {
 
   const item =
     carrito.find(
-      (producto) => producto.id === id
+      (producto) =>
+        producto.id === id
     );
 
 
@@ -562,43 +1276,49 @@ function disminuirCantidad(id) {
   item.cantidad--;
 
 
-  if (item.cantidad <= 0) {
+  if (
+    item.cantidad <= 0
+  ) {
 
     carrito =
       carrito.filter(
-        (producto) => producto.id !== id
+        (producto) =>
+          producto.id !== id
       );
 
   }
 
 
   guardarCarrito();
+
   actualizarCarrito();
 
 }
 
 
-// ================================
-// ELIMINAR PRODUCTO
-// ================================
+// ======================================================
+// ELIMINAR DEL CARRITO
+// ======================================================
 
 function eliminarDelCarrito(id) {
 
   carrito =
     carrito.filter(
-      (producto) => producto.id !== id
+      (producto) =>
+        producto.id !== id
     );
 
 
   guardarCarrito();
+
   actualizarCarrito();
 
 }
 
 
-// ================================
+// ======================================================
 // VACIAR CARRITO
-// ================================
+// ======================================================
 
 clearCartBtn.addEventListener(
   "click",
@@ -622,129 +1342,5 @@ clearCartBtn.addEventListener(
 
     carrito = [];
 
-    guardarCarrito();
-    actualizarCarrito();
 
-  }
-);
-
-
-// ================================
-// BUSCADOR
-// ================================
-
-searchInput.addEventListener(
-  "input",
-  () => {
-
-    const texto =
-      searchInput.value
-        .trim()
-        .toLowerCase();
-
-
-    if (!texto) {
-
-      mostrarProductos(productos);
-
-      return;
-    }
-
-
-    const resultados =
-      productos.filter((producto) => {
-
-        const nombre =
-          String(producto.nombre || "")
-            .toLowerCase();
-
-        const descripcion =
-          String(producto.descripcion || "")
-            .toLowerCase();
-
-        const categoria =
-          String(producto.categoria || "")
-            .toLowerCase();
-
-
-        return (
-          nombre.includes(texto) ||
-          descripcion.includes(texto) ||
-          categoria.includes(texto)
-        );
-
-      });
-
-
-    mostrarProductos(resultados);
-
-  }
-);
-
-
-// ================================
-// ACTUALIZAR FIRESTORE
-// ================================
-
-refreshBtn.addEventListener(
-  "click",
-  cargarProductos
-);
-
-
-// ================================
-// FORMATO DE PRECIO
-// ================================
-
-function formatearPrecio(numero) {
-
-  return Number(numero).toLocaleString(
-    "es-CL"
-  );
-
-}
-
-
-// ================================
-// MENÚ MÓVIL
-// ================================
-
-const menuBtn =
-  document.getElementById("menuBtn");
-
-const navLinks =
-  document.getElementById("navLinks");
-
-
-menuBtn.addEventListener(
-  "click",
-  () => {
-
-    navLinks.classList.toggle("show");
-
-  }
-);
-
-
-document
-  .querySelectorAll(".nav-links a")
-  .forEach((link) => {
-
-    link.addEventListener(
-      "click",
-      () => {
-
-        navLinks.classList.remove("show");
-
-      }
-    );
-
-  });
-
-
-// ================================
-// INICIO
-// ================================
-
-cargarCarrito();
-cargarProductos();
+    g
