@@ -1621,3 +1621,4 @@ crearBotonAgregarProducto();
 cargarCarrito();
 
 cargarProductos();
+console.log("Script cargado correctamente");
