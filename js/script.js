@@ -405,156 +405,155 @@ function agregarEventosProductos() {
 
 async function crearProducto() {
 
-  const nombre =
-    prompt("Nombre del producto:");
+  const nombre = prompt("Nombre del producto:");
 
   if (nombre === null) {
     return;
   }
 
+  const nombreLimpio = nombre.trim();
 
-  const nombreLimpio =
-    nombre.trim();
+  // ================================
+  // VALIDAR NOMBRE
+  // ================================
 
+  if (nombreLimpio === "") {
+    alert("El nombre del producto es obligatorio.");
+    return;
+  }
 
-  if (!nombreLimpio) {
+  // Evitar nombres repetidos
+  const nombreRepetido = productos.some(producto =>
+    String(producto.nombre || "")
+      .trim()
+      .toLowerCase() === nombreLimpio.toLowerCase()
+  );
 
-    alert(
-      "El nombre del producto es obligatorio."
-    );
-
+  if (nombreRepetido) {
+    alert("Ya existe un producto con ese nombre.");
     return;
   }
 
 
-  const categoria =
-    prompt(
-      "Categoría del producto:",
-      "General"
-    );
+  // ================================
+  // CATEGORÍA
+  // ================================
+
+  const categoria = prompt(
+    "Categoría del producto:"
+  );
 
   if (categoria === null) {
     return;
   }
 
+  const categoriaLimpia = categoria.trim();
 
-  const categoriaLimpia =
-    categoria.trim() || "General";
+  if (categoriaLimpia === "") {
+    alert("La categoría es obligatoria.");
+    return;
+  }
 
 
-  const descripcion =
-    prompt(
-      "Descripción del producto:",
-      "Sin descripción"
-    );
+  // ================================
+  // DESCRIPCIÓN
+  // ================================
+
+  const descripcion = prompt(
+    "Descripción del producto:"
+  );
 
   if (descripcion === null) {
     return;
   }
 
+  const descripcionLimpia = descripcion.trim();
 
-  const descripcionLimpia =
-    descripcion.trim() ||
-    "Sin descripción";
-
-
-  const precioTexto =
-    prompt(
-      "Precio del producto:",
-      "0"
-    );
-
-  if (precioTexto === null) {
+  if (descripcionLimpia === "") {
+    alert("La descripción es obligatoria.");
     return;
   }
 
 
-  const precio =
-    Number(
-      precioTexto
-        .replace(/\./g, "")
-        .replace(",", ".")
-    );
+  // ================================
+  // PRECIO
+  // ================================
 
+  const precioTexto = prompt(
+    "Precio del producto:"
+  );
 
-  if (
-    !Number.isFinite(precio) ||
-    precio <= 0
-  ) {
+  if (precioTexto === null || precioTexto.trim() === "") {
+    alert("El precio es obligatorio.");
+    return;
+  }
 
-    alert(
-      "El precio debe ser un número válido mayor o igual a 0."
-    );
+  const precio = Number(
+    precioTexto
+      .trim()
+      .replace(/\./g, "")
+      .replace(",", ".")
+  );
 
+  if (!Number.isFinite(precio) || precio <= 0) {
+    alert("El precio debe ser un número mayor que 0.");
     return;
   }
 
 
-  const stockTexto =
-    prompt(
-      "Stock disponible:",
-      "0"
-    );
+  // ================================
+  // STOCK
+  // ================================
 
-  if (stockTexto === null) {
+  const stockTexto = prompt(
+    "Stock del producto:"
+  );
+
+  if (stockTexto === null || stockTexto.trim() === "") {
+    alert("El stock es obligatorio.");
+    return;
+  }
+
+  const stock = Number(stockTexto.trim());
+
+  if (!Number.isInteger(stock) || stock < 0) {
+    alert("El stock debe ser un número entero mayor o igual a 0.");
     return;
   }
 
 
-  const stock =
-    Number(stockTexto);
-
-
-  if (
-    !Number.isInteger(stock) ||
-    stock < 0
-  ) {
-
-    alert(
-      "El stock debe ser un número entero mayor o igual a 0."
-    );
-
-    return;
-  }
-
+  // ================================
+  // GUARDAR EN FIRESTORE
+  // ================================
 
   try {
 
-    await addDoc(
-      productosRef,
-      {
-        nombre: nombreLimpio,
-        categoria: categoriaLimpia,
-        descripcion: descripcionLimpia,
-        precio: precio,
-        stock: stock
-      }
-    );
+    await addDoc(productosRef, {
 
+      nombre: nombreLimpio,
+      categoria: categoriaLimpia,
+      descripcion: descripcionLimpia,
+      precio: precio,
+      stock: stock
 
-    alert(
-      "✓ Producto creado correctamente."
-    );
+    });
 
+    alert("Producto creado correctamente.");
 
     await cargarProductos();
 
   } catch (error) {
 
     console.error(
-      "Error creando producto:",
+      "Error al crear producto:",
       error
     );
 
-
     alert(
-      "No fue posible crear el producto. Revisa tu conexión y las reglas de Firestore."
+      "No se pudo crear el producto. Revisa la conexión con Firebase."
     );
-
   }
-
 }
-
 
 // ======================================================
 // EDITAR PRODUCTO
