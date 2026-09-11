@@ -1316,9 +1316,9 @@ function eliminarDelCarrito(id) {
 }
 
 
-// ================================
-// VACIAR CARRITO
-// ================================
+// ======================================================
+//VACIAR CARRITO
+// ======================================================
 
 clearCartBtn.addEventListener(
   "click",
@@ -1328,24 +1328,32 @@ clearCartBtn.addEventListener(
       return;
     }
 
+
     const confirmar =
-      confirm("¿Quieres vaciar el carrito?");
+      confirm(
+        "¿Quieres vaciar el carrito?"
+      );
+
 
     if (!confirmar) {
       return;
     }
 
+
     carrito = [];
 
+
     guardarCarrito();
+
     actualizarCarrito();
+
   }
 );
 
 
-// ================================
+// ======================================================
 // BUSCADOR
-// ================================
+// ======================================================
 
 searchInput.addEventListener(
   "input",
@@ -1356,57 +1364,260 @@ searchInput.addEventListener(
         .trim()
         .toLowerCase();
 
-    if (texto === "") {
+
+    if (!texto) {
+
       mostrarProductos(productos);
+
       return;
     }
 
-    const filtrados =
-      productos.filter(producto => {
 
-        const nombre =
-          String(producto.nombre || "")
-            .toLowerCase();
+    const resultados =
+      productos.filter(
+        (producto) => {
 
-        const categoria =
-          String(producto.categoria || "")
-            .toLowerCase();
+          const nombre =
+            String(
+              producto.nombre || ""
+            ).toLowerCase();
 
-        const descripcion =
-          String(producto.descripcion || "")
-            .toLowerCase();
 
-        return (
-          nombre.includes(texto) ||
-          categoria.includes(texto) ||
-          descripcion.includes(texto)
-        );
-      });
+          const descripcion =
+            String(
+              producto.descripcion || ""
+            ).toLowerCase();
 
-    mostrarProductos(filtrados);
+
+          const categoria =
+            String(
+              producto.categoria || ""
+            ).toLowerCase();
+
+
+          return (
+            nombre.includes(texto) ||
+            descripcion.includes(texto) ||
+            categoria.includes(texto)
+          );
+
+        }
+      );
+
+
+    mostrarProductos(
+      resultados
+    );
+
   }
 );
 
 
-// ================================
+// ======================================================
 // BOTÓN ACTUALIZAR
-// ================================
+// ======================================================
 
-if (refreshBtn) {
+refreshBtn.addEventListener(
+  "click",
+  cargarProductos
+);
 
-  refreshBtn.addEventListener(
+
+// ======================================================
+// CREAR BOTÓN DE PRODUCTO
+// ======================================================
+
+function crearBotonAgregarProducto() {
+
+  const inventoryTools =
+    document.querySelector(
+      ".inventory-tools"
+    );
+
+
+  if (!inventoryTools) {
+    return;
+  }
+
+
+  if (
+    document.getElementById(
+      "addProductBtn"
+    )
+  ) {
+    return;
+  }
+
+
+  const boton =
+    document.createElement("button");
+
+
+  boton.id =
+    "addProductBtn";
+
+
+  boton.className =
+    "inventory-refresh";
+
+
+  boton.textContent =
+    "＋ Agregar producto";
+
+
+  boton.addEventListener(
     "click",
-    () => {
-      cargarProductos();
-    }
+    crearProducto
+  );
+
+
+  inventoryTools.appendChild(
+    boton
   );
 
 }
 
 
-// ================================
-// INICIO DE LA APLICACIÓN
-// ================================
+// ======================================================
+// FORMATEAR PRECIO
+// ======================================================
+
+function formatearPrecio(numero) {
+
+  return Number(numero)
+    .toLocaleString("es-CL");
+
+}
+
+
+// ======================================================
+// CONVERTIR PRECIO
+// ======================================================
+
+function convertirPrecio(valor) {
+
+  const numero =
+    Number(valor);
+
+
+  if (
+    !Number.isFinite(numero) ||
+    numero < 0
+  ) {
+
+    return 0;
+  }
+
+
+  return numero;
+
+}
+
+
+// ======================================================
+// CONVERTIR STOCK
+// ======================================================
+
+function convertirStock(valor) {
+
+  const numero =
+    Number(valor);
+
+
+  if (
+    !Number.isInteger(numero) ||
+    numero < 0
+  ) {
+
+    return 0;
+  }
+
+
+  return numero;
+
+}
+
+
+// ======================================================
+// EVITAR HTML INYECTADO
+// ======================================================
+
+function escaparHTML(texto) {
+
+  const div =
+    document.createElement("div");
+
+
+  div.textContent =
+    String(texto);
+
+
+  return div.innerHTML;
+
+}
+
+
+// ======================================================
+// MENÚ MÓVIL
+// ======================================================
+
+const menuBtn =
+  document.getElementById(
+    "menuBtn"
+  );
+
+
+const navLinks =
+  document.getElementById(
+    "navLinks"
+  );
+
+
+if (
+  menuBtn &&
+  navLinks
+) {
+
+  menuBtn.addEventListener(
+    "click",
+    () => {
+
+      navLinks.classList.toggle(
+        "show"
+      );
+
+    }
+  );
+
+
+  document
+    .querySelectorAll(
+      ".nav-links a"
+    )
+    .forEach((link) => {
+
+      link.addEventListener(
+        "click",
+        () => {
+
+          navLinks.classList.remove(
+            "show"
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+// ======================================================
+// INICIO
+// ======================================================
+
+crearBotonAgregarProducto();
 
 cargarCarrito();
+
 cargarProductos();
