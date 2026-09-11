@@ -35,7 +35,7 @@
         href="#inicio"
         class="logo"
       >
-        ☁ CloudStock
+        ☁️ CloudStock
       </a>
 
 
@@ -43,6 +43,7 @@
         class="menu-btn"
         id="menuBtn"
         aria-label="Abrir menú"
+        type="button"
       >
         ☰
       </button>
@@ -109,7 +110,7 @@
 
 
     <div class="cloud-decoration">
-      ☁
+      ☁️
     </div>
 
   </header>
@@ -147,7 +148,9 @@
     </div>
 
 
-    <!-- HERRAMIENTAS -->
+    <!-- ==================================================
+         HERRAMIENTAS
+    =================================================== -->
 
     <div class="inventory-tools">
 
@@ -159,18 +162,34 @@
       >
 
 
-      <button
-        class="inventory-refresh"
-        id="refreshBtn"
-        type="button"
-      >
-        ↻ Actualizar
-      </button>
+      <div class="inventory-actions">
+
+        <button
+          class="add-product-btn"
+          id="addProductBtn"
+          type="button"
+        >
+          ＋ Agregar producto
+        </button>
+
+
+        <button
+          class="inventory-refresh"
+          id="refreshBtn"
+          type="button"
+        >
+          ↻ Actualizar
+        </button>
+
+      </div>
 
     </div>
 
 
-    <!-- ESTADO DE FIREBASE -->
+
+    <!-- ==================================================
+         ESTADO DE FIREBASE
+    =================================================== -->
 
     <div
       id="connectionStatus"
@@ -180,7 +199,10 @@
     </div>
 
 
-    <!-- PRODUCTOS -->
+
+    <!-- ==================================================
+         PRODUCTOS
+    =================================================== -->
 
     <div
       id="productsContainer"
@@ -188,7 +210,7 @@
     >
 
       <div class="loading">
-        ☁ Cargando productos...
+        ☁️ Cargando productos...
       </div>
 
     </div>
@@ -255,6 +277,210 @@
     </div>
 
   </section>
+
+
+
+  <!-- ==================================================
+       MODAL AGREGAR PRODUCTO
+  =================================================== -->
+
+  <div
+    id="productModal"
+    class="product-modal"
+    aria-hidden="true"
+  >
+
+    <div class="product-modal-content">
+
+      <button
+        type="button"
+        id="closeModalBtn"
+        class="modal-close"
+        aria-label="Cerrar formulario"
+      >
+        ×
+      </button>
+
+
+      <div class="modal-header">
+
+        <span class="modal-icon">
+          📦
+        </span>
+
+
+        <div>
+
+          <p class="eyebrow">
+            CLOUDSTOCK
+          </p>
+
+          <h2>
+            Agregar producto
+          </h2>
+
+          <p>
+            Completa los datos del nuevo producto.
+          </p>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ==================================================
+           FORMULARIO
+      =================================================== -->
+
+      <form id="productForm">
+
+        <div class="form-group">
+
+          <label for="productName">
+            Nombre del producto
+          </label>
+
+          <input
+            type="text"
+            id="productName"
+            placeholder="Ej: Teclado mecánico"
+            maxlength="100"
+            autocomplete="off"
+            required
+          >
+
+        </div>
+
+
+
+        <div class="form-group">
+
+          <label for="productCategory">
+            Categoría
+          </label>
+
+          <input
+            type="text"
+            id="productCategory"
+            placeholder="Ej: Periféricos"
+            maxlength="50"
+            autocomplete="off"
+            required
+          >
+
+        </div>
+
+
+
+        <div class="form-group">
+
+          <label for="productDescription">
+            Descripción
+          </label>
+
+          <textarea
+            id="productDescription"
+            placeholder="Describe brevemente el producto..."
+            maxlength="250"
+            rows="3"
+            required
+          ></textarea>
+
+        </div>
+
+
+
+        <div class="form-row">
+
+          <div class="form-group">
+
+            <label for="productPrice">
+              Precio
+            </label>
+
+
+            <div class="input-prefix">
+
+              <span>
+                $
+              </span>
+
+
+              <input
+                type="number"
+                id="productPrice"
+                placeholder="0"
+                min="0.01"
+                step="0.01"
+                required
+              >
+
+            </div>
+
+          </div>
+
+
+
+          <div class="form-group">
+
+            <label for="productStock">
+              Stock
+            </label>
+
+
+            <input
+              type="number"
+              id="productStock"
+              placeholder="0"
+              min="0"
+              step="1"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+
+        <!-- MENSAJE DE VALIDACIÓN -->
+
+        <div
+          id="formMessage"
+          class="form-message"
+          role="alert"
+        ></div>
+
+
+
+        <!-- BOTONES -->
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            id="cancelProductBtn"
+            class="modal-cancel"
+          >
+            Cancelar
+          </button>
+
+
+          <button
+            type="submit"
+            class="modal-save"
+          >
+            ✓ Guardar producto
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
 
 
 
@@ -1001,7 +1227,7 @@
     <div>
 
       <h2>
-        ☁ CloudStock
+        ☁️ CloudStock
       </h2>
 
       <p>
