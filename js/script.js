@@ -1316,9 +1316,9 @@ function eliminarDelCarrito(id) {
 }
 
 
-// ======================================================
+// ================================
 // VACIAR CARRITO
-// ======================================================
+// ================================
 
 clearCartBtn.addEventListener(
   "click",
@@ -1328,19 +1328,85 @@ clearCartBtn.addEventListener(
       return;
     }
 
-
     const confirmar =
-      confirm(
-        "¿Quieres vaciar el carrito?"
-      );
-
+      confirm("¿Quieres vaciar el carrito?");
 
     if (!confirmar) {
       return;
     }
 
-
     carrito = [];
 
+    guardarCarrito();
+    actualizarCarrito();
+  }
+);
 
-    g
+
+// ================================
+// BUSCADOR
+// ================================
+
+searchInput.addEventListener(
+  "input",
+  () => {
+
+    const texto =
+      searchInput.value
+        .trim()
+        .toLowerCase();
+
+    if (texto === "") {
+      mostrarProductos(productos);
+      return;
+    }
+
+    const filtrados =
+      productos.filter(producto => {
+
+        const nombre =
+          String(producto.nombre || "")
+            .toLowerCase();
+
+        const categoria =
+          String(producto.categoria || "")
+            .toLowerCase();
+
+        const descripcion =
+          String(producto.descripcion || "")
+            .toLowerCase();
+
+        return (
+          nombre.includes(texto) ||
+          categoria.includes(texto) ||
+          descripcion.includes(texto)
+        );
+      });
+
+    mostrarProductos(filtrados);
+  }
+);
+
+
+// ================================
+// BOTÓN ACTUALIZAR
+// ================================
+
+if (refreshBtn) {
+
+  refreshBtn.addEventListener(
+    "click",
+    () => {
+      cargarProductos();
+    }
+  );
+
+}
+
+
+// ================================
+// INICIO DE LA APLICACIÓN
+// ================================
+
+cargarCarrito();
+cargarProductos();
