@@ -1,39 +1,78 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>CloudStock | Inventario Cloud</title>
 
-  <link rel="stylesheet" href="css/style.css">
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
 </head>
+
 
 <body>
 
-  <!-- =========================
-       NAVBAR
-  ========================== -->
-  <header class="hero" id="inicio">
+  <!-- ==================================================
+       INICIO
+  =================================================== -->
+
+  <header
+    class="hero"
+    id="inicio"
+  >
 
     <nav class="navbar">
 
-      <a href="#inicio" class="logo">
+      <a
+        href="#inicio"
+        class="logo"
+      >
         ☁ CloudStock
       </a>
 
-      <button class="menu-btn" id="menuBtn">
+
+      <button
+        class="menu-btn"
+        id="menuBtn"
+        aria-label="Abrir menú"
+      >
         ☰
       </button>
 
-      <div class="nav-links" id="navLinks">
-        <a href="#inventario">Inventario</a>
-        <a href="#cloud">Cloud</a>
-        <a href="#modelos">Modelos</a>
-        <a href="#comparacion">Local vs Cloud</a>
+
+      <div
+        class="nav-links"
+        id="navLinks"
+      >
+
+        <a href="#inventario">
+          Inventario
+        </a>
+
+        <a href="#cloud">
+          Cloud
+        </a>
+
+        <a href="#modelos">
+          Modelos
+        </a>
+
+        <a href="#comparacion">
+          Local vs Cloud
+        </a>
+
       </div>
 
     </nav>
+
 
     <div class="hero-content">
 
@@ -41,22 +80,33 @@
         SISTEMA DE INVENTARIO EN LA NUBE
       </span>
 
-      <h1>CloudStock</h1>
+
+      <h1>
+        CloudStock
+      </h1>
+
 
       <h2>
         Mi primer sistema Cloud
       </h2>
 
+
       <p>
-        Sistema web de inventario conectado a una base de datos
-        en la nube mediante Firebase Firestore.
+        Sistema web de inventario conectado
+        a una base de datos en la nube
+        mediante Firebase Firestore.
       </p>
 
-      <a href="#inventario" class="btn">
+
+      <a
+        href="#inventario"
+        class="btn"
+      >
         Ver inventario
       </a>
 
     </div>
+
 
     <div class="cloud-decoration">
       ☁
@@ -65,17 +115,25 @@
   </header>
 
 
-  <!-- =========================
-       INVENTARIO
-  ========================== -->
 
-  <section id="inventario" class="inventory-section">
+  <!-- ==================================================
+       INVENTARIO
+  =================================================== -->
+
+  <section
+    id="inventario"
+    class="inventory-section"
+  >
 
     <div class="section-title">
 
-      <span>01</span>
+      <span>
+        01
+      </span>
+
 
       <div>
+
         <p class="eyebrow">
           CLOUDSTOCK
         </p>
@@ -83,12 +141,13 @@
         <h2>
           Inventario Cloud
         </h2>
+
       </div>
 
     </div>
 
 
-    <!-- Barra de búsqueda -->
+    <!-- HERRAMIENTAS -->
 
     <div class="inventory-tools">
 
@@ -96,11 +155,14 @@
         type="text"
         id="searchInput"
         placeholder="Buscar producto..."
+        aria-label="Buscar producto"
       >
+
 
       <button
         class="inventory-refresh"
         id="refreshBtn"
+        type="button"
       >
         ↻ Actualizar
       </button>
@@ -108,7 +170,7 @@
     </div>
 
 
-    <!-- Estado de conexión -->
+    <!-- ESTADO DE FIREBASE -->
 
     <div
       id="connectionStatus"
@@ -118,7 +180,7 @@
     </div>
 
 
-    <!-- Contenedor de productos -->
+    <!-- PRODUCTOS -->
 
     <div
       id="productsContainer"
@@ -126,19 +188,23 @@
     >
 
       <div class="loading">
-        Cargando productos...
+        ☁ Cargando productos...
       </div>
 
     </div>
 
 
-    <!-- Carrito -->
+
+    <!-- ==================================================
+         CARRITO
+    =================================================== -->
 
     <div class="cart-container">
 
       <div class="cart-header">
 
         <div>
+
           <p class="eyebrow">
             PEDIDO
           </p>
@@ -146,7 +212,9 @@
           <h2>
             Carrito
           </h2>
+
         </div>
+
 
         <span id="cartCount">
           0 productos
@@ -173,9 +241,11 @@
           Total: $0
         </strong>
 
+
         <button
           id="clearCartBtn"
           class="clear-cart"
+          type="button"
         >
           Vaciar carrito
         </button>
@@ -187,20 +257,27 @@
   </section>
 
 
-  <!-- =========================
-       CLOUD COMPUTING
-  ========================== -->
 
-  <section class="intro" id="cloud">
+  <!-- ==================================================
+       CLOUD COMPUTING
+  =================================================== -->
+
+  <section
+    class="intro"
+    id="cloud"
+  >
 
     <div class="section-title">
 
-      <span>02</span>
+      <span>
+        02
+      </span>
+
 
       <div>
 
         <p class="eyebrow">
-          CONCEPTO PRINCIPAL
+          TECNOLOGÍA
         </p>
 
         <h2>
@@ -212,92 +289,61 @@
     </div>
 
 
-    <div class="content-grid">
+    <div class="intro-content">
 
-      <article class="card large">
-
-        <h3>
-          Computar
-        </h3>
-
-        <p>
-          Computar es procesar información mediante recursos
-          tecnológicos. Un computador recibe datos, los procesa,
-          puede almacenarlos y entrega un resultado.
-        </p>
-
-        <div class="resource-list">
-
-          <span>CPU</span>
-          <span>RAM</span>
-          <span>Almacenamiento</span>
-          <span>SO</span>
-          <span>Aplicaciones</span>
-          <span>Red</span>
-
-        </div>
-
-      </article>
+      <p>
+        El Cloud Computing o computación en la nube
+        permite utilizar recursos informáticos
+        a través de una red o Internet,
+        sin necesidad de tener toda la infraestructura
+        físicamente en nuestro equipo.
+      </p>
 
 
-      <article class="card highlight">
-
-        <h3>
-          ☁ Cloud Computing
-        </h3>
-
-        <p>
-          Es el uso bajo demanda de recursos informáticos
-          a través de una red, normalmente Internet.
-        </p>
-
-        <p>
-          Puede incluir almacenamiento, servidores,
-          bases de datos, aplicaciones, procesamiento y redes.
-        </p>
-
-      </article>
-
-    </div>
+      <p>
+        Estos recursos pueden incluir almacenamiento,
+        servidores, bases de datos,
+        aplicaciones y otros servicios.
+      </p>
 
 
-    <div class="note">
-
-      <strong>
-        Idea clave:
-      </strong>
-
-      La nube utiliza infraestructura física real.
-      Existen servidores físicos en centros de datos,
-      pero el usuario no necesita poseer ni administrar
-      toda esa infraestructura.
+      <p>
+        Aunque hablamos de "la nube",
+        los recursos realmente funcionan
+        sobre infraestructura física ubicada
+        en centros de datos.
+      </p>
 
     </div>
 
   </section>
 
 
-  <!-- =========================
+
+  <!-- ==================================================
        MODELOS CLOUD
-  ========================== -->
+  =================================================== -->
 
   <section
     class="dark-section"
     id="modelos"
   >
 
-    <div class="section-title light">
+    <div class="section-title">
 
-      <span>03</span>
+      <span>
+        03
+      </span>
+
 
       <div>
 
         <p class="eyebrow">
-          MODELOS DE SERVICIO
+          SERVICIOS
         </p>
 
         <h2>
-          SaaS, PaaS e IaaS
+          Modelos de servicio Cloud
         </h2>
 
       </div>
@@ -305,82 +351,96 @@
     </div>
 
 
-    <div class="service-grid">
+    <div class="models-grid">
 
-      <article class="service-card">
 
-        <div class="service-icon">
-          S
-        </div>
+      <!-- SaaS -->
+
+      <article class="model-card">
+
+        <span class="model-number">
+          01
+        </span>
 
         <h3>
           SaaS
         </h3>
 
-        <h4>
-          Software como servicio
-        </h4>
+        <p>
+          Software as a Service.
+        </p>
 
         <p>
-          Usamos una aplicación lista para funcionar.
+          El usuario utiliza directamente
+          una aplicación proporcionada
+          por un proveedor.
         </p>
 
-        <p class="example">
-          Ejemplo: Microsoft 365.
-        </p>
+        <strong>
+          Ejemplo: Microsoft 365
+        </strong>
 
       </article>
 
 
-      <article class="service-card">
 
-        <div class="service-icon">
-          P
-        </div>
+      <!-- PaaS -->
+
+      <article class="model-card">
+
+        <span class="model-number">
+          02
+        </span>
 
         <h3>
           PaaS
         </h3>
 
-        <h4>
-          Plataforma como servicio
-        </h4>
+        <p>
+          Platform as a Service.
+        </p>
 
         <p>
-          Desplegamos aplicaciones sobre una plataforma
-          administrada.
+          Proporciona una plataforma
+          para desarrollar y ejecutar
+          aplicaciones sin administrar
+          toda la infraestructura.
         </p>
 
-        <p class="example">
-          Firebase puede utilizarse como parte de una
-          arquitectura basada en servicios cloud.
-        </p>
+        <strong>
+          Ejemplo: Firebase
+        </strong>
 
       </article>
 
 
-      <article class="service-card">
 
-        <div class="service-icon">
-          I
-        </div>
+      <!-- IaaS -->
+
+      <article class="model-card">
+
+        <span class="model-number">
+          03
+        </span>
 
         <h3>
           IaaS
         </h3>
 
-        <h4>
-          Infraestructura como servicio
-        </h4>
+        <p>
+          Infrastructure as a Service.
+        </p>
 
         <p>
-          Utilizamos máquinas virtuales, redes y
-          almacenamiento virtual.
+          Permite utilizar recursos
+          de infraestructura como
+          máquinas virtuales,
+          almacenamiento y redes.
         </p>
 
-        <p class="example">
-          Ejemplo: una máquina virtual Ubuntu en Cloud.
-        </p>
+        <strong>
+          Ejemplo: una máquina virtual Ubuntu
+        </strong>
 
       </article>
 
@@ -389,24 +449,31 @@
   </section>
 
 
-  <!-- =========================
-       LOCAL VS CLOUD
-  ========================== -->
 
-  <section id="comparacion">
+  <!-- ==================================================
+       LOCAL VS CLOUD
+  =================================================== -->
+
+  <section
+    id="comparacion"
+    class="comparison-section"
+  >
 
     <div class="section-title">
 
-      <span>04</span>
+      <span>
+        04
+      </span>
+
 
       <div>
 
         <p class="eyebrow">
-          DÓNDE ESTÁN LOS RECURSOS
+          COMPARACIÓN
         </p>
 
         <h2>
-          Computación Local vs Cloud
+          Local vs Cloud
         </h2>
 
       </div>
@@ -414,30 +481,38 @@
     </div>
 
 
-    <div class="compare-grid">
+    <div class="comparison-grid">
 
-      <article class="compare-card local">
 
-        <div class="compare-head">
-          💻 LOCAL
-        </div>
+      <!-- LOCAL -->
+
+      <article class="comparison-card">
+
+        <h3>
+          🖥️ Sistema local
+        </h3>
+
 
         <ul>
 
           <li>
-            Los recursos están en nuestro equipo.
+            Los datos se almacenan
+            localmente.
           </li>
 
           <li>
-            Dependemos directamente del hardware.
+            Depende del equipo
+            o servidor físico.
           </li>
 
           <li>
-            Los archivos se almacenan localmente.
+            Puede ser más difícil
+            acceder desde otros dispositivos.
           </li>
 
           <li>
-            Ejemplo: un archivo HTML guardado en el computador.
+            Se debe mantener
+            la infraestructura.
           </li>
 
         </ul>
@@ -445,29 +520,37 @@
       </article>
 
 
-      <article class="compare-card cloud">
 
-        <div class="compare-head">
-          ☁ CLOUD
-        </div>
+      <!-- CLOUD -->
+
+      <article class="comparison-card">
+
+        <h3>
+          ☁️ Sistema Cloud
+        </h3>
+
 
         <ul>
 
           <li>
-            Los recursos son accesibles mediante Internet.
+            Los datos se almacenan
+            en servicios de nube.
           </li>
 
           <li>
-            Los datos pueden almacenarse en servicios cloud.
+            Se puede acceder
+            desde diferentes dispositivos.
           </li>
 
           <li>
-            Permite acceder desde distintos dispositivos.
+            La infraestructura
+            es administrada por
+            el proveedor.
           </li>
 
           <li>
-            CloudStock utiliza Firebase Firestore como
-            base de datos cloud.
+            Facilita la disponibilidad
+            y escalabilidad.
           </li>
 
         </ul>
@@ -476,27 +559,55 @@
 
     </div>
 
+
+    <div class="cloudstock-example">
+
+      <h3>
+        ¿Dónde está CloudStock?
+      </h3>
+
+
+      <p>
+        CloudStock utiliza
+        <strong>
+          GitHub Pages
+        </strong>
+        para publicar la página web
+        y
+        <strong>
+          Firebase Firestore
+        </strong>
+        para almacenar los productos
+        en la nube.
+      </p>
+
+    </div>
+
   </section>
 
 
-  <!-- =========================
+
+  <!-- ==================================================
        ARQUITECTURA
-  ========================== -->
+  =================================================== -->
 
   <section class="flow-section">
 
     <div class="section-title">
 
-      <span>05</span>
+      <span>
+        05
+      </span>
+
 
       <div>
 
         <p class="eyebrow">
-          ARQUITECTURA CLOUDSTOCK
+          ARQUITECTURA
         </p>
 
         <h2>
-          Cómo funciona el sistema
+          ¿Cómo funciona CloudStock?
         </h2>
 
       </div>
@@ -506,69 +617,106 @@
 
     <div class="flow">
 
-      <div>
-        💻
-        <br>
+      <div class="flow-item">
+
         <span>
+          01
+        </span>
+
+        <h3>
           Navegador
-        </span>
+        </h3>
+
+        <p>
+          El usuario abre CloudStock.
+        </p>
+
       </div>
 
-      <b>→</b>
 
-      <div>
-        🌐
-        <br>
+      <div class="flow-arrow">
+        →
+      </div>
+
+
+      <div class="flow-item">
+
         <span>
+          02
+        </span>
+
+        <h3>
           GitHub Pages
-        </span>
+        </h3>
+
+        <p>
+          Aloja y publica
+          los archivos de la página.
+        </p>
+
       </div>
 
-      <b>→</b>
 
-      <div>
-        ☁
-        <br>
+      <div class="flow-arrow">
+        →
+      </div>
+
+
+      <div class="flow-item">
+
         <span>
+          03
+        </span>
+
+        <h3>
           Firebase
-        </span>
+        </h3>
+
+        <p>
+          Proporciona los servicios
+          utilizados por la aplicación.
+        </p>
+
       </div>
 
-      <b>→</b>
 
-      <div>
-        🗄️
-        <br>
+      <div class="flow-arrow">
+        →
+      </div>
+
+
+      <div class="flow-item">
+
         <span>
+          04
+        </span>
+
+        <h3>
           Firestore
-        </span>
-      </div>
+        </h3>
 
-      <b>→</b>
+        <p>
+          Guarda los productos
+          del inventario.
+        </p>
 
-      <div>
-        📦
-        <br>
-        <span>
-          Productos
-        </span>
       </div>
 
     </div>
 
 
-    <div class="question-box">
 
-      <h3>
-        ¿Qué hace CloudStock?
-      </h3>
+    <div class="architecture-description">
 
       <p>
-        El sitio web está publicado mediante GitHub Pages.
-        JavaScript se conecta directamente con Firebase
-        Firestore para consultar los productos almacenados
-        en la nube. Los productos pueden visualizarse
-        desde el navegador y agregarse a un carrito.
+        <strong>
+          Flujo de datos:
+        </strong>
+      </p>
+
+      <p>
+        Navegador → GitHub Pages →
+        Firebase → Firestore → Productos
       </p>
 
     </div>
@@ -576,23 +724,27 @@
   </section>
 
 
-  <!-- =========================
+
+  <!-- ==================================================
        CONCEPTOS
-  ========================== -->
+  =================================================== -->
 
   <section
     class="concepts"
     id="conceptos"
   >
 
-    <div class="section-title light">
+    <div class="section-title">
 
-      <span>06</span>
+      <span>
+        06
+      </span>
+
 
       <div>
 
         <p class="eyebrow">
-          CONCEPTOS FUNDAMENTALES
+          CONCEPTOS
         </p>
 
         <h2>
@@ -604,7 +756,8 @@
     </div>
 
 
-    <div class="concept-grid">
+    <div class="concepts-grid">
+
 
       <article>
 
@@ -613,8 +766,8 @@
         </h3>
 
         <p>
-          Servicio que aloja y publica recursos de
-          una aplicación o sitio web.
+          Servicio que permite almacenar
+          y publicar un sitio web.
         </p>
 
       </article>
@@ -627,8 +780,9 @@
         </h3>
 
         <p>
-          Base de datos NoSQL de Firebase utilizada
-          para almacenar los productos.
+          Base de datos de Firebase
+          utilizada para almacenar
+          los productos de CloudStock.
         </p>
 
       </article>
@@ -641,8 +795,9 @@
         </h3>
 
         <p>
-          Protocolo utilizado para transmitir información
-          de forma segura en la web.
+          Protocolo utilizado para
+          establecer una comunicación
+          segura con los sitios web.
         </p>
 
       </article>
@@ -655,7 +810,8 @@
         </h3>
 
         <p>
-          Plataforma utilizada para almacenar y publicar
+          Plataforma utilizada para
+          almacenar y gestionar
           el código del proyecto.
         </p>
 
@@ -669,8 +825,23 @@
         </h3>
 
         <p>
-          Proceso de publicar una aplicación para
-          que pueda ser utilizada.
+          Proceso de publicar una aplicación
+          para que pueda ser utilizada.
+        </p>
+
+      </article>
+
+
+      <article>
+
+        <h3>
+          Base de datos Cloud
+        </h3>
+
+        <p>
+          Permite guardar información
+          en infraestructura administrada
+          por un proveedor de nube.
         </p>
 
       </article>
@@ -680,90 +851,193 @@
   </section>
 
 
-  <!-- =========================
+
+  <!-- ==================================================
        ROADMAP
-  ========================== -->
+  =================================================== -->
 
   <section class="roadmap">
 
-    <p class="eyebrow">
-      PROYECTO TRANSVERSAL
-    </p>
-
-    <h2>
-      El camino de CloudStock
-    </h2>
-
-
-    <div class="roadmap-list">
+    <div class="section-title">
 
       <span>
-        1. HTML local
+        07
       </span>
 
-      <span>
-        2. Git / GitHub
-      </span>
 
-      <span>
-        3. Sitio público
-      </span>
+      <div>
 
-      <span>
-        4. App Web
-      </span>
+        <p class="eyebrow">
+          PROYECTO
+        </p>
 
-      <span>
-        5. Base de datos Cloud
-      </span>
+        <h2>
+          Evolución de CloudStock
+        </h2>
 
-      <span>
-        6. Firebase
-      </span>
-
-      <span>
-        7. Firestore
-      </span>
+      </div>
 
     </div>
 
 
-    <p class="roadmap-text">
+    <div class="roadmap-list">
 
-      CloudStock demuestra cómo una página HTML puede
-      evolucionar hasta convertirse en una aplicación web
-      conectada a servicios de computación en la nube.
 
-    </p>
+      <div class="roadmap-item">
+
+        <span>
+          01
+        </span>
+
+        <p>
+          HTML local
+        </p>
+
+      </div>
+
+
+      <div class="roadmap-item">
+
+        <span>
+          02
+        </span>
+
+        <p>
+          Git y GitHub
+        </p>
+
+      </div>
+
+
+      <div class="roadmap-item">
+
+        <span>
+          03
+        </span>
+
+        <p>
+          Página web pública
+        </p>
+
+      </div>
+
+
+      <div class="roadmap-item">
+
+        <span>
+          04
+        </span>
+
+        <p>
+          Aplicación Web
+        </p>
+
+      </div>
+
+
+      <div class="roadmap-item">
+
+        <span>
+          05
+        </span>
+
+        <p>
+          Base de datos Cloud
+        </p>
+
+      </div>
+
+
+      <div class="roadmap-item">
+
+        <span>
+          06
+        </span>
+
+        <p>
+          Firebase
+        </p>
+
+      </div>
+
+
+      <div class="roadmap-item">
+
+        <span>
+          07
+        </span>
+
+        <p>
+          Firestore
+        </p>
+
+      </div>
+
+
+      <div class="roadmap-item">
+
+        <span>
+          08
+        </span>
+
+        <p>
+          CRUD de productos
+        </p>
+
+      </div>
+
+    </div>
 
   </section>
 
 
-  <!-- =========================
-       FOOTER
-  ========================== -->
+
+  <!-- ==================================================
+       PIE DE PÁGINA
+  =================================================== -->
 
   <footer>
 
-    <p>
-      <strong>
-        CloudStock
-      </strong>
-      · Sistema de Inventario Cloud
-    </p>
+    <div>
 
-    <p>
-      HTML · CSS · JavaScript · GitHub Pages · Firebase Firestore
-    </p>
+      <h2>
+        ☁ CloudStock
+      </h2>
+
+      <p>
+        Sistema de inventario
+        desarrollado para
+        Computación en la Nube.
+      </p>
+
+    </div>
+
+
+    <div>
+
+      <p>
+        Firebase Firestore · GitHub Pages
+      </p>
+
+      <p>
+        Proyecto académico
+      </p>
+
+    </div>
 
   </footer>
 
 
-  <!-- =========================
-       JAVASCRIPT
-  ========================== -->
 
-  <script type="module" src="js/script.js"></script>
+  <!-- ==================================================
+       JAVASCRIPT
+  =================================================== -->
+
+  <script
+    type="module"
+    src="js/script.js"
+  ></script>
 
 </body>
+
 </html>
