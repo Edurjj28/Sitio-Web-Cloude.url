@@ -479,7 +479,7 @@ async function crearProducto() {
 
   if (
     !Number.isFinite(precio) ||
-    precio < 0
+    precio <= 0
   ) {
 
     alert(
