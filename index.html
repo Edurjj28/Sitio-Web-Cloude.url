@@ -56,8 +56,11 @@
 
         <!-- LOGIN -->
         <div class="auth-card" id="authGate">
-          <h3>Inicia sesión para ver el inventario</h3>
-          <p class="muted">Usa la cuenta que te entregó el administrador.</p>
+          <div class="auth-tabs" role="tablist">
+            <button type="button" role="tab" id="tabLogin" class="auth-tab active" aria-selected="true">Iniciar sesión</button>
+            <button type="button" role="tab" id="tabRegister" class="auth-tab" aria-selected="false">Crear cuenta</button>
+          </div>
+          <p class="muted" id="authHint">Ingresa con tu cuenta para ver el inventario.</p>
 
           <form id="loginForm" novalidate>
             <div class="form-group">
@@ -70,6 +73,23 @@
             </div>
             <div id="loginMessage" class="form-message" role="alert"></div>
             <button type="submit" class="btn-primary full" id="loginBtn">Entrar</button>
+          </form>
+
+          <form id="registerForm" novalidate hidden>
+            <div class="form-group">
+              <label for="regEmail">Correo electrónico</label>
+              <input type="email" id="regEmail" autocomplete="email" required>
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Contraseña (mínimo 8 caracteres)</label>
+              <input type="password" id="regPassword" autocomplete="new-password" minlength="8" required>
+            </div>
+            <div class="form-group">
+              <label for="regPassword2">Repite la contraseña</label>
+              <input type="password" id="regPassword2" autocomplete="new-password" minlength="8" required>
+            </div>
+            <div id="registerMessage" class="form-message" role="alert"></div>
+            <button type="submit" class="btn-primary full" id="registerBtn">Crear cuenta</button>
           </form>
         </div>
 
