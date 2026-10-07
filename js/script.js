@@ -5,7 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 // getAuth() usa la app que ya inicializa firebase.js
@@ -98,6 +98,61 @@ $("loginForm").addEventListener("submit", async (e) => {
       : "Correo o contraseña incorrectos.";
   } finally {
     $("loginBtn").disabled = false;
+  }
+});
+
+// ---------- Pestañas ingresar / crear cuenta ----------
+function mostrarPanel(panel) {
+  const registro = panel === "registro";
+  $("loginForm").hidden = registro;
+  $("registerForm").hidden = !registro;
+  $("tabLogin").classList.toggle("active", !registro);
+  $("tabRegister").classList.toggle("active", registro);
+  $("tabLogin").setAttribute("aria-selected", String(!registro));
+  $("tabRegister").setAttribute("aria-selected", String(registro));
+  $("authHint").textContent = registro
+    ? "Crea una cuenta para consultar el inventario y armar tu pedido."
+    : "Ingresa con tu cuenta para ver el inventario.";
+  $("loginMessage").textContent = "";
+  $("registerMessage").textContent = "";
+}
+
+$("tabLogin").addEventListener("click", () => mostrarPanel("login"));
+$("tabRegister").addEventListener("click", () => mostrarPanel("registro"));
+
+// ---------- Registro (siempre con rol Usuario) ----------
+const erroresRegistro = {
+  "auth/email-already-in-use": "Ese correo ya tiene una cuenta. Prueba iniciando sesión.",
+  "auth/invalid-email": "El correo no es válido.",
+  "auth/weak-password": "La contraseña es demasiado débil. Usa al menos 8 caracteres.",
+  "auth/network-request-failed": "Sin conexión. Revisa tu Internet e inténtalo de nuevo."
+};
+
+$("registerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = $("registerMessage");
+  msg.className = "form-message error";
+
+  const email = $("regEmail").value.trim();
+  const clave = $("regPassword").value;
+  const clave2 = $("regPassword2").value;
+
+  if (!email) { msg.textContent = "Ingresa tu correo electrónico."; return; }
+  if (clave.length < 8) { msg.textContent = "La contraseña debe tener al menos 8 caracteres."; return; }
+  if (clave !== clave2) { msg.textContent = "Las contraseñas no coinciden."; return; }
+
+  $("registerBtn").disabled = true;
+  msg.textContent = "";
+
+  try {
+    // Al crear la cuenta Firebase inicia sesión solo y onAuthStateChanged abre el inventario
+    await createUserWithEmailAndPassword(auth, email, clave);
+    $("registerForm").reset();
+    toast("Cuenta creada. ¡Bienvenido!");
+  } catch (error) {
+    msg.textContent = erroresRegistro[error.code] || "No se pudo crear la cuenta. Inténtalo de nuevo.";
+  } finally {
+    $("registerBtn").disabled = false;
   }
 });
 
