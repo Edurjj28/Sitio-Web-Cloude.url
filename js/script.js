@@ -158,6 +158,18 @@ $("registerForm").addEventListener("submit", async (e) => {
 
 $("logoutBtn").addEventListener("click", () => signOut(auth));
 
+// Copia el UID del usuario actual (sirve para crear su documento en /usuarios y darle rol admin)
+$("copyUidBtn").addEventListener("click", async () => {
+  if (!usuarioActual) return;
+  const uid = usuarioActual.uid;
+  try {
+    await navigator.clipboard.writeText(uid);
+    toast("UID copiado al portapapeles.");
+  } catch {
+    prompt("Copia tu UID:", uid);
+  }
+});
+
 async function obtenerRol(uid) {
   try {
     const snap = await getDoc(doc(db, "usuarios", uid));
