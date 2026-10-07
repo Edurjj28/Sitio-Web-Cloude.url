@@ -125,7 +125,13 @@ const erroresRegistro = {
   "auth/email-already-in-use": "Ese correo ya tiene una cuenta. Prueba iniciando sesión.",
   "auth/invalid-email": "El correo no es válido.",
   "auth/weak-password": "La contraseña es demasiado débil. Usa al menos 8 caracteres.",
-  "auth/network-request-failed": "Sin conexión. Revisa tu Internet e inténtalo de nuevo."
+  "auth/network-request-failed": "Sin conexión. Revisa tu Internet e inténtalo de nuevo.",
+  "auth/operation-not-allowed": "El registro con correo no está activado en Firebase (Authentication → Sign-in method → Correo/contraseña).",
+  "auth/unauthorized-domain": "Este dominio no está autorizado en Firebase (Authentication → Settings → Dominios autorizados).",
+  "auth/api-key-not-valid.-please-pass-a-valid-api-key.": "La apiKey de firebase.js no es válida. Revisa tu firebaseConfig.",
+  "auth/invalid-api-key": "La apiKey de firebase.js no es válida. Revisa tu firebaseConfig.",
+  "auth/configuration-not-found": "Authentication no está activado en tu proyecto. Pulsa \"Comenzar\" en la sección Authentication.",
+  "auth/too-many-requests": "Demasiados intentos. Prueba de nuevo en unos minutos."
 };
 
 $("registerForm").addEventListener("submit", async (e) => {
@@ -150,7 +156,8 @@ $("registerForm").addEventListener("submit", async (e) => {
     $("registerForm").reset();
     toast("Cuenta creada. ¡Bienvenido!");
   } catch (error) {
-    msg.textContent = erroresRegistro[error.code] || "No se pudo crear la cuenta. Inténtalo de nuevo.";
+    console.error("Error al registrar:", error.code, error.message);
+    msg.textContent = erroresRegistro[error.code] || `No se pudo crear la cuenta (${error.code || "error desconocido"}).`;
   } finally {
     $("registerBtn").disabled = false;
   }
