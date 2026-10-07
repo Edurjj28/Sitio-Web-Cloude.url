@@ -1,1446 +1,298 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>CloudStock | Inventario Cloud</title>
-
-  <link
-    rel="stylesheet"
-    href="css/style.css"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1626">
+  <title>CloudStock | Inventario en la nube</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
-
 <body>
 
-  <!-- ==================================================
-       INICIO
-  =================================================== -->
-
-  <header
-    class="hero"
-    id="inicio"
-  >
-
+  <!-- NAVEGACIÓN -->
+  <header class="site-header">
     <nav class="navbar">
+      <a href="#inicio" class="logo">☁️ CloudStock</a>
 
-      <a
-        href="#inicio"
-        class="logo"
-      >
-        ☁️ CloudStock
-      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" type="button">☰</button>
 
+      <div class="nav-links" id="navLinks">
+        <a href="#inventario">Inventario</a>
+        <a href="#cloud">Cloud</a>
+        <a href="#modelos">Modelos</a>
+        <a href="#comparacion">Local vs Cloud</a>
 
-      <button
-        class="menu-btn"
-        id="menuBtn"
-        aria-label="Abrir menú"
-        type="button"
-      >
-        ☰
-      </button>
-
-
-      <div
-        class="nav-links"
-        id="navLinks"
-      >
-
-        <a href="#inventario">
-          Inventario
-        </a>
-
-        <a href="#cloud">
-          Cloud
-        </a>
-
-        <a href="#modelos">
-          Modelos
-        </a>
-
-        <a href="#comparacion">
-          Local vs Cloud
-        </a>
-
+        <div class="session-box" id="sessionBox" hidden>
+          <span class="role-badge" id="roleBadge">usuario</span>
+          <span class="session-email" id="sessionEmail"></span>
+          <button type="button" id="logoutBtn" class="btn-ghost">Cerrar sesión</button>
+        </div>
       </div>
-
     </nav>
-
-
-    <div class="hero-content">
-
-      <span class="tag">
-        SISTEMA DE INVENTARIO EN LA NUBE
-      </span>
-
-
-      <h1>
-        CloudStock
-      </h1>
-
-
-      <h2>
-        Mi primer sistema Cloud
-      </h2>
-
-
-      <p>
-        Sistema web de inventario conectado
-        a una base de datos en la nube
-        mediante Firebase Firestore.
-      </p>
-
-
-      <a
-        href="#inventario"
-        class="btn"
-      >
-        Ver inventario
-      </a>
-
-    </div>
-
-
-    <div class="cloud-decoration">
-      ☁️
-    </div>
-
   </header>
 
-
-
-  <!-- ==================================================
-       INVENTARIO
-  =================================================== -->
-
-  <section
-    id="inventario"
-    class="inventory-section"
-  >
-
-    <div class="section-title">
-
-      <span>
-        01
-      </span>
-
-
-      <div>
-
-        <p class="eyebrow">
-          CLOUDSTOCK
-        </p>
-
-        <h2>
-          Inventario Cloud
-        </h2>
-
-      </div>
-
+  <!-- INICIO -->
+  <section class="hero" id="inicio">
+    <div class="hero-inner">
+      <p class="hero-kicker">Inventario conectado a Firebase Firestore</p>
+      <h1>Tu stock, siempre al día y disponible desde cualquier lugar.</h1>
+      <p class="hero-text">CloudStock guarda los productos en la nube. Los administradores gestionan el catálogo y los usuarios consultan y arman su pedido.</p>
+      <a href="#inventario" class="btn">Ir al inventario</a>
     </div>
-
-
-    <!-- ==================================================
-         HERRAMIENTAS
-    =================================================== -->
-
-    <div class="inventory-tools">
-
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Buscar producto..."
-        aria-label="Buscar producto"
-      >
-
-
-      <div class="inventory-actions">
-
-        <button
-          class="add-product-btn"
-          id="addProductBtn"
-          type="button"
-        >
-          ＋ Agregar producto
-        </button>
-
-
-        <button
-          class="inventory-refresh"
-          id="refreshBtn"
-          type="button"
-        >
-          ↻ Actualizar
-        </button>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- ==================================================
-         ESTADO DE FIREBASE
-    =================================================== -->
-
-    <div
-      id="connectionStatus"
-      class="connection-status"
-    >
-      Conectando con Firebase...
-    </div>
-
-
-
-    <!-- ==================================================
-         PRODUCTOS
-    =================================================== -->
-
-    <div
-      id="productsContainer"
-      class="products-grid"
-    >
-
-      <div class="loading">
-        ☁️ Cargando productos...
-      </div>
-
-    </div>
-
-
-
-    <!-- ==================================================
-         CARRITO
-    =================================================== -->
-
-    <div class="cart-container">
-
-      <div class="cart-header">
-
-        <div>
-
-          <p class="eyebrow">
-            PEDIDO
-          </p>
-
-          <h2>
-            Carrito
-          </h2>
-
-        </div>
-
-
-        <span id="cartCount">
-          0 productos
-        </span>
-
-      </div>
-
-
-      <div
-        id="cartItems"
-        class="cart-items"
-      >
-
-        <p class="empty-cart">
-          Tu carrito está vacío.
-        </p>
-
-      </div>
-
-
-      <div class="cart-footer">
-
-        <strong id="total">
-          Total: $0
-        </strong>
-
-
-        <button
-          id="clearCartBtn"
-          class="clear-cart"
-          type="button"
-        >
-          Vaciar carrito
-        </button>
-
-      </div>
-
-    </div>
-
+    <div class="cloud-decoration" aria-hidden="true">☁️</div>
   </section>
 
-
-
-  <!-- ==================================================
-       MODAL AGREGAR PRODUCTO
-  =================================================== -->
-
-  <div
-    id="productModal"
-    class="product-modal"
-    aria-hidden="true"
-  >
-
-    <div class="product-modal-content">
-
-      <button
-        type="button"
-        id="closeModalBtn"
-        class="modal-close"
-        aria-label="Cerrar formulario"
-      >
-        ×
-      </button>
-
-
-      <div class="modal-header">
-
-        <span class="modal-icon">
-          📦
-        </span>
-
-
-        <div>
-
-          <p class="eyebrow">
-            CLOUDSTOCK
-          </p>
-
-          <h2>
-            Agregar producto
-          </h2>
-
-          <p>
-            Completa los datos del nuevo producto.
-          </p>
-
+  <!-- INVENTARIO -->
+  <main>
+    <section id="inventario" class="inventory-section">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Inventario</h2>
+          <p>Consulta los productos disponibles, su precio y su stock.</p>
         </div>
 
-      </div>
+        <!-- LOGIN -->
+        <div class="auth-card" id="authGate">
+          <h3>Inicia sesión para ver el inventario</h3>
+          <p class="muted">Usa la cuenta que te entregó el administrador.</p>
 
-
-
-      <!-- ==================================================
-           FORMULARIO
-      =================================================== -->
-
-      <form id="productForm">
-
-        <div class="form-group">
-
-          <label for="productName">
-            Nombre del producto
-          </label>
-
-          <input
-            type="text"
-            id="productName"
-            placeholder="Ej: Teclado mecánico"
-            maxlength="100"
-            autocomplete="off"
-            required
-          >
-
-        </div>
-
-
-
-        <div class="form-group">
-
-          <label for="productCategory">
-            Categoría
-          </label>
-
-          <input
-            type="text"
-            id="productCategory"
-            placeholder="Ej: Periféricos"
-            maxlength="50"
-            autocomplete="off"
-            required
-          >
-
-        </div>
-
-
-
-        <div class="form-group">
-
-          <label for="productDescription">
-            Descripción
-          </label>
-
-          <textarea
-            id="productDescription"
-            placeholder="Describe brevemente el producto..."
-            maxlength="250"
-            rows="3"
-            required
-          ></textarea>
-
-        </div>
-
-
-
-        <div class="form-row">
-
-          <div class="form-group">
-
-            <label for="productPrice">
-              Precio
-            </label>
-
-
-            <div class="input-prefix">
-
-              <span>
-                $
-              </span>
-
-
-              <input
-                type="number"
-                id="productPrice"
-                placeholder="0"
-                min="0.01"
-                step="0.01"
-                required
-              >
-
+          <form id="loginForm" novalidate>
+            <div class="form-group">
+              <label for="loginEmail">Correo electrónico</label>
+              <input type="email" id="loginEmail" autocomplete="username" required>
             </div>
-
-          </div>
-
-
-
-          <div class="form-group">
-
-            <label for="productStock">
-              Stock
-            </label>
-
-
-            <input
-              type="number"
-              id="productStock"
-              placeholder="0"
-              min="0"
-              step="1"
-              required
-            >
-
-          </div>
-
+            <div class="form-group">
+              <label for="loginPassword">Contraseña</label>
+              <input type="password" id="loginPassword" autocomplete="current-password" minlength="6" required>
+            </div>
+            <div id="loginMessage" class="form-message" role="alert"></div>
+            <button type="submit" class="btn-primary full" id="loginBtn">Entrar</button>
+          </form>
         </div>
 
+        <!-- APLICACIÓN (solo con sesión iniciada) -->
+        <div id="appArea" hidden>
 
+          <div class="inventory-tools">
+            <input type="search" id="searchInput" placeholder="Buscar por nombre, categoría o descripción" aria-label="Buscar producto">
+            <div class="inventory-actions">
+              <button type="button" class="btn-primary admin-only" id="addProductBtn">＋ Nuevo producto</button>
+              <button type="button" class="btn-secondary" id="refreshBtn">↻ Actualizar</button>
+            </div>
+          </div>
 
-        <!-- MENSAJE DE VALIDACIÓN -->
+          <div id="connectionStatus" class="connection-status" role="status">Conectando con Firebase...</div>
 
-        <div
-          id="formMessage"
-          class="form-message"
-          role="alert"
-        ></div>
+          <div id="productsContainer">
+            <div class="loading">Cargando productos...</div>
+          </div>
 
-
-
-        <!-- BOTONES -->
-
-        <div class="modal-actions">
-
-          <button
-            type="button"
-            id="cancelProductBtn"
-            class="modal-cancel"
-          >
-            Cancelar
-          </button>
-
-
-          <button
-            type="submit"
-            class="modal-save"
-          >
-            ✓ Guardar producto
-          </button>
-
+          <!-- CARRITO -->
+          <div class="cart-container">
+            <div class="cart-header">
+              <h3>Tu pedido</h3>
+              <span id="cartCount" class="pill">0 productos</span>
+            </div>
+            <div id="cartItems" class="cart-items">
+              <p class="empty-cart">Tu carrito está vacío. Agrega productos desde el inventario.</p>
+            </div>
+            <div class="cart-footer">
+              <strong id="total">Total: $0</strong>
+              <button id="clearCartBtn" class="btn-danger-outline" type="button">Vaciar carrito</button>
+            </div>
+          </div>
         </div>
-
-      </form>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- ==================================================
-       CLOUD COMPUTING
-  =================================================== -->
-
-  <section
-    class="intro"
-    id="cloud"
-  >
-
-    <div class="section-title">
-
-      <span>
-        02
-      </span>
-
-
-      <div>
-
-        <p class="eyebrow">
-          TECNOLOGÍA
-        </p>
-
-        <h2>
-          ¿Qué es Cloud Computing?
-        </h2>
-
       </div>
+    </section>
 
-    </div>
-
-
-    <div class="intro-content">
-
-      <p>
-        El Cloud Computing o computación en la nube
-        permite utilizar recursos informáticos
-        a través de una red o Internet,
-        sin necesidad de tener toda la infraestructura
-        físicamente en nuestro equipo.
-      </p>
-
-
-      <p>
-        Estos recursos pueden incluir almacenamiento,
-        servidores, bases de datos,
-        aplicaciones y otros servicios.
-      </p>
-
-
-      <p>
-        Aunque hablamos de "la nube",
-        los recursos realmente funcionan
-        sobre infraestructura física ubicada
-        en centros de datos.
-      </p>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- ==================================================
-       MODELOS CLOUD
-  =================================================== -->
-
-  <section
-    class="dark-section"
-    id="modelos"
-  >
-
-    <div class="section-title">
-
-      <span>
-        03
-      </span>
-
-
-      <div>
-
-        <p class="eyebrow">
-          SERVICIOS
-        </p>
-
-        <h2>
-          Modelos de servicio Cloud
-        </h2>
-
+    <!-- CLOUD -->
+    <section id="cloud">
+      <div class="wrap narrow">
+        <div class="section-title">
+          <h2>¿Qué es Cloud Computing?</h2>
+        </div>
+        <p>La computación en la nube permite usar recursos informáticos a través de Internet, sin tener toda la infraestructura en tu propio equipo. Esos recursos incluyen almacenamiento, servidores, bases de datos y aplicaciones.</p>
+        <p>Aunque hablamos de "la nube", todo funciona sobre infraestructura física ubicada en centros de datos.</p>
       </div>
+    </section>
 
-    </div>
-
-
-    <div class="models-grid">
-
-
-      <!-- SaaS -->
-
-      <article class="model-card">
-
-        <span class="model-number">
-          01
-        </span>
-
-        <h3>
-          SaaS
-        </h3>
-
-        <p>
-          Software as a Service.
-        </p>
-
-        <p>
-          El usuario utiliza directamente
-          una aplicación proporcionada
-          por un proveedor.
-        </p>
-
-        <strong>
-          Ejemplo: Microsoft 365
-        </strong>
-
-      </article>
-
-
-
-      <!-- PaaS -->
-
-      <article class="model-card">
-
-        <span class="model-number">
-          02
-        </span>
-
-        <h3>
-          PaaS
-        </h3>
-
-        <p>
-          Platform as a Service.
-        </p>
-
-        <p>
-          Proporciona una plataforma
-          para desarrollar y ejecutar
-          aplicaciones sin administrar
-          toda la infraestructura.
-        </p>
-
-        <strong>
-          Ejemplo: Firebase
-        </strong>
-
-      </article>
-
-
-
-      <!-- IaaS -->
-
-      <article class="model-card">
-
-        <span class="model-number">
-          03
-        </span>
-
-        <h3>
-          IaaS
-        </h3>
-
-        <p>
-          Infrastructure as a Service.
-        </p>
-
-        <p>
-          Permite utilizar recursos
-          de infraestructura como
-          máquinas virtuales,
-          almacenamiento y redes.
-        </p>
-
-        <strong>
-          Ejemplo: una máquina virtual Ubuntu
-        </strong>
-
-      </article>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- ==================================================
-       LOCAL VS CLOUD
-  =================================================== -->
-
-  <section
-    id="comparacion"
-    class="comparison-section"
-  >
-
-    <div class="section-title">
-
-      <span>
-        04
-      </span>
-
-
-      <div>
-
-        <p class="eyebrow">
-          COMPARACIÓN
-        </p>
-
-        <h2>
-          Local vs Cloud
-        </h2>
-
+    <!-- MODELOS -->
+    <section id="modelos" class="band-dark">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Modelos de servicio Cloud</h2>
+        </div>
+        <div class="cards">
+          <article class="card-dark">
+            <h3>SaaS</h3>
+            <p class="sub">Software as a Service</p>
+            <p>El usuario utiliza directamente una aplicación entregada por un proveedor.</p>
+            <strong>Ejemplo: Microsoft 365</strong>
+          </article>
+          <article class="card-dark">
+            <h3>PaaS</h3>
+            <p class="sub">Platform as a Service</p>
+            <p>Entrega una plataforma para desarrollar y ejecutar aplicaciones sin administrar la infraestructura.</p>
+            <strong>Ejemplo: Firebase</strong>
+          </article>
+          <article class="card-dark">
+            <h3>IaaS</h3>
+            <p class="sub">Infrastructure as a Service</p>
+            <p>Permite usar máquinas virtuales, almacenamiento y redes como recursos.</p>
+            <strong>Ejemplo: una máquina virtual Ubuntu</strong>
+          </article>
+        </div>
       </div>
+    </section>
 
-    </div>
-
-
-    <div class="comparison-grid">
-
-
-      <!-- LOCAL -->
-
-      <article class="comparison-card">
-
-        <h3>
-          🖥️ Sistema local
-        </h3>
-
-
-        <ul>
-
-          <li>
-            Los datos se almacenan
-            localmente.
-          </li>
-
-          <li>
-            Depende del equipo
-            o servidor físico.
-          </li>
-
-          <li>
-            Puede ser más difícil
-            acceder desde otros dispositivos.
-          </li>
-
-          <li>
-            Se debe mantener
-            la infraestructura.
-          </li>
-
-        </ul>
-
-      </article>
-
-
-
-      <!-- CLOUD -->
-
-      <article class="comparison-card">
-
-        <h3>
-          ☁️ Sistema Cloud
-        </h3>
-
-
-        <ul>
-
-          <li>
-            Los datos se almacenan
-            en servicios de nube.
-          </li>
-
-          <li>
-            Se puede acceder
-            desde diferentes dispositivos.
-          </li>
-
-          <li>
-            La infraestructura
-            es administrada por
-            el proveedor.
-          </li>
-
-          <li>
-            Facilita la disponibilidad
-            y escalabilidad.
-          </li>
-
-        </ul>
-
-      </article>
-
-    </div>
-
-
-    <div class="cloudstock-example">
-
-      <h3>
-        ¿Dónde está CloudStock?
-      </h3>
-
-
-      <p>
-        CloudStock utiliza
-        <strong>
-          GitHub Pages
-        </strong>
-        para publicar la página web
-        y
-        <strong>
-          Firebase Firestore
-        </strong>
-        para almacenar los productos
-        en la nube.
-      </p>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- ==================================================
-       ARQUITECTURA
-  =================================================== -->
-
-  <section class="flow-section">
-
-    <div class="section-title">
-
-      <span>
-        05
-      </span>
-
-
-      <div>
-
-        <p class="eyebrow">
-          ARQUITECTURA
-        </p>
-
-        <h2>
-          ¿Cómo funciona CloudStock?
-        </h2>
-
+    <!-- COMPARACIÓN -->
+    <section id="comparacion">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Local vs Cloud</h2>
+        </div>
+        <div class="cards two">
+          <article class="card">
+            <h3>🖥️ Sistema local</h3>
+            <ul>
+              <li>Los datos se guardan en el propio equipo.</li>
+              <li>Depende de un servidor físico.</li>
+              <li>Es más difícil acceder desde otros dispositivos.</li>
+              <li>Tú mantienes la infraestructura.</li>
+            </ul>
+          </article>
+          <article class="card card-accent">
+            <h3>☁️ Sistema Cloud</h3>
+            <ul>
+              <li>Los datos viven en servicios de nube.</li>
+              <li>Se accede desde cualquier dispositivo.</li>
+              <li>El proveedor administra la infraestructura.</li>
+              <li>Facilita la disponibilidad y la escalabilidad.</li>
+            </ul>
+          </article>
+        </div>
+        <p class="note"><strong>¿Dónde está CloudStock?</strong> La página se publica en GitHub Pages, los productos se guardan en Firebase Firestore y el acceso se controla con Firebase Authentication.</p>
       </div>
+    </section>
 
-    </div>
-
-
-    <div class="flow">
-
-      <div class="flow-item">
-
-        <span>
-          01
-        </span>
-
-        <h3>
-          Navegador
-        </h3>
-
-        <p>
-          El usuario abre CloudStock.
-        </p>
-
+    <!-- ARQUITECTURA -->
+    <section class="band-soft">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>¿Cómo funciona CloudStock?</h2>
+        </div>
+        <ol class="flow">
+          <li><strong>Navegador</strong><span>El usuario abre CloudStock.</span></li>
+          <li><strong>GitHub Pages</strong><span>Publica los archivos de la página.</span></li>
+          <li><strong>Authentication</strong><span>Verifica quién es el usuario y su rol.</span></li>
+          <li><strong>Firestore</strong><span>Guarda los productos y aplica las reglas de seguridad.</span></li>
+        </ol>
       </div>
+    </section>
 
-
-      <div class="flow-arrow">
-        →
+    <!-- CONCEPTOS -->
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Conceptos utilizados</h2>
+        </div>
+        <div class="cards">
+          <article class="card"><h3>Hosting</h3><p>Servicio que almacena y publica un sitio web.</p></article>
+          <article class="card"><h3>Firestore</h3><p>Base de datos de Firebase donde se guardan los productos.</p></article>
+          <article class="card"><h3>Authentication</h3><p>Servicio que identifica a cada persona con correo y contraseña.</p></article>
+          <article class="card"><h3>Reglas de seguridad</h3><p>Definen en el servidor quién puede leer y quién puede modificar los datos.</p></article>
+          <article class="card"><h3>HTTPS</h3><p>Protocolo que cifra la comunicación con el sitio.</p></article>
+          <article class="card"><h3>Deploy</h3><p>Proceso de publicar una aplicación para que se pueda usar.</p></article>
+        </div>
       </div>
+    </section>
 
-
-      <div class="flow-item">
-
-        <span>
-          02
-        </span>
-
-        <h3>
-          GitHub Pages
-        </h3>
-
-        <p>
-          Aloja y publica
-          los archivos de la página.
-        </p>
-
+    <!-- EVOLUCIÓN -->
+    <section class="band-soft">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Evolución de CloudStock</h2>
+        </div>
+        <ol class="roadmap">
+          <li>HTML local</li>
+          <li>Git y GitHub</li>
+          <li>Página pública</li>
+          <li>Aplicación web</li>
+          <li>Firebase y Firestore</li>
+          <li>CRUD de productos</li>
+          <li>Roles y seguridad</li>
+        </ol>
       </div>
-
-
-      <div class="flow-arrow">
-        →
-      </div>
-
-
-      <div class="flow-item">
-
-        <span>
-          03
-        </span>
-
-        <h3>
-          Firebase
-        </h3>
-
-        <p>
-          Proporciona los servicios
-          utilizados por la aplicación.
-        </p>
-
-      </div>
-
-
-      <div class="flow-arrow">
-        →
-      </div>
-
-
-      <div class="flow-item">
-
-        <span>
-          04
-        </span>
-
-        <h3>
-          Firestore
-        </h3>
-
-        <p>
-          Guarda los productos
-          del inventario.
-        </p>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="architecture-description">
-
-      <p>
-        <strong>
-          Flujo de datos:
-        </strong>
-      </p>
-
-      <p>
-        Navegador → GitHub Pages →
-        Firebase → Firestore → Productos
-      </p>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- ==================================================
-       CONCEPTOS
-  =================================================== -->
-
-  <section
-    class="concepts"
-    id="conceptos"
-  >
-
-    <div class="section-title">
-
-      <span>
-        06
-      </span>
-
-
-      <div>
-
-        <p class="eyebrow">
-          CONCEPTOS
-        </p>
-
-        <h2>
-          Conceptos utilizados
-        </h2>
-
-      </div>
-
-    </div>
-
-
-    <div class="concepts-grid">
-
-
-      <article>
-
-        <h3>
-          Hosting
-        </h3>
-
-        <p>
-          Servicio que permite almacenar
-          y publicar un sitio web.
-        </p>
-
-      </article>
-
-
-      <article>
-
-        <h3>
-          Firestore
-        </h3>
-
-        <p>
-          Base de datos de Firebase
-          utilizada para almacenar
-          los productos de CloudStock.
-        </p>
-
-      </article>
-
-
-      <article>
-
-        <h3>
-          HTTPS
-        </h3>
-
-        <p>
-          Protocolo utilizado para
-          establecer una comunicación
-          segura con los sitios web.
-        </p>
-
-      </article>
-
-
-      <article>
-
-        <h3>
-          GitHub
-        </h3>
-
-        <p>
-          Plataforma utilizada para
-          almacenar y gestionar
-          el código del proyecto.
-        </p>
-
-      </article>
-
-
-      <article>
-
-        <h3>
-          Deploy
-        </h3>
-
-        <p>
-          Proceso de publicar una aplicación
-          para que pueda ser utilizada.
-        </p>
-
-      </article>
-
-
-      <article>
-
-        <h3>
-          Base de datos Cloud
-        </h3>
-
-        <p>
-          Permite guardar información
-          en infraestructura administrada
-          por un proveedor de nube.
-        </p>
-
-      </article>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- ==================================================
-       ROADMAP
-  =================================================== -->
-
-  <section class="roadmap">
-
-    <div class="section-title">
-
-      <span>
-        07
-      </span>
-
-
-      <div>
-
-        <p class="eyebrow">
-          PROYECTO
-        </p>
-
-        <h2>
-          Evolución de CloudStock
-        </h2>
-
-      </div>
-
-    </div>
-
-
-    <div class="roadmap-list">
-
-
-      <div class="roadmap-item">
-
-        <span>
-          01
-        </span>
-
-        <p>
-          HTML local
-        </p>
-
-      </div>
-
-
-      <div class="roadmap-item">
-
-        <span>
-          02
-        </span>
-
-        <p>
-          Git y GitHub
-        </p>
-
-      </div>
-
-
-      <div class="roadmap-item">
-
-        <span>
-          03
-        </span>
-
-        <p>
-          Página web pública
-        </p>
-
-      </div>
-
-
-      <div class="roadmap-item">
-
-        <span>
-          04
-        </span>
-
-        <p>
-          Aplicación Web
-        </p>
-
-      </div>
-
-
-      <div class="roadmap-item">
-
-        <span>
-          05
-        </span>
-
-        <p>
-          Base de datos Cloud
-        </p>
-
-      </div>
-
-
-      <div class="roadmap-item">
-
-        <span>
-          06
-        </span>
-
-        <p>
-          Firebase
-        </p>
-
-      </div>
-
-
-      <div class="roadmap-item">
-
-        <span>
-          07
-        </span>
-
-        <p>
-          Firestore
-        </p>
-
-      </div>
-
-
-      <div class="roadmap-item">
-
-        <span>
-          08
-        </span>
-
-        <p>
-          CRUD de productos
-        </p>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- ==================================================
-       PIE DE PÁGINA
-  =================================================== -->
+    </section>
+  </main>
 
   <footer>
-
     <div>
-
-      <h2>
-        ☁️ CloudStock
-      </h2>
-
-      <p>
-        Sistema de inventario
-        desarrollado para
-        Computación en la Nube.
-      </p>
-
+      <h2>☁️ CloudStock</h2>
+      <p>Sistema de inventario desarrollado para Computación en la Nube.</p>
     </div>
-
-
-    <div>
-
-      <p>
-        Firebase Firestore · GitHub Pages
-      </p>
-
-      <p>
-        Proyecto académico
-      </p>
-
-    </div>
-
+    <p>Firebase Firestore · Firebase Authentication · GitHub Pages</p>
   </footer>
 
-<!-- ==================================================
-     MODAL AGREGAR PRODUCTO
-=================================================== -->
+  <!-- MODAL PRODUCTO (agregar y editar) -->
+  <div id="productModal" class="product-modal" aria-hidden="true">
+    <div class="product-modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button type="button" id="closeModalBtn" class="modal-close" aria-label="Cerrar formulario">×</button>
 
-<div
-  id="productModal"
-  class="product-modal"
-  aria-hidden="true"
->
-
-  <div class="product-modal-content">
-
-    <button
-      type="button"
-      id="closeModalBtn"
-      class="modal-close"
-      aria-label="Cerrar"
-    >
-      ×
-    </button>
-
-
-    <div class="modal-header">
-
-      <span class="modal-icon">
-        📦
-      </span>
-
-      <div>
-
-        <p class="eyebrow">
-          CLOUDSTOCK
-        </p>
-
-        <h2>
-          Agregar producto
-        </h2>
-
-        <p>
-          Completa los datos del nuevo producto.
-        </p>
-
+      <div class="modal-header">
+        <span class="modal-icon" aria-hidden="true">📦</span>
+        <div>
+          <h2 id="modalTitle">Nuevo producto</h2>
+          <p class="muted" id="modalSubtitle">Completa los datos del producto.</p>
+        </div>
       </div>
 
-    </div>
-
-
-    <form id="productForm">
-
-      <div class="form-group">
-
-        <label for="productName">
-          Nombre del producto
-        </label>
-
-        <input
-          type="text"
-          id="productName"
-          placeholder="Ej: Teclado mecánico"
-          maxlength="100"
-          required
-        >
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label for="productCategory">
-          Categoría
-        </label>
-
-        <input
-          type="text"
-          id="productCategory"
-          placeholder="Ej: Periféricos"
-          maxlength="50"
-          required
-        >
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label for="productDescription">
-          Descripción
-        </label>
-
-        <textarea
-          id="productDescription"
-          placeholder="Describe brevemente el producto..."
-          maxlength="250"
-          rows="3"
-          required
-        ></textarea>
-
-      </div>
-
-
-      <div class="form-row">
+      <form id="productForm" novalidate>
+        <div class="form-group">
+          <label for="productName">Nombre</label>
+          <input type="text" id="productName" maxlength="100" autocomplete="off" placeholder="Ej: Teclado mecánico" required>
+        </div>
 
         <div class="form-group">
+          <label for="productCategory">Categoría</label>
+          <input type="text" id="productCategory" maxlength="50" autocomplete="off" list="categoryList" placeholder="Ej: Periféricos" required>
+          <datalist id="categoryList"></datalist>
+        </div>
 
-          <label for="productPrice">
-            Precio
-          </label>
+        <div class="form-group">
+          <label for="productDescription">Descripción</label>
+          <textarea id="productDescription" maxlength="250" rows="3" placeholder="Describe brevemente el producto" required></textarea>
+        </div>
 
-          <div class="input-prefix">
-
-            <span>
-              $
-            </span>
-
-            <input
-              type="number"
-              id="productPrice"
-              placeholder="0"
-              min="0.01"
-              step="0.01"
-              required
-            >
-
+        <div class="form-row">
+          <div class="form-group">
+            <label for="productPrice">Precio</label>
+            <div class="input-prefix">
+              <span>$</span>
+              <input type="number" id="productPrice" min="1" step="1" inputmode="numeric" placeholder="0" required>
+            </div>
           </div>
-
+          <div class="form-group">
+            <label for="productStock">Stock</label>
+            <input type="number" id="productStock" min="0" step="1" inputmode="numeric" placeholder="0" required>
+          </div>
         </div>
 
+        <div id="formMessage" class="form-message" role="alert"></div>
 
-        <div class="form-group">
-
-          <label for="productStock">
-            Stock
-          </label>
-
-          <input
-            type="number"
-            id="productStock"
-            placeholder="0"
-            min="0"
-            step="1"
-            required
-          >
-
+        <div class="modal-actions">
+          <button type="button" id="cancelProductBtn" class="btn-secondary">Cancelar</button>
+          <button type="submit" id="saveProductBtn" class="btn-primary">Guardar producto</button>
         </div>
-
-      </div>
-
-
-      <div
-        id="formMessage"
-        class="form-message"
-      ></div>
-
-
-      <div class="modal-actions">
-
-        <button
-          type="button"
-          id="cancelProductBtn"
-          class="modal-cancel"
-        >
-          Cancelar
-        </button>
-
-        <button
-          type="submit"
-          class="modal-save"
-        >
-          ✓ Guardar producto
-        </button>
-
-      </div>
-
-    </form>
-
+      </form>
+    </div>
   </div>
 
-</div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- ==================================================
-       JAVASCRIPT
-  =================================================== -->
-
-  <script
-    type="module"
-    src="js/script.js"
-  ></script>
-
+  <script type="module" src="js/script.js"></script>
 </body>
-
 </html>
