@@ -1,1623 +1,499 @@
 import { db } from "./firebase.js";
 
 import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc
+  collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
-// ======================================================
-// VARIABLES
-// ======================================================
-
-let productos = [];
-let carrito = [];
-
-const productsContainer = document.getElementById("productsContainer");
-const searchInput = document.getElementById("searchInput");
-const cartItems = document.getElementById("cartItems");
-const cartCount = document.getElementById("cartCount");
-const totalElemento = document.getElementById("total");
-const connectionStatus = document.getElementById("connectionStatus");
-const refreshBtn = document.getElementById("refreshBtn");
-const clearCartBtn = document.getElementById("clearCartBtn");
-
-
-// ======================================================
-// REFERENCIA A FIRESTORE
-// ======================================================
-
+// getAuth() usa la app que ya inicializa firebase.js
+const auth = getAuth();
 const productosRef = collection(db, "productos");
 
+// ======================================================
+// ESTADO
+// ======================================================
+let productos = [];
+let carrito = [];
+let rol = null;          // "admin" | "user" | null
+let usuarioActual = null;
+let editandoId = null;
+
+const $ = (id) => document.getElementById(id);
+const esAdmin = () => rol === "admin";
 
 // ======================================================
-// CARGAR CARRITO
+// UTILIDADES
 // ======================================================
+const escaparHTML = (t) =>
+  String(t ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-function cargarCarrito() {
+const numero = (v) => (Number.isFinite(Number(v)) && Number(v) >= 0 ? Number(v) : 0);
+const stockValido = (v) => (Number.isInteger(Number(v)) && Number(v) >= 0 ? Number(v) : 0);
+const precioFmt = (n) => Number(n).toLocaleString("es-CL");
 
-  const carritoGuardado =
-    localStorage.getItem("cloudstock_carrito");
+function toast(mensaje, tipo = "ok") {
+  const el = $("toast");
+  el.textContent = mensaje;
+  el.className = `toast show ${tipo}`;
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => (el.className = "toast"), 3200);
+}
 
-  if (carritoGuardado) {
+function icono(categoria) {
+  const c = String(categoria || "").toLowerCase();
+  if (c.includes("comput") || c.includes("notebook")) return "💻";
+  if (c.includes("perif")) return "🖱️";
+  if (c.includes("tecl")) return "⌨️";
+  if (c.includes("audio")) return "🎧";
+  if (c.includes("monitor")) return "🖥️";
+  if (c.includes("celular")) return "📱";
+  return "📦";
+}
 
-    try {
+// ======================================================
+// AUTENTICACIÓN Y ROLES
+// ======================================================
+let intentosFallidos = 0;
+let bloqueadoHasta = 0;
 
-      const carritoParseado =
-        JSON.parse(carritoGuardado);
+$("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = $("loginMessage");
+  const email = $("loginEmail").value.trim();
+  const clave = $("loginPassword").value;
 
-      if (Array.isArray(carritoParseado)) {
-        carrito = carritoParseado;
-      } else {
-        carrito = [];
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Error leyendo el carrito:",
-        error
-      );
-
-      carrito = [];
-    }
+  if (Date.now() < bloqueadoHasta) {
+    const seg = Math.ceil((bloqueadoHasta - Date.now()) / 1000);
+    msg.className = "form-message error";
+    msg.textContent = `Demasiados intentos. Espera ${seg} segundos.`;
+    return;
+  }
+  if (!email || !clave) {
+    msg.className = "form-message error";
+    msg.textContent = "Ingresa tu correo y tu contraseña.";
+    return;
   }
 
-  actualizarCarrito();
-}
-
-
-// ======================================================
-// GUARDAR CARRITO
-// ======================================================
-
-function guardarCarrito() {
-
-  localStorage.setItem(
-    "cloudstock_carrito",
-    JSON.stringify(carrito)
-  );
-}
-
-
-// ======================================================
-// CARGAR PRODUCTOS DESDE FIRESTORE
-// ======================================================
-
-async function cargarProductos() {
-
-  productsContainer.innerHTML = `
-    <div class="loading">
-      ☁ Cargando productos desde Firestore...
-    </div>
-  `;
-
-  connectionStatus.textContent =
-    "Conectando con Firebase Firestore...";
-
-  connectionStatus.className =
-    "connection-status";
-
+  $("loginBtn").disabled = true;
+  msg.textContent = "";
 
   try {
-
-    const snapshot =
-      await getDocs(productosRef);
-
-    productos = [];
-
-
-    snapshot.forEach((documento) => {
-
-      productos.push({
-        id: documento.id,
-        ...documento.data()
-      });
-
-    });
-
-
-    console.log(
-      "Productos cargados desde Firestore:",
-      productos
-    );
-
-
-    connectionStatus.textContent =
-      `✓ Conectado a Firestore · ${productos.length} productos encontrados`;
-
-    connectionStatus.className =
-      "connection-status success";
-
-
-    mostrarProductos(productos);
-
-    actualizarStockCarrito();
-
+    await signInWithEmailAndPassword(auth, email, clave);
+    intentosFallidos = 0;
+    $("loginForm").reset();
   } catch (error) {
-
-    console.error(
-      "Error cargando productos:",
-      error
-    );
-
-
-    connectionStatus.textContent =
-      "✕ Error de conexión con Firestore";
-
-    connectionStatus.className =
-      "connection-status error";
-
-
-    productsContainer.innerHTML = `
-      <div class="no-products">
-
-        <h3>Error al cargar los productos</h3>
-
-        <p>
-          No fue posible obtener los productos desde Firebase.
-        </p>
-
-        <p>
-          Revisa la conexión a Internet,
-          la configuración de Firebase
-          y las reglas de Firestore.
-        </p>
-
-        <button
-          id="retryBtn"
-          class="inventory-refresh"
-        >
-          ↻ Intentar nuevamente
-        </button>
-
-      </div>
-    `;
-
-
-    const retryBtn =
-      document.getElementById("retryBtn");
-
-    if (retryBtn) {
-
-      retryBtn.addEventListener(
-        "click",
-        cargarProductos
-      );
-
+    intentosFallidos++;
+    if (intentosFallidos >= 5) {
+      bloqueadoHasta = Date.now() + 30000;
+      intentosFallidos = 0;
     }
-
+    msg.className = "form-message error";
+    // Mensaje genérico: no revela si el correo existe
+    msg.textContent = error.code === "auth/too-many-requests"
+      ? "Demasiados intentos. Prueba de nuevo en unos minutos."
+      : "Correo o contraseña incorrectos.";
+  } finally {
+    $("loginBtn").disabled = false;
   }
+});
 
+$("logoutBtn").addEventListener("click", () => signOut(auth));
+
+async function obtenerRol(uid) {
+  try {
+    const snap = await getDoc(doc(db, "usuarios", uid));
+    return snap.exists() && snap.data().rol === "admin" ? "admin" : "user";
+  } catch (error) {
+    console.error("No se pudo leer el rol:", error);
+    return "user"; // ante la duda, permisos mínimos
+  }
 }
 
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    usuarioActual = null;
+    rol = null;
+    productos = [];
+    carrito = [];
+    document.body.classList.remove("is-admin");
+    $("authGate").hidden = false;
+    $("appArea").hidden = true;
+    $("sessionBox").hidden = true;
+    $("productsContainer").innerHTML = "";
+    return;
+  }
+
+  usuarioActual = user;
+  rol = await obtenerRol(user.uid);
+
+  document.body.classList.toggle("is-admin", esAdmin());
+  $("authGate").hidden = true;
+  $("appArea").hidden = false;
+  $("sessionBox").hidden = false;
+  $("sessionEmail").textContent = user.email;
+  $("roleBadge").textContent = esAdmin() ? "Administrador" : "Usuario";
+  $("roleBadge").className = `role-badge ${esAdmin() ? "admin" : ""}`;
+
+  cargarCarrito();
+  cargarProductos();
+});
 
 // ======================================================
-// MOSTRAR PRODUCTOS
+// PRODUCTOS (lectura)
 // ======================================================
+async function cargarProductos() {
+  const estado = $("connectionStatus");
+  $("productsContainer").innerHTML = `<div class="loading">Cargando productos...</div>`;
+  estado.textContent = "Conectando con Firebase Firestore...";
+  estado.className = "connection-status";
+
+  try {
+    const snapshot = await getDocs(productosRef);
+    productos = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    estado.textContent = `Conectado · ${productos.length} ${productos.length === 1 ? "producto" : "productos"}`;
+    estado.className = "connection-status success";
+
+    actualizarCategorias();
+    filtrar();
+    sincronizarCarrito();
+  } catch (error) {
+    console.error("Error cargando productos:", error);
+    estado.textContent = "No se pudo conectar con Firestore";
+    estado.className = "connection-status error";
+    $("productsContainer").innerHTML = `
+      <div class="no-products">
+        <h3>No pudimos cargar los productos</h3>
+        <p>Revisa tu conexión a Internet y las reglas de Firestore, y vuelve a intentarlo.</p>
+        <button type="button" class="btn-primary" id="retryBtn">↻ Reintentar</button>
+      </div>`;
+    $("retryBtn").addEventListener("click", cargarProductos);
+  }
+}
+
+function tarjeta(p) {
+  const stock = stockValido(p.stock);
+  let clase = "", texto = `${stock} en stock`;
+  if (stock === 0) { clase = "out"; texto = "Sin stock"; }
+  else if (stock <= 5) { clase = "low"; texto = `Últimas ${stock} unidades`; }
+
+  const id = escaparHTML(p.id);
+
+  return `
+    <article class="product-card">
+      <div class="product-icon" aria-hidden="true">${icono(p.categoria)}</div>
+      <h4>${escaparHTML(p.nombre || "Producto")}</h4>
+      <p class="product-description">${escaparHTML(p.descripcion || "Sin descripción.")}</p>
+      <p class="product-price">$${precioFmt(numero(p.precio))}</p>
+      <p class="product-stock ${clase}">${texto}</p>
+
+      <button type="button" class="btn-primary full" data-action="add" data-id="${id}" ${stock === 0 ? "disabled" : ""}>
+        ${stock === 0 ? "Sin stock" : "🛒 Agregar al carrito"}
+      </button>
+
+      <div class="product-admin-buttons admin-only">
+        <button type="button" class="btn-secondary" data-action="edit" data-id="${id}">✏️ Editar</button>
+        <button type="button" class="btn-danger-outline" data-action="delete" data-id="${id}">🗑️ Eliminar</button>
+      </div>
+    </article>`;
+}
 
 function mostrarProductos(lista) {
+  const cont = $("productsContainer");
 
-  productsContainer.innerHTML = "";
-
-
-  if (lista.length === 0) {
-
-    productsContainer.innerHTML = `
+  if (!lista.length) {
+    cont.innerHTML = `
       <div class="no-products">
-
-        <h3>No hay productos</h3>
-
-        <p>
-          No se encontraron productos en el inventario.
-        </p>
-
-      </div>
-    `;
-
+        <h3>No hay productos para mostrar</h3>
+        <p>${esAdmin() ? "Agrega el primero con el botón “Nuevo producto”." : "Prueba con otra búsqueda o vuelve más tarde."}</p>
+      </div>`;
     return;
   }
 
+  // Cada categoría tiene su propio apartado
+  const grupos = lista.reduce((acc, p) => {
+    const cat = (p.categoria || "General").trim() || "General";
+    (acc[cat] ||= []).push(p);
+    return acc;
+  }, {});
 
-  lista.forEach((producto) => {
+  cont.innerHTML = Object.entries(grupos)
+    .sort(([a], [b]) => a.localeCompare(b, "es"))
+    .map(([cat, items]) => `
+      <div class="cat-block">
+        <h3 class="cat-title"><span aria-hidden="true">${icono(cat)}</span>${escaparHTML(cat)}<small>${items.length}</small></h3>
+        <div class="products-grid">${items.map(tarjeta).join("")}</div>
+      </div>`)
+    .join("");
+}
 
-    const stock =
-      convertirStock(producto.stock);
+function filtrar() {
+  const t = $("searchInput").value.trim().toLowerCase();
+  if (!t) return mostrarProductos(productos);
+  mostrarProductos(productos.filter((p) =>
+    [p.nombre, p.descripcion, p.categoria].some((v) => String(v || "").toLowerCase().includes(t))
+  ));
+}
 
-    const precio =
-      convertirPrecio(producto.precio);
+function actualizarCategorias() {
+  const cats = [...new Set(productos.map((p) => p.categoria).filter(Boolean))].sort();
+  $("categoryList").innerHTML = cats.map((c) => `<option value="${escaparHTML(c)}">`).join("");
+}
 
+$("searchInput").addEventListener("input", filtrar);
+$("refreshBtn").addEventListener("click", cargarProductos);
 
-    let stockClass = "";
+$("productsContainer").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+  const { action, id } = btn.dataset;
+  if (action === "add") agregarAlCarrito(id);
+  if (action === "edit") abrirModal(id);
+  if (action === "delete") eliminarProducto(id);
+});
 
-    let stockTexto =
-      `Stock disponible: ${stock}`;
+// ======================================================
+// MODAL: AGREGAR / EDITAR (solo administrador)
+// ======================================================
+const modal = $("productModal");
 
+function abrirModal(id = null) {
+  if (!esAdmin()) return toast("Solo un administrador puede hacer esto.", "error");
 
-    if (stock === 0) {
+  editandoId = id;
+  $("productForm").reset();
+  $("formMessage").textContent = "";
 
-      stockClass = "out";
+  if (id) {
+    const p = productos.find((x) => x.id === id);
+    if (!p) return toast("No se encontró el producto.", "error");
+    $("modalTitle").textContent = "Editar producto";
+    $("modalSubtitle").textContent = "Modifica los datos y guarda los cambios.";
+    $("productName").value = p.nombre || "";
+    $("productCategory").value = p.categoria || "";
+    $("productDescription").value = p.descripcion || "";
+    $("productPrice").value = p.precio ?? "";
+    $("productStock").value = p.stock ?? "";
+  } else {
+    $("modalTitle").textContent = "Nuevo producto";
+    $("modalSubtitle").textContent = "Completa los datos del producto.";
+  }
 
-      stockTexto =
-        "Sin stock";
+  modal.classList.add("active");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("no-scroll");
+  $("productName").focus();
+}
 
-    } else if (stock <= 5) {
+function cerrarModal() {
+  modal.classList.remove("active");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("no-scroll");
+  editandoId = null;
+}
 
-      stockClass = "low";
+$("addProductBtn").addEventListener("click", () => abrirModal());
+$("closeModalBtn").addEventListener("click", cerrarModal);
+$("cancelProductBtn").addEventListener("click", cerrarModal);
+modal.addEventListener("click", (e) => { if (e.target === modal) cerrarModal(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modal.classList.contains("active")) cerrarModal();
+});
 
-      stockTexto =
-        `Últimas unidades: ${stock}`;
+$("productForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = $("formMessage");
+  msg.className = "form-message error";
 
+  if (!esAdmin()) { msg.textContent = "No tienes permisos para guardar productos."; return; }
+
+  const nombre = $("productName").value.trim();
+  const categoria = $("productCategory").value.trim();
+  const descripcion = $("productDescription").value.trim();
+  const precio = Number($("productPrice").value);
+  const stock = Number($("productStock").value);
+
+  if (!nombre || !categoria || !descripcion) { msg.textContent = "Completa nombre, categoría y descripción."; return; }
+  if (!Number.isFinite(precio) || precio <= 0) { msg.textContent = "El precio debe ser mayor que 0."; return; }
+  if (!Number.isInteger(stock) || stock < 0) { msg.textContent = "El stock debe ser un número entero, 0 o mayor."; return; }
+
+  const repetido = productos.some((p) =>
+    p.id !== editandoId && String(p.nombre || "").trim().toLowerCase() === nombre.toLowerCase());
+  if (repetido) { msg.textContent = "Ya existe un producto con ese nombre."; return; }
+
+  const datos = { nombre, categoria, descripcion, precio, stock };
+  const btn = $("saveProductBtn");
+  btn.disabled = true;
+
+  try {
+    if (editandoId) {
+      await updateDoc(doc(db, "productos", editandoId), datos);
+      toast("Producto actualizado.");
+    } else {
+      await addDoc(productosRef, datos);
+      toast("Producto agregado.");
     }
-
-
-    const card =
-      document.createElement("article");
-
-    card.className =
-      "product-card";
-
-
-    card.innerHTML = `
-
-      <div class="product-icon">
-        ${obtenerIcono(producto.categoria)}
-      </div>
-
-      <p class="product-category">
-        ${escaparHTML(
-          producto.categoria || "General"
-        )}
-      </p>
-
-      <h3>
-        ${escaparHTML(
-          producto.nombre || "Producto"
-        )}
-      </h3>
-
-      <p class="product-description">
-        ${escaparHTML(
-          producto.descripcion ||
-          "Sin descripción disponible."
-        )}
-      </p>
-
-      <p class="product-price">
-        $${formatearPrecio(precio)}
-      </p>
-
-      <p class="product-stock ${stockClass}">
-        ${stockTexto}
-      </p>
-
-      <button
-        class="add-cart-btn"
-        data-id="${producto.id}"
-        ${stock === 0 ? "disabled" : ""}
-      >
-        ${
-          stock === 0
-            ? "Sin stock"
-            : "🛒 Agregar al carrito"
-        }
-      </button>
-
-      <div class="product-admin-buttons">
-
-        <button
-          class="edit-product-btn"
-          data-id="${producto.id}"
-        >
-          ✏️ Editar
-        </button>
-
-        <button
-          class="delete-product-btn"
-          data-id="${producto.id}"
-        >
-          🗑️ Eliminar
-        </button>
-
-      </div>
-
-    `;
-
-
-    productsContainer.appendChild(card);
-
-  });
-
-
-  agregarEventosProductos();
-}
-
-
-// ======================================================
-// EVENTOS DE PRODUCTOS
-// ======================================================
-
-function agregarEventosProductos() {
-
-  document
-    .querySelectorAll(".add-cart-btn")
-    .forEach((boton) => {
-
-      boton.addEventListener(
-        "click",
-        () => {
-
-          agregarAlCarrito(
-            boton.dataset.id
-          );
-
-        }
-      );
-
-    });
-
-
-  document
-    .querySelectorAll(".edit-product-btn")
-    .forEach((boton) => {
-
-      boton.addEventListener(
-        "click",
-        () => {
-
-          editarProducto(
-            boton.dataset.id
-          );
-
-        }
-      );
-
-    });
-
-
-  document
-    .querySelectorAll(".delete-product-btn")
-    .forEach((boton) => {
-
-      boton.addEventListener(
-        "click",
-        () => {
-
-          eliminarProducto(
-            boton.dataset.id
-          );
-
-        }
-      );
-
-    });
-
-}
-
-
-// ======================================================
-// CREAR PRODUCTO
-// ======================================================
-
-async function crearProducto() {
-
-  const nombre = prompt("Nombre del producto:");
-
-  if (nombre === null) {
-    return;
-  }
-
-  const nombreLimpio = nombre.trim();
-
-  // ================================
-  // VALIDAR NOMBRE
-  // ================================
-
-  if (nombreLimpio === "") {
-    alert("El nombre del producto es obligatorio.");
-    return;
-  }
-
-  // Evitar nombres repetidos
-  const nombreRepetido = productos.some(producto =>
-    String(producto.nombre || "")
-      .trim()
-      .toLowerCase() === nombreLimpio.toLowerCase()
-  );
-
-  if (nombreRepetido) {
-    alert("Ya existe un producto con ese nombre.");
-    return;
-  }
-
-
-  // ================================
-  // CATEGORÍA
-  // ================================
-
-  const categoria = prompt(
-    "Categoría del producto:"
-  );
-
-  if (categoria === null) {
-    return;
-  }
-
-  const categoriaLimpia = categoria.trim();
-
-  if (categoriaLimpia === "") {
-    alert("La categoría es obligatoria.");
-    return;
-  }
-
-
-  // ================================
-  // DESCRIPCIÓN
-  // ================================
-
-  const descripcion = prompt(
-    "Descripción del producto:"
-  );
-
-  if (descripcion === null) {
-    return;
-  }
-
-  const descripcionLimpia = descripcion.trim();
-
-  if (descripcionLimpia === "") {
-    alert("La descripción es obligatoria.");
-    return;
-  }
-
-
-  // ================================
-  // PRECIO
-  // ================================
-
-  const precioTexto = prompt(
-    "Precio del producto:"
-  );
-
-  if (precioTexto === null || precioTexto.trim() === "") {
-    alert("El precio es obligatorio.");
-    return;
-  }
-
-  const precio = Number(
-    precioTexto
-      .trim()
-      .replace(/\./g, "")
-      .replace(",", ".")
-  );
-
-  if (!Number.isFinite(precio) || precio <= 0) {
-    alert("El precio debe ser un número mayor que 0.");
-    return;
-  }
-
-
-  // ================================
-  // STOCK
-  // ================================
-
-  const stockTexto = prompt(
-    "Stock del producto:"
-  );
-
-  if (stockTexto === null || stockTexto.trim() === "") {
-    alert("El stock es obligatorio.");
-    return;
-  }
-
-  const stock = Number(stockTexto.trim());
-
-  if (!Number.isInteger(stock) || stock < 0) {
-    alert("El stock debe ser un número entero mayor o igual a 0.");
-    return;
-  }
-
-
-  // ================================
-  // GUARDAR EN FIRESTORE
-  // ================================
-
-  try {
-
-    await addDoc(productosRef, {
-
-      nombre: nombreLimpio,
-      categoria: categoriaLimpia,
-      descripcion: descripcionLimpia,
-      precio: precio,
-      stock: stock
-
-    });
-
-    alert("Producto creado correctamente.");
-
+    cerrarModal();
     await cargarProductos();
-
   } catch (error) {
-
-    console.error(
-      "Error al crear producto:",
-      error
-    );
-
-    alert(
-      "No se pudo crear el producto. Revisa la conexión con Firebase."
-    );
+    console.error("Error guardando producto:", error);
+    msg.textContent = "No se pudo guardar. Verifica tu conexión y tus permisos.";
+  } finally {
+    btn.disabled = false;
   }
-}
-
-// ======================================================
-// EDITAR PRODUCTO
-// ======================================================
-
-async function editarProducto(id) {
-
-  const producto =
-    productos.find(
-      (item) => item.id === id
-    );
-
-
-  if (!producto) {
-
-    alert(
-      "No se encontró el producto."
-    );
-
-    return;
-  }
-
-
-  const nombre =
-    prompt(
-      "Nombre del producto:",
-      producto.nombre || ""
-    );
-
-  if (nombre === null) {
-    return;
-  }
-
-
-  const nombreLimpio =
-    nombre.trim();
-
-
-  if (!nombreLimpio) {
-
-    alert(
-      "El nombre del producto es obligatorio."
-    );
-
-    return;
-  }
-
-
-  const categoria =
-    prompt(
-      "Categoría:",
-      producto.categoria || "General"
-    );
-
-  if (categoria === null) {
-    return;
-  }
-
-
-  const categoriaLimpia =
-    categoria.trim() || "General";
-
-
-  const descripcion =
-    prompt(
-      "Descripción:",
-      producto.descripcion || ""
-    );
-
-  if (descripcion === null) {
-    return;
-  }
-
-
-  const descripcionLimpia =
-    descripcion.trim() ||
-    "Sin descripción";
-
-
-  const precioTexto =
-    prompt(
-      "Precio:",
-      String(producto.precio ?? 0)
-    );
-
-  if (precioTexto === null) {
-    return;
-  }
-
-
-  const precio =
-    Number(
-      precioTexto
-        .replace(/\./g, "")
-        .replace(",", ".")
-    );
-
-
-  if (
-    !Number.isFinite(precio) ||
-    precio < 0
-  ) {
-
-    alert(
-      "El precio debe ser un número válido mayor o igual a 0."
-    );
-
-    return;
-  }
-
-
-  const stockTexto =
-    prompt(
-      "Stock:",
-      String(producto.stock ?? 0)
-    );
-
-  if (stockTexto === null) {
-    return;
-  }
-
-
-  const stock =
-    Number(stockTexto);
-
-
-  if (
-    !Number.isInteger(stock) ||
-    stock < 0
-  ) {
-
-    alert(
-      "El stock debe ser un número entero mayor o igual a 0."
-    );
-
-    return;
-  }
-
-
-  try {
-
-    const productoRef =
-      doc(
-        db,
-        "productos",
-        id
-      );
-
-
-    await updateDoc(
-      productoRef,
-      {
-        nombre: nombreLimpio,
-        categoria: categoriaLimpia,
-        descripcion: descripcionLimpia,
-        precio: precio,
-        stock: stock
-      }
-    );
-
-
-    alert(
-      "✓ Producto actualizado correctamente."
-    );
-
-
-    await cargarProductos();
-
-  } catch (error) {
-
-    console.error(
-      "Error actualizando producto:",
-      error
-    );
-
-
-    alert(
-      "No fue posible actualizar el producto. Revisa la conexión y las reglas de Firestore."
-    );
-
-  }
-
-}
-
-
-// ======================================================
-// ELIMINAR PRODUCTO
-// ======================================================
+});
 
 async function eliminarProducto(id) {
-
-  const producto =
-    productos.find(
-      (item) => item.id === id
-    );
-
-
-  if (!producto) {
-
-    alert(
-      "No se encontró el producto."
-    );
-
-    return;
-  }
-
-
-  const confirmar =
-    confirm(
-      `¿Seguro que quieres eliminar "${producto.nombre}"?`
-    );
-
-
-  if (!confirmar) {
-    return;
-  }
-
+  if (!esAdmin()) return toast("Solo un administrador puede eliminar productos.", "error");
+  const p = productos.find((x) => x.id === id);
+  if (!p) return;
+  if (!confirm(`¿Eliminar "${p.nombre}"? Esta acción no se puede deshacer.`)) return;
 
   try {
-
-    const productoRef =
-      doc(
-        db,
-        "productos",
-        id
-      );
-
-
-    await deleteDoc(
-      productoRef
-    );
-
-
-    carrito =
-      carrito.filter(
-        (item) => item.id !== id
-      );
-
-
-    guardarCarrito();
-
-    actualizarCarrito();
-
-
-    alert(
-      "✓ Producto eliminado correctamente."
-    );
-
-
+    await deleteDoc(doc(db, "productos", id));
+    toast("Producto eliminado.");
     await cargarProductos();
-
   } catch (error) {
-
-    console.error(
-      "Error eliminando producto:",
-      error
-    );
-
-
-    alert(
-      "No fue posible eliminar el producto. Revisa la conexión y las reglas de Firestore."
-    );
-
+    console.error("Error eliminando producto:", error);
+    toast("No se pudo eliminar el producto.", "error");
   }
-
 }
 
-
 // ======================================================
-// ICONOS
+// CARRITO (guardado por usuario en este navegador)
 // ======================================================
+const claveCarrito = () => `cloudstock_carrito_${usuarioActual?.uid || "anon"}`;
 
-function obtenerIcono(categoria) {
-
-  const categoriaTexto =
-    String(categoria || "")
-      .toLowerCase();
-
-
-  if (categoriaTexto.includes("comput")) {
-    return "💻";
+function cargarCarrito() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(claveCarrito()));
+    carrito = Array.isArray(guardado) ? guardado : [];
+  } catch {
+    carrito = [];
   }
-
-  if (categoriaTexto.includes("perif")) {
-    return "🖱️";
-  }
-
-  if (categoriaTexto.includes("tecl")) {
-    return "⌨️";
-  }
-
-  if (categoriaTexto.includes("audio")) {
-    return "🎧";
-  }
-
-  if (categoriaTexto.includes("monitor")) {
-    return "🖥️";
-  }
-
-  if (categoriaTexto.includes("celular")) {
-    return "📱";
-  }
-
-  if (categoriaTexto.includes("mouse")) {
-    return "🖱️";
-  }
-
-  return "📦";
-
+  pintarCarrito();
 }
 
-
-// ======================================================
-// AGREGAR AL CARRITO
-// ======================================================
+function guardarCarrito() {
+  if (usuarioActual) localStorage.setItem(claveCarrito(), JSON.stringify(carrito));
+}
 
 function agregarAlCarrito(id) {
-
-  const producto =
-    productos.find(
-      (item) => item.id === id
-    );
-
-
-  if (!producto) {
-
-    alert(
-      "No se encontró el producto."
-    );
-
-    return;
-  }
-
-
-  const stock =
-    convertirStock(producto.stock);
-
-
-  if (stock <= 0) {
-
-    alert(
-      "Este producto no tiene stock disponible."
-    );
-
-    return;
-  }
-
-
-  const productoCarrito =
-    carrito.find(
-      (item) => item.id === id
-    );
-
-
-  if (productoCarrito) {
-
-    if (
-      productoCarrito.cantidad < stock
-    ) {
-
-      productoCarrito.cantidad++;
-
-    } else {
-
-      alert(
-        "No puedes agregar más unidades que el stock disponible."
-      );
-
-      return;
-    }
-
-  } else {
-
-    carrito.push({
-
-      id: producto.id,
-
-      nombre:
-        producto.nombre ||
-        "Producto",
-
-      precio:
-        convertirPrecio(
-          producto.precio
-        ),
-
-      stock: stock,
-
-      cantidad: 1
-
-    });
-
-  }
-
-
-  guardarCarrito();
-
-  actualizarCarrito();
-
-}
-
-
-// ======================================================
-// ACTUALIZAR STOCK DEL CARRITO
-// ======================================================
-
-function actualizarStockCarrito() {
-
-  carrito =
-    carrito.filter((item) => {
-
-      const producto =
-        productos.find(
-          (producto) =>
-            producto.id === item.id
-        );
-
-
-      if (!producto) {
-        return false;
-      }
-
-
-      const stock =
-        convertirStock(
-          producto.stock
-        );
-
-
-      item.stock = stock;
-
-
-      if (
-        item.cantidad > stock
-      ) {
-
-        item.cantidad = stock;
-
-      }
-
-
-      return item.cantidad > 0;
-
-    });
-
-
-  guardarCarrito();
-
-  actualizarCarrito();
-
-}
-
-
-// ======================================================
-// ACTUALIZAR CARRITO
-// ======================================================
-
-function actualizarCarrito() {
-
-  cartItems.innerHTML = "";
-
-
-  if (carrito.length === 0) {
-
-    cartItems.innerHTML = `
-      <p class="empty-cart">
-        Tu carrito está vacío.
-      </p>
-    `;
-
-    cartCount.textContent =
-      "0 productos";
-
-    totalElemento.textContent =
-      "Total: $0";
-
-    return;
-  }
-
-
-  let total = 0;
-
-  let cantidadTotal = 0;
-
-
-  carrito.forEach((item) => {
-
-    const precio =
-      convertirPrecio(item.precio);
-
-    const cantidad =
-      Number(item.cantidad) || 0;
-
-
-    const subtotal =
-      precio * cantidad;
-
-
-    total += subtotal;
-
-    cantidadTotal += cantidad;
-
-
-    const elemento =
-      document.createElement("div");
-
-
-    elemento.className =
-      "cart-item";
-
-
-    elemento.innerHTML = `
-
-      <div class="cart-item-info">
-
-        <h4>
-          ${escaparHTML(
-            item.nombre
-          )}
-        </h4>
-
-        <p>
-          $${formatearPrecio(precio)} cada uno
-        </p>
-
-      </div>
-
-      <div class="quantity-controls">
-
-        <button
-          data-action="minus"
-          data-id="${item.id}"
-        >
-          −
-        </button>
-
-        <span class="quantity">
-          ${cantidad}
-        </span>
-
-        <button
-          data-action="plus"
-          data-id="${item.id}"
-        >
-          +
-        </button>
-
-      </div>
-
-      <div class="cart-item-price">
-
-        $${formatearPrecio(subtotal)}
-
-      </div>
-
-      <button
-        class="remove-item"
-        data-action="remove"
-        data-id="${item.id}"
-      >
-        Eliminar
-      </button>
-
-    `;
-
-
-    cartItems.appendChild(elemento);
-
-  });
-
-
-  cartCount.textContent =
-    `${cantidadTotal} ${
-      cantidadTotal === 1
-        ? "producto"
-        : "productos"
-    }`;
-
-
-  totalElemento.textContent =
-    `Total: $${formatearPrecio(total)}`;
-
-
-  agregarEventosCarrito();
-
-}
-
-
-// ======================================================
-// EVENTOS DEL CARRITO
-// ======================================================
-
-function agregarEventosCarrito() {
-
-  cartItems
-    .querySelectorAll("button")
-    .forEach((boton) => {
-
-      boton.addEventListener(
-        "click",
-        () => {
-
-          const id =
-            boton.dataset.id;
-
-          const action =
-            boton.dataset.action;
-
-
-          if (action === "plus") {
-
-            aumentarCantidad(id);
-
-          } else if (
-            action === "minus"
-          ) {
-
-            disminuirCantidad(id);
-
-          } else if (
-            action === "remove"
-          ) {
-
-            eliminarDelCarrito(id);
-
-          }
-
-        }
-      );
-
-    });
-
-}
-
-
-// ======================================================
-// AUMENTAR CANTIDAD
-// ======================================================
-
-function aumentarCantidad(id) {
-
-  const item =
-    carrito.find(
-      (producto) =>
-        producto.id === id
-    );
-
-
-  if (!item) {
-    return;
-  }
-
-
-  const producto =
-    productos.find(
-      (producto) =>
-        producto.id === id
-    );
-
-
-  if (!producto) {
-
-    eliminarDelCarrito(id);
-
-    return;
-  }
-
-
-  const stock =
-    convertirStock(
-      producto.stock
-    );
-
-
-  item.stock = stock;
-
-
-  if (
-    item.cantidad < stock
-  ) {
-
+  const p = productos.find((x) => x.id === id);
+  if (!p) return toast("No se encontró el producto.", "error");
+  const stock = stockValido(p.stock);
+  if (stock <= 0) return toast("Este producto no tiene stock.", "error");
+
+  const item = carrito.find((i) => i.id === id);
+  if (item) {
+    if (item.cantidad >= stock) return toast("Ya tienes todo el stock disponible.", "error");
     item.cantidad++;
-
   } else {
-
-    alert(
-      "Has alcanzado el stock disponible."
-    );
-
-    return;
+    carrito.push({ id, nombre: p.nombre || "Producto", precio: numero(p.precio), cantidad: 1 });
   }
-
-
   guardarCarrito();
-
-  actualizarCarrito();
-
+  pintarCarrito();
+  toast(`${p.nombre} agregado al carrito.`);
 }
 
-
-// ======================================================
-// DISMINUIR CANTIDAD
-// ======================================================
-
-function disminuirCantidad(id) {
-
-  const item =
-    carrito.find(
-      (producto) =>
-        producto.id === id
-    );
-
-
-  if (!item) {
-    return;
-  }
-
-
-  item.cantidad--;
-
-
-  if (
-    item.cantidad <= 0
-  ) {
-
-    carrito =
-      carrito.filter(
-        (producto) =>
-          producto.id !== id
-      );
-
-  }
-
-
+// Ajusta el carrito a los precios y stock actuales de Firestore
+function sincronizarCarrito() {
+  carrito = carrito.filter((item) => {
+    const p = productos.find((x) => x.id === item.id);
+    if (!p) return false;
+    item.nombre = p.nombre || item.nombre;
+    item.precio = numero(p.precio);
+    item.cantidad = Math.min(item.cantidad, stockValido(p.stock));
+    return item.cantidad > 0;
+  });
   guardarCarrito();
-
-  actualizarCarrito();
-
+  pintarCarrito();
 }
 
+function pintarCarrito() {
+  const cont = $("cartItems");
 
-// ======================================================
-// ELIMINAR DEL CARRITO
-// ======================================================
+  if (!carrito.length) {
+    cont.innerHTML = `<p class="empty-cart">Tu carrito está vacío. Agrega productos desde el inventario.</p>`;
+    $("cartCount").textContent = "0 productos";
+    $("total").textContent = "Total: $0";
+    return;
+  }
 
-function eliminarDelCarrito(id) {
+  let total = 0, unidades = 0;
 
-  carrito =
-    carrito.filter(
-      (producto) =>
-        producto.id !== id
-    );
+  cont.innerHTML = carrito.map((item) => {
+    const subtotal = item.precio * item.cantidad;
+    total += subtotal;
+    unidades += item.cantidad;
+    const id = escaparHTML(item.id);
+    return `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <h4>${escaparHTML(item.nombre)}</h4>
+          <p>$${precioFmt(item.precio)} c/u</p>
+        </div>
+        <div class="quantity-controls">
+          <button type="button" data-action="minus" data-id="${id}" aria-label="Quitar una unidad">−</button>
+          <span class="quantity">${item.cantidad}</span>
+          <button type="button" data-action="plus" data-id="${id}" aria-label="Agregar una unidad">+</button>
+        </div>
+        <div class="cart-item-price">$${precioFmt(subtotal)}</div>
+        <button type="button" class="remove-item" data-action="remove" data-id="${id}">Quitar</button>
+      </div>`;
+  }).join("");
 
+  $("cartCount").textContent = `${unidades} ${unidades === 1 ? "producto" : "productos"}`;
+  $("total").textContent = `Total: $${precioFmt(total)}`;
+}
 
+$("cartItems").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+  const { action, id } = btn.dataset;
+  const item = carrito.find((i) => i.id === id);
+  if (!item) return;
+
+  if (action === "plus") {
+    const p = productos.find((x) => x.id === id);
+    if (p && item.cantidad < stockValido(p.stock)) item.cantidad++;
+    else return toast("Alcanzaste el stock disponible.", "error");
+  } else if (action === "minus") {
+    item.cantidad--;
+    if (item.cantidad <= 0) carrito = carrito.filter((i) => i.id !== id);
+  } else if (action === "remove") {
+    carrito = carrito.filter((i) => i.id !== id);
+  }
   guardarCarrito();
-
-  actualizarCarrito();
-
-}
-
-
-// ======================================================
-//VACIAR CARRITO
-// ======================================================
-
-clearCartBtn.addEventListener(
-  "click",
-  () => {
-
-    if (carrito.length === 0) {
-      return;
-    }
-
-
-    const confirmar =
-      confirm(
-        "¿Quieres vaciar el carrito?"
-      );
-
-
-    if (!confirmar) {
-      return;
-    }
-
-
-    carrito = [];
-
-
-    guardarCarrito();
-
-    actualizarCarrito();
-
-  }
-);
-
-
-// ======================================================
-// BUSCADOR
-// ======================================================
-
-searchInput.addEventListener(
-  "input",
-  () => {
-
-    const texto =
-      searchInput.value
-        .trim()
-        .toLowerCase();
-
-
-    if (!texto) {
-
-      mostrarProductos(productos);
-
-      return;
-    }
-
-
-    const resultados =
-      productos.filter(
-        (producto) => {
-
-          const nombre =
-            String(
-              producto.nombre || ""
-            ).toLowerCase();
-
-
-          const descripcion =
-            String(
-              producto.descripcion || ""
-            ).toLowerCase();
-
-
-          const categoria =
-            String(
-              producto.categoria || ""
-            ).toLowerCase();
-
-
-          return (
-            nombre.includes(texto) ||
-            descripcion.includes(texto) ||
-            categoria.includes(texto)
-          );
-
-        }
-      );
-
-
-    mostrarProductos(
-      resultados
-    );
-
-  }
-);
-
-
-// ======================================================
-// BOTÓN ACTUALIZAR
-// ======================================================
-
-refreshBtn.addEventListener(
-  "click",
-  cargarProductos
-);
-
-
-// ======================================================
-// CREAR BOTÓN DE PRODUCTO
-// ======================================================
-
-function crearBotonAgregarProducto() {
-
-  const inventoryTools =
-    document.querySelector(
-      ".inventory-tools"
-    );
-
-
-  if (!inventoryTools) {
-    return;
-  }
-
-
-  if (
-    document.getElementById(
-      "addProductBtn"
-    )
-  ) {
-    return;
-  }
-
-
-  const boton =
-    document.createElement("button");
-
-
-  boton.id =
-    "addProductBtn";
-
-
-  boton.className =
-    "inventory-refresh";
-
-
-  boton.textContent =
-    "＋ Agregar producto";
-
-
-  boton.addEventListener(
-    "click",
-    crearProducto
-  );
-
-
-  inventoryTools.appendChild(
-    boton
-  );
-
-}
-
-
-// ======================================================
-// FORMATEAR PRECIO
-// ======================================================
-
-function formatearPrecio(numero) {
-
-  return Number(numero)
-    .toLocaleString("es-CL");
-
-}
-
-
-// ======================================================
-// CONVERTIR PRECIO
-// ======================================================
-
-function convertirPrecio(valor) {
-
-  const numero =
-    Number(valor);
-
-
-  if (
-    !Number.isFinite(numero) ||
-    numero < 0
-  ) {
-
-    return 0;
-  }
-
-
-  return numero;
-
-}
-
-
-// ======================================================
-// CONVERTIR STOCK
-// ======================================================
-
-function convertirStock(valor) {
-
-  const numero =
-    Number(valor);
-
-
-  if (
-    !Number.isInteger(numero) ||
-    numero < 0
-  ) {
-
-    return 0;
-  }
-
-
-  return numero;
-
-}
-
-
-// ======================================================
-// EVITAR HTML INYECTADO
-// ======================================================
-
-function escaparHTML(texto) {
-
-  const div =
-    document.createElement("div");
-
-
-  div.textContent =
-    String(texto);
-
-
-  return div.innerHTML;
-
-}
-
+  pintarCarrito();
+});
+
+$("clearCartBtn").addEventListener("click", () => {
+  if (!carrito.length) return;
+  if (!confirm("¿Quieres vaciar el carrito?")) return;
+  carrito = [];
+  guardarCarrito();
+  pintarCarrito();
+});
 
 // ======================================================
 // MENÚ MÓVIL
 // ======================================================
+const menuBtn = $("menuBtn");
+const navLinks = $("navLinks");
 
-const menuBtn =
-  document.getElementById(
-    "menuBtn"
-  );
+menuBtn.addEventListener("click", () => {
+  const abierto = navLinks.classList.toggle("show");
+  menuBtn.setAttribute("aria-expanded", String(abierto));
+});
 
-
-const navLinks =
-  document.getElementById(
-    "navLinks"
-  );
-
-
-if (
-  menuBtn &&
-  navLinks
-) {
-
-  menuBtn.addEventListener(
-    "click",
-    () => {
-
-      navLinks.classList.toggle(
-        "show"
-      );
-
-    }
-  );
-
-
-  document
-    .querySelectorAll(
-      ".nav-links a"
-    )
-    .forEach((link) => {
-
-      link.addEventListener(
-        "click",
-        () => {
-
-          navLinks.classList.remove(
-            "show"
-          );
-
-        }
-      );
-
-    });
-
-}
-
-
-// ======================================================
-// INICIO
-// ======================================================
-
-crearBotonAgregarProducto();
-
-cargarCarrito();
-
-cargarProductos();
-console.log("Script cargado correctamente");
+navLinks.querySelectorAll("a").forEach((a) =>
+  a.addEventListener("click", () => {
+    navLinks.classList.remove("show");
+    menuBtn.setAttribute("aria-expanded", "false");
+  })
+);
