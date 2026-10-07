@@ -177,8 +177,10 @@ textarea { resize: vertical; }
 
 /* ---------- Login ---------- */
 .auth-card { max-width: 440px; margin: 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: clamp(24px, 5vw, 36px); box-shadow: var(--shadow); }
-.auth-card h3 { font-size: 1.5rem; margin-bottom: 6px; }
 .auth-card .muted { margin-bottom: 22px; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 18px; background: #eaf0f7; border-radius: 12px; }
+.auth-tab { border: none; background: transparent; color: var(--muted); font-weight: 600; padding: 11px 8px; border-radius: 9px; min-height: 44px; transition: background .2s, color .2s; }
+.auth-tab.active { background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(10,22,38,.1); }
 
 /* ---------- Inventario ---------- */
 .inventory-tools { display: flex; gap: 12px; margin-bottom: 16px; }
