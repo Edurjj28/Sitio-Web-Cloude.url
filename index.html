@@ -1,319 +1,1217 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0a1626">
-  <title>CloudStock | Inventario en la nube</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santo Tomás | Feria de Innovación y Votación de Proyectos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QRCode.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        st: {
+                            50: '#eef7f3',
+                            100: '#d5ece2',
+                            200: '#aedac7',
+                            500: '#008556',
+                            600: '#005C3E', // Verde Institucional Santo Tomás
+                            700: '#004830',
+                            800: '#003826',
+                            900: '#00291c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f5;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+        }
+
+        /* Estilos exclusivos para impresión de tarjetas QR */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .qr-card-print {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 2px solid #005C3E !important;
+                box-shadow: none !important;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        /* Animaciones suaves y resaltadoras */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.94) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes shimmerSweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 133, 86, 0.35); }
+            50% { box-shadow: 0 0 0 8px rgba(0, 133, 86, 0); }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-modal-pop {
+            animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Tarjeta interactiva con elevación y brillo institucional */
+        .project-card {
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        border-color 0.28s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 28px -8px rgba(0, 92, 62, 0.14), 0 4px 10px -4px rgba(0, 92, 62, 0.08);
+            border-color: #008556;
+        }
+
+        /* Barra de progreso con brillo animado */
+        .progress-bar-shimmer {
+            position: relative;
+            overflow: hidden;
+            transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .progress-bar-shimmer::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent);
+            animation: shimmerSweep 2.4s infinite;
+        }
+
+        .btn-vote-glow:hover {
+            animation: pulseGlow 1.6s infinite;
+        }
+    </style>
 </head>
-<body>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-  <!-- NAVEGACIÓN -->
-  <header class="site-header">
-    <nav class="navbar">
-      <a href="#inicio" class="logo">☁️ CloudStock</a>
-
-      <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" type="button">☰</button>
-
-      <div class="nav-links" id="navLinks">
-        <a href="#inventario">Inventario</a>
-        <a href="#cloud">Cloud</a>
-        <a href="#modelos">Modelos</a>
-        <a href="#comparacion">Local vs Cloud</a>
-
-        <div class="session-box" id="sessionBox" hidden>
-          <span class="role-badge" id="roleBadge">usuario</span>
-          <span class="session-email" id="sessionEmail"></span>
-          <button type="button" id="copyUidBtn" class="btn-ghost" title="Copia tu UID para asignarte un rol en Firestore">Copiar mi UID</button>
-          <button type="button" id="logoutBtn" class="btn-ghost">Cerrar sesión</button>
-        </div>
-      </div>
-    </nav>
-  </header>
-
-  <!-- INICIO -->
-  <section class="hero" id="inicio">
-    <div class="hero-inner">
-      <p class="hero-kicker">Inventario conectado a Firebase Firestore</p>
-      <h1>Tu stock, siempre al día y disponible desde cualquier lugar.</h1>
-      <p class="hero-text">CloudStock guarda los productos en la nube. Los administradores gestionan el catálogo y los usuarios consultan y arman su pedido.</p>
-      <a href="#inventario" class="btn">Ir al inventario</a>
+    <!-- Franja Institucional Superior -->
+    <div class="bg-st-700 text-white/90 text-[11px] py-1.5 px-4 text-center font-medium tracking-wide no-print">
+        TÚ PUEDES • SISTEMA OFICIAL DE VOTACIÓN ESTUDIANTIL E INNOVACIÓN
     </div>
-    <div class="cloud-decoration" aria-hidden="true">☁️</div>
-  </section>
 
-  <!-- INVENTARIO -->
-  <main>
-    <section id="inventario" class="inventory-section">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>Inventario</h2>
-          <p>Consulta los productos disponibles, su precio y su stock.</p>
-        </div>
+    <!-- Barra de Navegación Superior Institucional Santo Tomás -->
+    <header class="bg-st-600 text-white shadow-md sticky top-0 z-30 no-print">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 sm:h-18">
+                <!-- Logo / Emblema Vectorizado Santo Tomás (Esquina Superior Izquierda) -->
+                <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('galeria')">
+                    <div class="bg-white p-1.5 sm:p-2 rounded-xl shadow-sm transition-transform duration-300 group-hover:scale-105 shrink-0">
+                        <!-- Emblema SVG Institucional Santo Tomás (Cruz de Calatrava / Escudo minimalista) -->
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-st-600" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Santo Tomás">
+                            <!-- Marco escudo minimalista -->
+                            <path d="M8 6H40V24C40 34.5 24 42 24 42C24 42 8 34.5 8 24V6Z" stroke="#005C3E" stroke-width="2.5" fill="#EEF7F3"/>
+                            <!-- Cruz institucional estilizada -->
+                            <path d="M24 11V35M14 21H34" stroke="#005C3E" stroke-width="3.4" stroke-linecap="round"/>
+                            <!-- Remates flordelisados minimalistas -->
+                            <circle cx="24" cy="11" r="2.2" fill="#008556"/>
+                            <circle cx="24" cy="35" r="2.2" fill="#008556"/>
+                            <circle cx="14" cy="21" r="2.2" fill="#008556"/>
+                            <circle cx="34" cy="21" r="2.2" fill="#008556"/>
+                            <circle cx="24" cy="21" r="2.6" fill="#005C3E"/>
+                        </svg>
+                    </div>
+                    <div class="leading-tight">
+                        <span class="font-display font-extrabold text-base sm:text-xl tracking-wider text-white block">SANTO TOMÁS</span>
+                        <span class="text-[11px] sm:text-xs font-medium text-st-100 block">Feria de Innovación y Proyectos</span>
+                    </div>
+                </div>
 
-        <!-- LOGIN -->
-        <div class="auth-card" id="authGate">
-          <div class="auth-tabs" role="tablist">
-            <button type="button" role="tab" id="tabLogin" class="auth-tab active" aria-selected="true">Iniciar sesión</button>
-            <button type="button" role="tab" id="tabRegister" class="auth-tab" aria-selected="false">Crear cuenta</button>
-          </div>
-          <p class="muted" id="authHint">Ingresa con tu cuenta para ver el inventario.</p>
+                <!-- Navegación Desktop & Tablet -->
+                <nav class="hidden md:flex items-center gap-1.5 bg-st-700/70 p-1.5 rounded-xl border border-white/10">
+                    <button onclick="switchTab('galeria')" id="nav-galeria" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-white text-st-600 shadow-sm">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i> Proyectos
+                    </button>
+                    <button onclick="switchTab('resultados')" id="nav-resultados" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Resultados en Vivo
+                    </button>
+                    <button onclick="switchTab('qr')" id="nav-qr" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Códigos QR
+                    </button>
+                    <button onclick="switchTab('admin')" id="nav-admin" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Nuevo Stand
+                    </button>
+                </nav>
 
-          <form id="loginForm" novalidate>
-            <div class="form-group">
-              <label for="loginEmail">Correo electrónico</label>
-              <input type="email" id="loginEmail" autocomplete="username" required>
+                <!-- Estado de conexión en vivo -->
+                <div class="flex items-center gap-2">
+                    <span id="connection-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white border border-white/20 backdrop-blur-sm">
+                        <span class="w-2 h-2 rounded-full bg-amber-300 animate-pulse"></span>
+                        Conectando...
+                    </span>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="loginPassword">Contraseña</label>
-              <input type="password" id="loginPassword" autocomplete="current-password" minlength="6" required>
+        </div>
+
+        <!-- Navegación Móvil Adaptativa -->
+        <div class="md:hidden border-t border-white/15 bg-st-700 px-2 py-1.5 flex justify-around">
+            <button onclick="switchTab('galeria')" id="mnav-galeria" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg bg-white text-st-600 font-bold text-xs transition-all">
+                <i data-lucide="layout-grid" class="w-4 h-4 mb-0.5"></i> Proyectos
+            </button>
+            <button onclick="switchTab('resultados')" id="mnav-resultados" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 mb-0.5"></i> Ranking
+            </button>
+            <button onclick="switchTab('qr')" id="mnav-qr" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all">
+                <i data-lucide="printer" class="w-4 h-4 mb-0.5"></i> QRs
+            </button>
+            <button onclick="switchTab('admin')" id="mnav-admin" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all">
+                <i data-lucide="plus-circle" class="w-4 h-4 mb-0.5"></i> Nuevo
+            </button>
+        </div>
+    </header>
+
+    <!-- Notificación Toast Flotante -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0 no-print"></div>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- Banner de Proyecto Escaneado por QR (Visible solo si viene ?proyecto=ID) -->
+        <div id="qr-direct-banner" class="hidden mb-6 bg-gradient-to-r from-st-700 to-st-600 text-white rounded-2xl p-4 sm:p-5 shadow-lg border border-st-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-up no-print">
+            <div class="flex items-center gap-3.5">
+                <div class="bg-white/15 p-2.5 rounded-xl shrink-0">
+                    <i data-lucide="scan-line" class="w-6 h-6 text-st-100"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] uppercase tracking-wider font-bold text-st-200">Acceso directo mediante código QR</p>
+                    <p class="text-sm sm:text-base font-medium">Estás viendo el proyecto escaneado. Ingresa tu RUT para registrar tu voto.</p>
+                </div>
             </div>
-            <div id="loginMessage" class="form-message" role="alert"></div>
-            <button type="submit" class="btn-primary full" id="loginBtn">Entrar</button>
-          </form>
+            <button onclick="clearUrlParam()" class="w-full sm:w-auto px-4 py-2 bg-white text-st-700 hover:bg-st-50 font-bold text-sm rounded-xl transition shrink-0 text-center shadow-sm cursor-pointer">
+                Ver todos los proyectos
+            </button>
+        </div>
 
-          <form id="registerForm" novalidate hidden>
-            <div class="form-group">
-              <label for="regEmail">Correo electrónico</label>
-              <input type="email" id="regEmail" autocomplete="email" required>
+        <!-- VISTA 1: GALERÍA DE PROYECTOS -->
+        <section id="view-galeria" class="space-y-6 animate-fade-up">
+            <!-- Encabezado y Filtros -->
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-st-600 bg-st-50 px-2.5 py-1 rounded-md mb-1.5">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Votación Participativa
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Proyectos en Exposición</h1>
+                    <p class="text-slate-600 text-sm mt-1">Explora los stands o escanea su QR. Puedes emitir <strong>1 voto por proyecto</strong> validando tu RUT.</p>
+                </div>
+
+                <!-- Buscador y Filtro -->
+                <div class="flex flex-col sm:flex-row gap-2.5 w-full lg:w-auto shrink-0">
+                    <div class="relative flex-grow sm:w-64">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="search-input" placeholder="Buscar proyecto, código o equipo..." 
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500 focus:border-transparent transition">
+                    </div>
+                    <select id="category-filter" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500 transition">
+                        <option value="TODAS">Todas las categorías</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="regPassword">Contraseña (mínimo 8 caracteres)</label>
-              <input type="password" id="regPassword" autocomplete="new-password" minlength="8" required>
+
+            <!-- Estado de Carga -->
+            <div id="loading-projects" class="py-16 text-center">
+                <div class="inline-block w-9 h-9 border-4 border-st-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+                <p class="text-slate-600 text-sm font-medium">Cargando proyectos de la feria Santo Tomás...</p>
             </div>
-            <div class="form-group">
-              <label for="regPassword2">Repite la contraseña</label>
-              <input type="password" id="regPassword2" autocomplete="new-password" minlength="8" required>
+
+            <!-- Grid de Tarjetas de Proyectos -->
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+                <!-- Inyectado dinámicamente -->
             </div>
-            <div id="registerMessage" class="form-message" role="alert"></div>
-            <button type="submit" class="btn-primary full" id="registerBtn">Crear cuenta</button>
-          </form>
-        </div>
 
-        <!-- APLICACIÓN (solo con sesión iniciada) -->
-        <div id="appArea" hidden>
-
-          <div class="inventory-tools">
-            <input type="search" id="searchInput" placeholder="Buscar por nombre, categoría o descripción" aria-label="Buscar producto">
-            <div class="inventory-actions">
-              <button type="button" class="btn-primary admin-only" id="addProductBtn">＋ Nuevo producto</button>
-              <button type="button" class="btn-secondary" id="refreshBtn">↻ Actualizar</button>
+            <!-- Estado Vacío -->
+            <div id="empty-projects" class="hidden py-16 text-center bg-white rounded-2xl border border-slate-200 p-6">
+                <i data-lucide="folder-search" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+                <h3 class="text-lg font-bold text-slate-800">No se encontraron proyectos</h3>
+                <p class="text-slate-500 text-sm mt-1">Intenta con otro término de búsqueda o cambia la categoría seleccionada.</p>
             </div>
-          </div>
+        </section>
 
-          <div id="connectionStatus" class="connection-status" role="status">Conectando con Firebase...</div>
+        <!-- VISTA 2: RESULTADOS EN VIVO -->
+        <section id="view-resultados" class="hidden space-y-6 animate-fade-up">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-st-600 bg-st-50 border border-st-200 px-3 py-1 rounded-full mb-2">
+                            <span class="w-2 h-2 rounded-full bg-st-500 animate-ping"></span> Sincronización en Tiempo Real
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Ranking Oficial de Proyectos</h2>
+                        <p class="text-slate-500 text-sm mt-0.5">Conteo transparente de votos válidos registrados por RUT.</p>
+                    </div>
+                    <div class="bg-st-50 px-6 py-3.5 rounded-2xl border border-st-200 text-right">
+                        <span class="text-xs font-semibold text-st-700 uppercase tracking-wider block">Total Votos Emitidos</span>
+                        <span id="total-votes-counter" class="text-3xl sm:text-4xl font-black text-st-600">0</span>
+                    </div>
+                </div>
 
-          <div id="productsContainer">
-            <div class="loading">Cargando productos...</div>
-          </div>
-
-          <!-- CARRITO -->
-          <div class="cart-container">
-            <div class="cart-header">
-              <h3>Tu pedido</h3>
-              <span id="cartCount" class="pill">0 productos</span>
+                <!-- Lista de Barras de Progreso -->
+                <div id="results-list" class="mt-6 space-y-4">
+                    <!-- Inyectado dinámicamente -->
+                </div>
             </div>
-            <div id="cartItems" class="cart-items">
-              <p class="empty-cart">Tu carrito está vacío. Agrega productos desde el inventario.</p>
+        </section>
+
+        <!-- VISTA 3: CÓDIGOS QR ESTÁTICOS PARA IMPRIMIR -->
+        <section id="view-qr" class="hidden space-y-6 animate-fade-up">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Códigos QR Estáticos por Stand</h2>
+                    <p class="text-slate-600 text-sm mt-1">Cada QR apunta de forma permanente a su proyecto. Imprime estas tarjetas y colócalas en cada stand de la feria.</p>
+                </div>
+                <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-st-600 hover:bg-st-700 text-white font-bold text-sm rounded-xl shadow-sm transition cursor-pointer shrink-0">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Imprimir Tarjetas QR
+                </button>
             </div>
-            <div class="cart-footer">
-              <strong id="total">Total: $0</strong>
-              <button id="clearCartBtn" class="btn-danger-outline" type="button">Vaciar carrito</button>
+
+            <!-- Área Imprimible -->
+            <div id="print-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tarjetas QR inyectadas dinámicamente -->
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- CLOUD -->
-    <section id="cloud">
-      <div class="wrap narrow">
-        <div class="section-title">
-          <h2>¿Qué es Cloud Computing?</h2>
-        </div>
-        <p>La computación en la nube permite usar recursos informáticos a través de Internet, sin tener toda la infraestructura en tu propio equipo. Esos recursos incluyen almacenamiento, servidores, bases de datos y aplicaciones.</p>
-        <p>Aunque hablamos de "la nube", todo funciona sobre infraestructura física ubicada en centros de datos.</p>
-      </div>
-    </section>
+        <!-- VISTA 4: ADMINISTRAR / AGREGAR PROYECTO -->
+        <section id="view-admin" class="hidden max-w-2xl mx-auto animate-fade-up">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                <div class="mb-6 pb-4 border-b border-slate-100">
+                    <span class="text-xs font-bold uppercase tracking-wider text-st-600">Gestión de Feria</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-0.5">Registrar Nuevo Proyecto</h2>
+                    <p class="text-slate-600 text-sm mt-1">Se generará automáticamente un identificador fijo y su código QR permanente.</p>
+                </div>
 
-    <!-- MODELOS -->
-    <section id="modelos" class="band-dark">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>Modelos de servicio Cloud</h2>
-        </div>
-        <div class="cards">
-          <article class="card-dark">
-            <h3>SaaS</h3>
-            <p class="sub">Software as a Service</p>
-            <p>El usuario utiliza directamente una aplicación entregada por un proveedor.</p>
-            <strong>Ejemplo: Microsoft 365</strong>
-          </article>
-          <article class="card-dark">
-            <h3>PaaS</h3>
-            <p class="sub">Platform as a Service</p>
-            <p>Entrega una plataforma para desarrollar y ejecutar aplicaciones sin administrar la infraestructura.</p>
-            <strong>Ejemplo: Firebase</strong>
-          </article>
-          <article class="card-dark">
-            <h3>IaaS</h3>
-            <p class="sub">Infrastructure as a Service</p>
-            <p>Permite usar máquinas virtuales, almacenamiento y redes como recursos.</p>
-            <strong>Ejemplo: una máquina virtual Ubuntu</strong>
-          </article>
-        </div>
-      </div>
-    </section>
+                <form id="add-project-form" class="space-y-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="sm:col-span-1">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Código Stand *</label>
+                            <input type="text" id="proj-code" required placeholder="Ej: PROY-05" maxlength="15"
+                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono uppercase focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                            <p class="text-[11px] text-slate-400 mt-1">ID único para el QR</p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Área / Carrera / Categoría *</label>
+                            <input type="text" id="proj-category" required placeholder="Ej: Ingeniería, Salud, Recursos Naturales..."
+                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                        </div>
+                    </div>
 
-    <!-- COMPARACIÓN -->
-    <section id="comparacion">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>Local vs Cloud</h2>
-        </div>
-        <div class="cards two">
-          <article class="card">
-            <h3>🖥️ Sistema local</h3>
-            <ul>
-              <li>Los datos se guardan en el propio equipo.</li>
-              <li>Depende de un servidor físico.</li>
-              <li>Es más difícil acceder desde otros dispositivos.</li>
-              <li>Tú mantienes la infraestructura.</li>
-            </ul>
-          </article>
-          <article class="card card-accent">
-            <h3>☁️ Sistema Cloud</h3>
-            <ul>
-              <li>Los datos viven en servicios de nube.</li>
-              <li>Se accede desde cualquier dispositivo.</li>
-              <li>El proveedor administra la infraestructura.</li>
-              <li>Facilita la disponibilidad y la escalabilidad.</li>
-            </ul>
-          </article>
-        </div>
-        <p class="note"><strong>¿Dónde está CloudStock?</strong> La página se publica en GitHub Pages, los productos se guardan en Firebase Firestore y el acceso se controla con Firebase Authentication.</p>
-      </div>
-    </section>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Título del Proyecto *</label>
+                        <input type="text" id="proj-title" required placeholder="Nombre descriptivo del proyecto"
+                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                    </div>
 
-    <!-- ARQUITECTURA -->
-    <section class="band-soft">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>¿Cómo funciona CloudStock?</h2>
-        </div>
-        <ol class="flow">
-          <li><strong>Navegador</strong><span>El usuario abre CloudStock.</span></li>
-          <li><strong>GitHub Pages</strong><span>Publica los archivos de la página.</span></li>
-          <li><strong>Authentication</strong><span>Verifica quién es el usuario y su rol.</span></li>
-          <li><strong>Firestore</strong><span>Guarda los productos y aplica las reglas de seguridad.</span></li>
-        </ol>
-      </div>
-    </section>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Equipo / Estudiantes *</label>
+                        <input type="text" id="proj-authors" required placeholder="Ej: Camila Rojas, Matías Soto"
+                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                    </div>
 
-    <!-- CONCEPTOS -->
-    <section>
-      <div class="wrap">
-        <div class="section-title">
-          <h2>Conceptos utilizados</h2>
-        </div>
-        <div class="cards">
-          <article class="card"><h3>Hosting</h3><p>Servicio que almacena y publica un sitio web.</p></article>
-          <article class="card"><h3>Firestore</h3><p>Base de datos de Firebase donde se guardan los productos.</p></article>
-          <article class="card"><h3>Authentication</h3><p>Servicio que identifica a cada persona con correo y contraseña.</p></article>
-          <article class="card"><h3>Reglas de seguridad</h3><p>Definen en el servidor quién puede leer y quién puede modificar los datos.</p></article>
-          <article class="card"><h3>HTTPS</h3><p>Protocolo que cifra la comunicación con el sitio.</p></article>
-          <article class="card"><h3>Deploy</h3><p>Proceso de publicar una aplicación para que se pueda usar.</p></article>
-        </div>
-      </div>
-    </section>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Descripción Breve *</label>
+                        <textarea id="proj-desc" required rows="3" placeholder="Explica en qué consiste el proyecto y qué problema resuelve..."
+                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500"></textarea>
+                    </div>
 
-    <!-- EVOLUCIÓN -->
-    <section class="band-soft">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>Evolución de CloudStock</h2>
-        </div>
-        <ol class="roadmap">
-          <li>HTML local</li>
-          <li>Git y GitHub</li>
-          <li>Página pública</li>
-          <li>Aplicación web</li>
-          <li>Firebase y Firestore</li>
-          <li>CRUD de productos</li>
-          <li>Roles y seguridad</li>
-        </ol>
-      </div>
-    </section>
-  </main>
+                    <div class="pt-2 flex items-center justify-end gap-3">
+                        <button type="button" onclick="switchTab('galeria')" class="px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="btn-save-project" class="px-6 py-2.5 bg-st-600 hover:bg-st-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
+                            <i data-lucide="save" class="w-4 h-4"></i> Guardar Proyecto y Generar QR
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
 
-  <footer>
-    <div>
-      <h2>☁️ CloudStock</h2>
-      <p>Sistema de inventario desarrollado para Computación en la Nube.</p>
+    </main>
+
+    <!-- MODAL DE VOTACIÓN (Se abre al hacer clic en "Votar" o al entrar con ?proyecto=ID) -->
+    <div id="vote-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm no-print">
+        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] animate-modal-pop">
+            <!-- Header Institucional del Modal -->
+            <div class="px-6 py-4 bg-st-600 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span id="modal-proj-code" class="px-2.5 py-1 bg-white text-st-700 font-mono text-xs font-extrabold rounded-lg shadow-xs">PROY-01</span>
+                    <span id="modal-proj-category" class="text-xs font-medium text-st-100">Categoría</span>
+                </div>
+                <button onclick="closeVoteModal()" class="p-1.5 text-white/80 hover:text-white hover:bg-white/15 rounded-lg transition cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Cuerpo del Modal -->
+            <div class="p-6 overflow-y-auto space-y-5">
+                <div>
+                    <h3 id="modal-proj-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">Título del Proyecto</h3>
+                    <p class="text-xs sm:text-sm font-medium text-slate-500 mt-1.5 flex items-center gap-1.5">
+                        <i data-lucide="users" class="w-4 h-4 text-st-600 shrink-0"></i>
+                        <span id="modal-proj-authors">Autores</span>
+                    </p>
+                </div>
+
+                <p id="modal-proj-desc" class="text-sm text-slate-600 leading-relaxed bg-st-50/60 p-4 rounded-xl border border-st-100">
+                    Descripción completa del proyecto...
+                </p>
+
+                <!-- Formulario de Voto con RUT -->
+                <form id="vote-form" class="space-y-4 pt-1">
+                    <input type="hidden" id="modal-proj-id">
+                    <div>
+                        <label for="voter-rut" class="block text-sm font-bold text-slate-800 mb-1.5">
+                            Ingresa tu RUT para registrar tu voto
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="voter-rut" required autocomplete="off" placeholder="Ej: 12.345.678-9" maxlength="12"
+                                class="w-full px-4 py-3 text-base font-mono bg-white border-2 border-slate-300 rounded-xl focus:outline-none focus:border-st-600 transition">
+                            <div id="rut-status-icon" class="absolute right-3.5 top-1/2 -translate-y-1/2 hidden"></div>
+                        </div>
+                        <p id="rut-helper-text" class="text-xs text-slate-500 mt-1.5">
+                            Solo se permite 1 voto por RUT en este stand. Puedes votar por otros proyectos libremente.
+                        </p>
+                    </div>
+
+                    <!-- Caja de Alerta dentro del modal (Errores o Éxito) -->
+                    <div id="modal-feedback" class="hidden p-3.5 rounded-xl text-sm font-medium flex items-start gap-2.5 transition-all">
+                        <i id="modal-feedback-icon" data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                        <span id="modal-feedback-msg"></span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+                        <button type="submit" id="btn-submit-vote" class="btn-vote-glow w-full py-3.5 px-5 bg-st-600 hover:bg-st-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold text-sm rounded-xl shadow-md shadow-st-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i> Confirmar Voto
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer del Modal -->
+            <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
+                <span>Votos actuales: <strong id="modal-proj-votes" class="text-st-700 text-sm">0</strong></span>
+                <button type="button" onclick="closeVoteModalAndShowAll()" class="text-st-600 hover:text-st-800 hover:underline font-bold cursor-pointer">
+                    Ver todos los proyectos →
+                </button>
+            </div>
+        </div>
     </div>
-    <p>Firebase Firestore · Firebase Authentication · GitHub Pages</p>
-  </footer>
 
-  <!-- MODAL PRODUCTO (agregar y editar) -->
-  <div id="productModal" class="product-modal" aria-hidden="true">
-    <div class="product-modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <button type="button" id="closeModalBtn" class="modal-close" aria-label="Cerrar formulario">×</button>
-
-      <div class="modal-header">
-        <span class="modal-icon" aria-hidden="true">📦</span>
-        <div>
-          <h2 id="modalTitle">Nuevo producto</h2>
-          <p class="muted" id="modalSubtitle">Completa los datos del producto.</p>
-        </div>
-      </div>
-
-      <form id="productForm" novalidate>
-        <div class="form-group">
-          <label for="productName">Nombre</label>
-          <input type="text" id="productName" maxlength="100" autocomplete="off" placeholder="Ej: Teclado mecánico" required>
-        </div>
-
-        <div class="form-group">
-          <label for="productCategory">Categoría</label>
-          <input type="text" id="productCategory" maxlength="50" autocomplete="off" list="categoryList" placeholder="Ej: Periféricos" required>
-          <datalist id="categoryList"></datalist>
-        </div>
-
-        <div class="form-group">
-          <label for="productDescription">Descripción</label>
-          <textarea id="productDescription" maxlength="250" rows="3" placeholder="Describe brevemente el producto" required></textarea>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="productPrice">Precio</label>
-            <div class="input-prefix">
-              <span>$</span>
-              <input type="number" id="productPrice" min="1" step="1" inputmode="numeric" placeholder="0" required>
+    <!-- Pie de página Institucional -->
+    <footer class="bg-st-800 text-st-100 py-6 mt-12 no-print">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="font-display font-bold text-white tracking-wider">SANTO TOMÁS</span>
+                <span class="text-st-200">• Feria de Innovación y Proyectos</span>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="productStock">Stock</label>
-            <input type="number" id="productStock" min="0" step="1" inputmode="numeric" placeholder="0" required>
-          </div>
+            <p class="text-st-200">Validación oficial mediante algoritmo Módulo 11 (RUT Chileno)</p>
         </div>
+    </footer>
 
-        <div id="formMessage" class="form-message" role="alert"></div>
+    <!-- Lógica de la Aplicación con Firebase Firestore -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, collection, doc, getDoc, setDoc, onSnapshot, 
+            runTransaction, serverTimestamp, getDocs 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        <div class="modal-actions">
-          <button type="button" id="cancelProductBtn" class="btn-secondary">Cancelar</button>
-          <button type="submit" id="saveProductBtn" class="btn-primary">Guardar producto</button>
-        </div>
-      </form>
-    </div>
-  </div>
+        // ==========================================
+        // 1. CONFIGURACIÓN E INICIALIZACIÓN FIREBASE
+        // ==========================================
+        const defaultFirebaseConfig = {
+            apiKey: "AIzaSyDis2WFXehN98Q3X1gK3-_ekuySBPChHyg",
+            authDomain: "feria-proyectos-st.firebaseapp.com",
+            projectId: "feria-proyectos-st",
+            storageBucket: "feria-proyectos-st.firebasestorage.app",
+            messagingSenderId: "973437935970",
+            appId: "1:973437935970:web:25cf78ef8678522809cc3b",
+            measurementId: "G-EGL2KWN54X"
+        };
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : defaultFirebaseConfig;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'feria-proyectos-st';
 
-  <script type="module" src="js/script.js"></script>
+        let app, auth, db, currentUser = null;
+        let allProjects = [];
+        let initialUrlProjectHandled = false;
+
+        // Proyectos iniciales de demostración
+        const SAMPLE_PROJECTS = [
+            {
+                id: "PROY-01",
+                code: "PROY-01",
+                title: "EcoRiego IoT: Agricultura Inteligente",
+                category: "Recursos Naturales",
+                authors: "Valentina Muñoz, Sebastián Silva",
+                description: "Sistema automatizado de riego por goteo controlado mediante sensores de humedad del suelo y pronóstico meteorológico en tiempo real, reduciendo el consumo hídrico hasta en un 45%.",
+                votes: 0
+            },
+            {
+                id: "PROY-02",
+                code: "PROY-02",
+                title: "MediAlert: Asistente de Medicación para Adultos Mayores",
+                category: "Área Salud",
+                authors: "Camila Contreras, Diego Araya, Javiera Soto",
+                description: "Dispositivo dispensador conectado a una aplicación móvil que alerta con luz y voz las dosis exactas de medicamentos, notificando a familiares en caso de omisión.",
+                votes: 0
+            },
+            {
+                id: "PROY-03",
+                code: "PROY-03",
+                title: "RutaSegura: Movilidad Urbana Colaborativa",
+                category: "Ingeniería e Informática",
+                authors: "Matías Rojas, Fernanda Valenzuela",
+                description: "Plataforma ciudadana que mapea en tiempo real ciclovías obstruidas, luminarias apagadas y zonas seguras para peatones y ciclistas nocturnos.",
+                votes: 0
+            },
+            {
+                id: "PROY-04",
+                code: "PROY-04",
+                title: "BioEnvase: Empaques Comestibles de Algas",
+                category: "Innovación y Sustentabilidad",
+                authors: "Ignacio Pérez, Sofía Morales",
+                description: "Alternativa biodegradable al plástico de un solo uso fabricada a partir de extractos de algas marinas chilenas, ideal para alimentos y delivery.",
+                votes: 0
+            }
+        ];
+
+        async function initFirebase() {
+            const badge = document.getElementById('connection-badge');
+            try {
+                if (!firebaseConfig) {
+                    throw new Error("Configuración de Firebase no encontrada en el entorno.");
+                }
+
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const cred = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = cred.user;
+                } else {
+                    const cred = await signInAnonymously(auth);
+                    currentUser = cred.user;
+                }
+
+                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white border border-white/25";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span> En Vivo`;
+
+                await seedSampleProjectsIfEmpty();
+                listenToProjects();
+
+            } catch (error) {
+                console.error("Error inicializando Firebase:", error);
+                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/90 text-white border border-rose-300/40";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-white"></span> Sin conexión`;
+                showToast("Error de conexión con la base de datos en la nube.", "error");
+            }
+        }
+
+        async function seedSampleProjectsIfEmpty() {
+            if (!currentUser) return;
+            const projectsCol = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
+            const snapshot = await getDocs(projectsCol);
+            if (snapshot.empty) {
+                for (const proj of SAMPLE_PROJECTS) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', proj.id);
+                    await setDoc(docRef, {
+                        ...proj,
+                        createdAt: serverTimestamp()
+                    });
+                }
+            }
+        }
+
+        function listenToProjects() {
+            if (!currentUser) return;
+            const projectsCol = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
+
+            onSnapshot(projectsCol, (snapshot) => {
+                const list = [];
+                snapshot.forEach((docSnap) => {
+                    list.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                list.sort((a, b) => (a.code || a.id).localeCompare(b.code || b.id, undefined, { numeric: true }));
+                allProjects = list;
+
+                document.getElementById('loading-projects').classList.add('hidden');
+                updateCategoryFilterOptions();
+                renderGallery();
+                renderResults();
+                renderQRCodes();
+                updateOpenModalVotes();
+
+                if (!initialUrlProjectHandled) {
+                    initialUrlProjectHandled = true;
+                    checkUrlForDirectProject();
+                }
+            }, (error) => {
+                console.error("Error escuchando proyectos:", error);
+                showToast("No se pudieron sincronizar los proyectos.", "error");
+            });
+        }
+
+        // ==========================================
+        // 2. VALIDACIÓN Y FORMATO DE RUT CHILENO
+        // ==========================================
+        function cleanRut(rut) {
+            return typeof rut === 'string' ? rut.replace(/[^0-9kK]/g, '').toUpperCase() : '';
+        }
+
+        function formatRut(value) {
+            const clean = cleanRut(value);
+            if (clean.length <= 1) return clean;
+
+            const body = clean.slice(0, -1);
+            const dv = clean.slice(-1);
+
+            let formattedBody = '';
+            for (let i = body.length - 1, j = 1; i >= 0; i--, j++) {
+                formattedBody = body[i] + formattedBody;
+                if (j % 3 === 0 && i !== 0) {
+                    formattedBody = '.' + formattedBody;
+                }
+            }
+            return `${formattedBody}-${dv}`;
+        }
+
+        function validateChileanRut(rut) {
+            const clean = cleanRut(rut);
+            if (clean.length < 7 || clean.length > 9) return false;
+
+            const body = clean.slice(0, -1);
+            const dv = clean.slice(-1);
+
+            if (!/^\d+$/.test(body)) return false;
+            if (/^(\d)\1+$/.test(body)) return false;
+
+            let sum = 0;
+            let multiplier = 2;
+
+            for (let i = body.length - 1; i >= 0; i--) {
+                sum += parseInt(body[i], 10) * multiplier;
+                multiplier = multiplier === 7 ? 2 : multiplier + 1;
+            }
+
+            const remainder = sum % 11;
+            const calculatedDv = 11 - remainder;
+
+            let expectedDv = '';
+            if (calculatedDv === 11) expectedDv = '0';
+            else if (calculatedDv === 10) expectedDv = 'K';
+            else expectedDv = String(calculatedDv);
+
+            return dv === expectedDv;
+        }
+
+        const rutInput = document.getElementById('voter-rut');
+        rutInput.addEventListener('input', (e) => {
+            const formatted = formatRut(e.target.value);
+            e.target.value = formatted;
+
+            const statusIcon = document.getElementById('rut-status-icon');
+            const clean = cleanRut(formatted);
+
+            if (clean.length >= 7) {
+                statusIcon.classList.remove('hidden');
+                if (validateChileanRut(formatted)) {
+                    e.target.classList.remove('border-rose-400', 'border-slate-300');
+                    e.target.classList.add('border-st-500');
+                    statusIcon.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-st-600"></i>`;
+                } else {
+                    e.target.classList.remove('border-st-500', 'border-slate-300');
+                    e.target.classList.add('border-rose-400');
+                    statusIcon.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-rose-500"></i>`;
+                }
+                lucide.createIcons();
+            } else {
+                statusIcon.classList.add('hidden');
+                e.target.classList.remove('border-st-500', 'border-rose-400');
+                e.target.classList.add('border-slate-300');
+            }
+        });
+
+        // ==========================================
+        // 3. LÓGICA DE VOTACIÓN EN FIRESTORE
+        // ==========================================
+        document.getElementById('vote-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                showModalFeedback("Aún conectando con el servidor. Intenta en un segundo.", "error");
+                return;
+            }
+
+            const projectId = document.getElementById('modal-proj-id').value;
+            const rawRut = rutInput.value;
+            const cleanedRut = cleanRut(rawRut);
+            const formattedRut = formatRut(rawRut);
+
+            if (!validateChileanRut(rawRut)) {
+                showModalFeedback("El RUT ingresado no es válido. Verifica el número y su dígito verificador.", "error");
+                rutInput.focus();
+                return;
+            }
+
+            const submitBtn = document.getElementById('btn-submit-vote');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Verificando voto...`;
+
+            try {
+                const voteDocId = `${projectId}_${cleanedRut}`;
+                const voteRef = doc(db, 'artifacts', appId, 'public', 'data', 'votes', voteDocId);
+                const projectRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId);
+
+                await runTransaction(db, async (transaction) => {
+                    const voteSnap = await transaction.get(voteRef);
+                    if (voteSnap.exists()) {
+                        throw new Error("ALREADY_VOTED");
+                    }
+
+                    const projSnap = await transaction.get(projectRef);
+                    if (!projSnap.exists()) {
+                        throw new Error("PROJECT_NOT_FOUND");
+                    }
+
+                    const currentVotes = projSnap.data().votes || 0;
+
+                    transaction.set(voteRef, {
+                        projectId: projectId,
+                        rut: cleanedRut,
+                        rutFormatted: formattedRut,
+                        timestamp: serverTimestamp()
+                    });
+
+                    transaction.update(projectRef, {
+                        votes: currentVotes + 1
+                    });
+                });
+
+                showModalFeedback(`¡Voto registrado con éxito para el RUT ${formattedRut}! Puedes seguir votando por otros proyectos.`, "success");
+                showToast(`¡Voto confirmado! (${formattedRut})`, "success");
+                
+                window.lastUsedRut = formattedRut;
+
+            } catch (err) {
+                if (err.message === "ALREADY_VOTED") {
+                    showModalFeedback(`El RUT ${formattedRut} ya registró un voto en este proyecto. ¡Recuerda que puedes votar por los demás stands!`, "warning");
+                } else if (err.message === "PROJECT_NOT_FOUND") {
+                    showModalFeedback("El proyecto seleccionado ya no está disponible.", "error");
+                } else {
+                    console.error("Error al registrar voto:", err);
+                    showModalFeedback("Ocurrió un error al registrar tu voto. Por favor intenta nuevamente.", "error");
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i> Confirmar Voto`;
+                lucide.createIcons();
+            }
+        });
+
+        // ==========================================
+        // 4. MANEJO DE URL DIRECTA (ESCANEO DE QR)
+        // ==========================================
+        function getProjectDirectUrl(projectId) {
+            const baseUrl = window.location.origin + window.location.pathname;
+            return `${baseUrl}?proyecto=${encodeURIComponent(projectId)}`;
+        }
+
+        function checkUrlForDirectProject() {
+            const params = new URLSearchParams(window.location.search);
+            const targetId = params.get('proyecto');
+
+            if (targetId) {
+                const found = allProjects.find(p => p.id.toLowerCase() === targetId.toLowerCase());
+                document.getElementById('qr-direct-banner').classList.remove('hidden');
+                if (found) {
+                    openVoteModal(found.id);
+                } else {
+                    showToast(`No se encontró el proyecto "${targetId}". Mostrando todos los stands.`, "warning");
+                }
+            }
+        }
+
+        window.clearUrlParam = function() {
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+            document.getElementById('qr-direct-banner').classList.add('hidden');
+            closeVoteModal();
+        };
+
+        // ==========================================
+        // 5. RENDERIZADO DE VISTAS (GALERÍA, RANKING, QR)
+        // ==========================================
+        function updateCategoryFilterOptions() {
+            const select = document.getElementById('category-filter');
+            const currentVal = select.value;
+            const categories = [...new Set(allProjects.map(p => p.category).filter(Boolean))];
+
+            select.innerHTML = `<option value="TODAS">Todas las categorías</option>`;
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
+            if (categories.includes(currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        function renderGallery() {
+            const grid = document.getElementById('projects-grid');
+            const emptyState = document.getElementById('empty-projects');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            const filtered = allProjects.filter(p => {
+                const matchesCat = categoryFilter === 'TODAS' || p.category === categoryFilter;
+                const matchesSearch = !searchTerm || 
+                    (p.title && p.title.toLowerCase().includes(searchTerm)) ||
+                    (p.code && p.code.toLowerCase().includes(searchTerm)) ||
+                    (p.authors && p.authors.toLowerCase().includes(searchTerm)) ||
+                    (p.description && p.description.toLowerCase().includes(searchTerm));
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.classList.remove('hidden');
+
+            grid.innerHTML = filtered.map((proj, index) => `
+                <article style="animation-delay: ${index * 45}ms" class="project-card animate-fade-up bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm flex flex-col justify-between">
+                    <!-- Barra superior de acento institucional -->
+                    <div class="h-1.5 w-full bg-gradient-to-r from-st-600 to-st-500"></div>
+                    
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                <span class="px-2.5 py-1 bg-st-50 text-st-700 font-mono text-xs font-extrabold rounded-lg border border-st-200">
+                                    ${escapeHtml(proj.code || proj.id)}
+                                </span>
+                                <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
+                                    ${escapeHtml(proj.category || 'General')}
+                                </span>
+                            </div>
+
+                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-1.5 leading-snug">
+                                ${escapeHtml(proj.title)}
+                            </h3>
+
+                            <p class="text-xs font-medium text-slate-500 mb-3 flex items-center gap-1.5">
+                                <i data-lucide="users" class="w-3.5 h-3.5 text-st-600 shrink-0"></i>
+                                <span>${escapeHtml(proj.authors)}</span>
+                            </p>
+
+                            <p class="text-sm text-slate-600 line-clamp-3 leading-relaxed mb-5">
+                                ${escapeHtml(proj.description)}
+                            </p>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2 text-slate-700">
+                                <div class="bg-st-50 text-st-600 p-2 rounded-xl border border-st-100">
+                                    <i data-lucide="award" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <span class="text-base font-black text-slate-900 leading-none block">${proj.votes || 0}</span>
+                                    <span class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">votos</span>
+                                </div>
+                            </div>
+
+                            <button onclick="openVoteModal('${escapeHtml(proj.id)}')" 
+                                class="btn-vote-glow px-5 py-2.5 bg-st-600 hover:bg-st-700 active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer">
+                                <i data-lucide="vote" class="w-4 h-4"></i> Votar Proyecto
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function renderResults() {
+            const container = document.getElementById('results-list');
+            const totalCounter = document.getElementById('total-votes-counter');
+
+            const sorted = [...allProjects].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+            const totalVotes = sorted.reduce((acc, p) => acc + (p.votes || 0), 0);
+            const maxVotes = sorted.length > 0 ? Math.max(...sorted.map(p => p.votes || 0), 1) : 1;
+
+            totalCounter.textContent = totalVotes;
+
+            if (sorted.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-500 py-8 text-sm">Aún no hay proyectos registrados.</p>`;
+                return;
+            }
+
+            container.innerHTML = sorted.map((proj, idx) => {
+                const votes = proj.votes || 0;
+                const pctOfTotal = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+                const barWidth = totalVotes > 0 ? Math.round((votes / maxVotes) * 100) : 0;
+                
+                let medalBadge = `<span class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0">#${idx + 1}</span>`;
+                if (idx === 0 && votes > 0) medalBadge = `<span class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-black text-xs flex items-center justify-center shrink-0 shadow-xs">1°</span>`;
+                if (idx === 1 && votes > 0) medalBadge = `<span class="w-8 h-8 rounded-full bg-slate-200 text-slate-800 border border-slate-300 font-black text-xs flex items-center justify-center shrink-0">2°</span>`;
+                if (idx === 2 && votes > 0) medalBadge = `<span class="w-8 h-8 rounded-full bg-orange-100 text-orange-800 border border-orange-300 font-black text-xs flex items-center justify-center shrink-0">3°</span>`;
+
+                return `
+                    <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-st-200 transition-colors">
+                        <div class="flex items-center justify-between gap-3 mb-2.5">
+                            <div class="flex items-center gap-3 min-w-0">
+                                ${medalBadge}
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-mono font-extrabold text-st-600 bg-st-50 px-2 py-0.5 rounded">${escapeHtml(proj.code || proj.id)}</span>
+                                        <h4 class="font-bold text-slate-900 text-sm sm:text-base truncate">${escapeHtml(proj.title)}</h4>
+                                    </div>
+                                    <p class="text-xs text-slate-500 truncate mt-0.5">${escapeHtml(proj.authors)}</p>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="text-xl font-black text-slate-900">${votes}</span>
+                                <span class="text-xs font-semibold text-st-600 block">${pctOfTotal}%</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-200/90 rounded-full h-3 overflow-hidden">
+                            <div class="progress-bar-shimmer bg-gradient-to-r from-st-600 to-st-500 h-3 rounded-full" style="width: ${barWidth}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderQRCodes() {
+            const printArea = document.getElementById('print-area');
+            if (allProjects.length === 0) {
+                printArea.innerHTML = `<p class="col-span-full text-center text-slate-500 py-10">No hay proyectos disponibles para generar QR.</p>`;
+                return;
+            }
+
+            printArea.innerHTML = allProjects.map(proj => {
+                const directUrl = getProjectDirectUrl(proj.id);
+                return `
+                    <div class="qr-card-print bg-white rounded-2xl border-2 border-st-600/30 p-6 flex flex-col items-center text-center shadow-sm">
+                        <div class="flex items-center gap-1.5 text-st-600 font-display font-extrabold text-xs tracking-wider mb-2">
+                            <span>SANTO TOMÁS</span>
+                        </div>
+                        <span class="px-3.5 py-1 bg-st-600 text-white font-mono text-xs font-bold rounded-full mb-3">
+                            STAND ${escapeHtml(proj.code || proj.id)}
+                        </span>
+                        <h3 class="font-extrabold text-slate-900 text-lg leading-tight mb-1 line-clamp-2">
+                            ${escapeHtml(proj.title)}
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-4 line-clamp-1">${escapeHtml(proj.authors)}</p>
+                        
+                        <!-- Contenedor donde QRCode.js dibujará el QR estático -->
+                        <div id="qrcode-${escapeHtml(proj.id)}" class="p-3 bg-white border-2 border-st-100 rounded-xl mb-4 flex items-center justify-center"></div>
+                        
+                        <p class="text-xs font-extrabold text-st-600 uppercase tracking-wide mb-1">Escanea para votar con tu RUT</p>
+                        <p class="text-[10px] text-slate-400 font-mono break-all max-w-full px-2">${escapeHtml(directUrl)}</p>
+
+                        <div class="mt-4 pt-3 border-t border-slate-100 w-full flex justify-center gap-2 no-print">
+                            <button onclick="copyProjectLink('${escapeHtml(proj.id)}')" class="text-xs font-semibold text-slate-600 hover:text-st-600 flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-st-50 transition cursor-pointer">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar enlace directo
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            allProjects.forEach(proj => {
+                const container = document.getElementById(`qrcode-${proj.id}`);
+                if (container) {
+                    container.innerHTML = '';
+                    new QRCode(container, {
+                        text: getProjectDirectUrl(proj.id),
+                        width: 170,
+                        height: 170,
+                        colorDark: "#003826",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }
+            });
+
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // 6. AGREGAR NUEVO PROYECTO (ADMIN)
+        // ==========================================
+        document.getElementById('add-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const rawCode = document.getElementById('proj-code').value.trim().toUpperCase().replace(/[^A-Z0-9-_]/g, '-');
+            const category = document.getElementById('proj-category').value.trim();
+            const title = document.getElementById('proj-title').value.trim();
+            const authors = document.getElementById('proj-authors').value.trim();
+            const description = document.getElementById('proj-desc').value.trim();
+
+            if (!rawCode || !title || !authors || !description) return;
+
+            const btn = document.getElementById('btn-save-project');
+            btn.disabled = true;
+            btn.textContent = "Guardando...";
+
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', rawCode);
+                const existing = await getDoc(docRef);
+
+                if (existing.exists()) {
+                    showToast(`Ya existe un proyecto con el código "${rawCode}". Usa otro código.`, "error");
+                    btn.disabled = false;
+                    btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Guardar Proyecto y Generar QR`;
+                    lucide.createIcons();
+                    return;
+                }
+
+                await setDoc(docRef, {
+                    id: rawCode,
+                    code: rawCode,
+                    category,
+                    title,
+                    authors,
+                    description,
+                    votes: 0,
+                    createdAt: serverTimestamp()
+                });
+
+                document.getElementById('add-project-form').reset();
+                showToast(`Proyecto ${rawCode} creado y su QR estático está listo.`, "success");
+                switchTab('qr');
+
+            } catch (error) {
+                console.error("Error guardando proyecto:", error);
+                showToast("Error al guardar el proyecto.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Guardar Proyecto y Generar QR`;
+                lucide.createIcons();
+            }
+        });
+
+        // ==========================================
+        // 7. CONTROLADORES DE UI Y MODALES
+        // ==========================================
+        window.openVoteModal = function(projectId) {
+            const proj = allProjects.find(p => p.id === projectId);
+            if (!proj) return;
+
+            document.getElementById('modal-proj-id').value = proj.id;
+            document.getElementById('modal-proj-code').textContent = proj.code || proj.id;
+            document.getElementById('modal-proj-category').textContent = proj.category || 'General';
+            document.getElementById('modal-proj-title').textContent = proj.title;
+            document.getElementById('modal-proj-authors').textContent = proj.authors;
+            document.getElementById('modal-proj-desc').textContent = proj.description;
+            document.getElementById('modal-proj-votes').textContent = proj.votes || 0;
+
+            const feedback = document.getElementById('modal-feedback');
+            feedback.classList.add('hidden');
+
+            if (window.lastUsedRut) {
+                rutInput.value = window.lastUsedRut;
+                rutInput.dispatchEvent(new Event('input'));
+            } else {
+                rutInput.value = '';
+                document.getElementById('rut-status-icon').classList.add('hidden');
+                rutInput.classList.remove('border-st-500', 'border-rose-400');
+                rutInput.classList.add('border-slate-300');
+            }
+
+            const modal = document.getElementById('vote-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        };
+
+        window.closeVoteModal = function() {
+            const modal = document.getElementById('vote-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.closeVoteModalAndShowAll = function() {
+            closeVoteModal();
+            switchTab('galeria');
+        };
+
+        function updateOpenModalVotes() {
+            const modal = document.getElementById('vote-modal');
+            if (!modal.classList.contains('hidden')) {
+                const openId = document.getElementById('modal-proj-id').value;
+                const proj = allProjects.find(p => p.id === openId);
+                if (proj) {
+                    document.getElementById('modal-proj-votes').textContent = proj.votes || 0;
+                }
+            }
+        }
+
+        function showModalFeedback(message, type = "info") {
+            const box = document.getElementById('modal-feedback');
+            const msg = document.getElementById('modal-feedback-msg');
+            const icon = document.getElementById('modal-feedback-icon');
+
+            box.classList.remove('hidden', 'bg-st-50', 'text-st-800', 'border-st-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'bg-amber-50', 'text-amber-800', 'border-amber-200');
+            box.classList.add('border', 'animate-fade-up');
+
+            if (type === 'success') {
+                box.classList.add('bg-st-50', 'text-st-800', 'border-st-200');
+                icon.setAttribute('data-lucide', 'check-circle-2');
+            } else if (type === 'warning') {
+                box.classList.add('bg-amber-50', 'text-amber-800', 'border-amber-200');
+                icon.setAttribute('data-lucide', 'alert-triangle');
+            } else {
+                box.classList.add('bg-rose-50', 'text-rose-800', 'border-rose-200');
+                icon.setAttribute('data-lucide', 'x-circle');
+            }
+
+            msg.textContent = message;
+            lucide.createIcons();
+        }
+
+        window.switchTab = function(tabName) {
+            const views = ['galeria', 'resultados', 'qr', 'admin'];
+            views.forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                
+                // Desktop nav
+                const navBtn = document.getElementById(`nav-${v}`);
+                if (navBtn) {
+                    navBtn.className = "tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10";
+                }
+                // Mobile nav
+                const mnavBtn = document.getElementById(`mnav-${v}`);
+                if (mnavBtn) {
+                    mnavBtn.className = "mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all";
+                }
+            });
+
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeNav) {
+                activeNav.className = "tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-white text-st-600 shadow-sm";
+            }
+            const activeMnav = document.getElementById(`mnav-${tabName}`);
+            if (activeMnav) {
+                activeMnav.className = "mtab-btn flex flex-col items-center py-1 px-3 rounded-lg bg-white text-st-600 font-bold text-xs transition-all";
+            }
+        };
+
+        window.copyProjectLink = function(projectId) {
+            const url = getProjectDirectUrl(projectId);
+            const tempInput = document.createElement('input');
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast(`Enlace directo copiado para ${projectId}`, "success");
+        };
+
+        function showToast(text, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let colors = "bg-slate-900 text-white";
+            if (type === "success") colors = "bg-st-600 text-white border border-st-500";
+            if (type === "error") colors = "bg-rose-600 text-white";
+            if (type === "warning") colors = "bg-amber-600 text-white";
+
+            toast.className = `${colors} px-4 py-3 rounded-xl shadow-lg text-sm font-semibold flex items-center justify-between gap-3 pointer-events-auto animate-fade-up`;
+            toast.innerHTML = `<span>${escapeHtml(text)}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3800);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        document.getElementById('search-input').addEventListener('input', renderGallery);
+        document.getElementById('category-filter').addEventListener('change', renderGallery);
+
+        document.getElementById('vote-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'vote-modal') closeVoteModal();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initFirebase();
+        });
+    </script>
 </body>
 </html>
