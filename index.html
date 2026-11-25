@@ -1,633 +1,1142 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Santo Tomás | Feria de Innovación y Votación de Proyectos</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- QRCode.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feria de Proyectos e Innovación | Santo Tomás</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        st: {
-                            50: '#eef7f3',
-                            100: '#d5ece2',
-                            200: '#aedac7',
-                            500: '#008556',
-                            600: '#005C3E', // Verde Institucional Santo Tomás
-                            700: '#004830',
-                            800: '#003826',
-                            900: '#00291c',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    :root {
+      --st-green-dark: #00432D;
+      --st-green-primary: #005C3E;
+      --st-green-vibrant: #008556;
+      --st-green-light: #E6F4EF;
+      --st-gold: #C5A059;
+    }
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f5;
-            scroll-behavior: smooth;
-        }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f4f7f6;
+      color: #0f172a;
+      overflow-x: hidden;
+    }
 
-        h1, h2, h3, .font-display {
-            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-        }
+    /* Animaciones suaves y resaltadoras */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-        /* Estilos exclusivos para impresión de tarjetas QR */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #print-area, #print-area * {
-                visibility: visible;
-            }
-            #print-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .qr-card-print {
-                break-inside: avoid;
-                page-break-inside: avoid;
-                border: 2px solid #005C3E !important;
-                box-shadow: none !important;
-                margin-bottom: 1.5rem;
-            }
-        }
+    @keyframes modalScaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
 
-        /* Animaciones suaves y resaltadoras */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes modalPop {
-            0% { opacity: 0; transform: scale(0.94) translateY(10px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        @keyframes shimmerSweep {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 133, 86, 0.35); }
-            50% { box-shadow: 0 0 0 8px rgba(0, 133, 86, 0); }
-        }
+    @keyframes subtlePulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 133, 86, 0.35);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(0, 133, 86, 0);
+      }
+    }
 
-        .animate-fade-up {
-            animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-modal-pop {
-            animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+    .animate-fade-up {
+      animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 
-        /* Tarjeta interactiva con elevación y brillo institucional */
-        .project-card {
-            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-                        box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-                        border-color 0.28s ease;
-        }
-        .project-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 14px 28px -8px rgba(0, 92, 62, 0.14), 0 4px 10px -4px rgba(0, 92, 62, 0.08);
-            border-color: #008556;
-        }
+    .animate-modal {
+      animation: modalScaleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 
-        /* Barra de progreso con brillo animado */
-        .progress-bar-shimmer {
-            position: relative;
-            overflow: hidden;
-            transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .progress-bar-shimmer::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent);
-            animation: shimmerSweep 2.4s infinite;
-        }
+    .project-card {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.3s ease;
+    }
 
-        .btn-vote-glow:hover {
-            animation: pulseGlow 1.6s infinite;
-        }
-    </style>
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 32px -10px rgba(0, 92, 62, 0.16);
+      border-color: #008556;
+    }
+
+    .btn-st {
+      background: linear-gradient(135deg, #005C3E 0%, #007A52 100%);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-st:hover {
+      background: linear-gradient(135deg, #004A32 0%, #006644 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px -4px rgba(0, 92, 62, 0.35);
+    }
+
+    .btn-st:active {
+      transform: translateY(0);
+    }
+
+    .pulse-live {
+      animation: subtlePulse 2.4s infinite;
+    }
+
+    /* Estilos específicos para impresión de códigos QR */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-qr-area, #print-qr-area * {
+        visibility: visible;
+      }
+      #print-qr-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .qr-print-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 2px solid #005C3E !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col">
 
-    <!-- Franja Institucional Superior -->
-    <div class="bg-st-700 text-white/90 text-[11px] py-1.5 px-4 text-center font-medium tracking-wide no-print">
-        TÚ PUEDES • SISTEMA OFICIAL DE VOTACIÓN ESTUDIANTIL E INNOVACIÓN
+  <!-- Barra Superior Institucional -->
+  <header class="bg-[#005C3E] text-white sticky top-0 z-30 shadow-lg border-b border-[#00432D]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2">
+      <!-- Logo Santo Tomás en esquina superior izquierda -->
+      <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('proyectos')">
+        <div class="bg-white p-1.5 sm:p-2 rounded-xl shadow-md transition-transform duration-300 group-hover:scale-105 shrink-0">
+          <!-- Emblema Institucional SVG -->
+          <svg class="w-8 h-8 sm:w-9 sm:h-9" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Santo Tomás">
+            <path d="M10 10C10 7.79086 11.7909 6 14 6H50C52.2091 6 54 7.79086 54 10V32C54 46.5 32 58 32 58C32 58 10 46.5 10 32V10Z" fill="#005C3E"/>
+            <path d="M14 10H50V31.5C50 43.2 32 53.2 32 53.2C32 53.2 14 43.2 14 31.5V10Z" stroke="#C5A059" stroke-width="2"/>
+            <path d="M32 14L34.4 21.2L42 21.2L35.8 25.6L38.2 32.8L32 28.4L25.8 32.8L28.2 25.6L22 21.2L29.6 21.2L32 14Z" fill="#C5A059"/>
+            <path d="M22 39C25.5 41.5 38.5 41.5 42 39" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="leading-tight">
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-sm sm:text-lg tracking-tight text-white uppercase">Santo Tomás</span>
+            <span class="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-[#C5A059]"></span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-emerald-100/90 font-medium">Feria de Proyectos e Innovación</p>
+        </div>
+      </div>
+
+      <!-- Navegación Responsiva -->
+      <nav class="flex items-center gap-1 sm:gap-2 bg-[#00432D]/70 p-1 rounded-xl border border-white/10">
+        <button id="tab-btn-proyectos" onclick="switchTab('proyectos')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-[#005C3E] shadow-sm flex items-center gap-1.5">
+          <i data-lucide="layout-grid" class="w-4 h-4"></i>
+          <span>Proyectos</span>
+        </button>
+        <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-emerald-100 hover:text-white flex items-center gap-1.5">
+          <i data-lucide="trophy" class="w-4 h-4"></i>
+          <span>Ranking</span>
+        </button>
+        <button id="tab-btn-qr" onclick="switchTab('qr')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-emerald-100 hover:text-white flex items-center gap-1.5">
+          <i data-lucide="qr-code" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Códigos QR</span>
+          <span class="sm:hidden">QRs</span>
+        </button>
+        <!-- Pestaña Administrar: OCULTA EN CELULARES (hidden md:flex) Y SIN PIN -->
+        <button id="tab-btn-admin" onclick="switchTab('admin')" class="tab-btn hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold transition-all text-emerald-100 hover:text-white items-center gap-1.5">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span>Administrar</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Banner de Estado y Conexión -->
+  <div class="bg-white border-b border-slate-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2 text-slate-600">
+        <span id="connection-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 pulse-live"></span>
+        <span id="connection-text" class="font-medium">Conectando con base de datos en vivo...</span>
+      </div>
+      <div class="flex items-center gap-3 text-slate-500">
+        <span class="inline-flex items-center gap-1 font-medium text-[#005C3E] bg-[#E6F4EF] px-2.5 py-0.5 rounded-full">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          1 voto por RUT en cada proyecto
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- Alerta de protocolo file:// si el usuario abre local -->
+    <div id="local-warning" class="hidden mb-6 bg-amber-50 border border-amber-300 text-amber-900 rounded-2xl p-4 flex items-start gap-3 animate-fade-up">
+      <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+      <div class="text-xs sm:text-sm">
+        <p class="font-bold">Estás abriendo el archivo localmente</p>
+        <p class="mt-0.5 text-amber-800">Para que los códigos QR funcionen en los celulares de los asistentes, asegúrate de abrir y compartir tu enlace público de GitHub Pages.</p>
+      </div>
     </div>
 
-    <!-- Barra de Navegación Superior Institucional Santo Tomás -->
-    <header class="bg-st-600 text-white shadow-md sticky top-0 z-30 no-print">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16 sm:h-18">
-                <!-- Logo / Emblema Vectorizado Santo Tomás (Esquina Superior Izquierda) -->
-                <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('galeria')">
-                    <div class="bg-white p-1.5 sm:p-2 rounded-xl shadow-sm transition-transform duration-300 group-hover:scale-105 shrink-0">
-                        <!-- Emblema SVG Institucional Santo Tomás (Cruz de Calatrava / Escudo minimalista) -->
-                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-st-600" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Santo Tomás">
-                            <!-- Marco escudo minimalista -->
-                            <path d="M8 6H40V24C40 34.5 24 42 24 42C24 42 8 34.5 8 24V6Z" stroke="#005C3E" stroke-width="2.5" fill="#EEF7F3"/>
-                            <!-- Cruz institucional estilizada -->
-                            <path d="M24 11V35M14 21H34" stroke="#005C3E" stroke-width="3.4" stroke-linecap="round"/>
-                            <!-- Remates flordelisados minimalistas -->
-                            <circle cx="24" cy="11" r="2.2" fill="#008556"/>
-                            <circle cx="24" cy="35" r="2.2" fill="#008556"/>
-                            <circle cx="14" cy="21" r="2.2" fill="#008556"/>
-                            <circle cx="34" cy="21" r="2.2" fill="#008556"/>
-                            <circle cx="24" cy="21" r="2.6" fill="#005C3E"/>
-                        </svg>
-                    </div>
-                    <div class="leading-tight">
-                        <span class="font-display font-extrabold text-base sm:text-xl tracking-wider text-white block">SANTO TOMÁS</span>
-                        <span class="text-[11px] sm:text-xs font-medium text-st-100 block">Feria de Innovación y Proyectos</span>
-                    </div>
-                </div>
+    <!-- VISTA 1: CATÁLOGO DE PROYECTOS -->
+    <section id="view-proyectos" class="animate-fade-up">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#008556]">Votación Oficial</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">Proyectos Participantes</h1>
+          <p class="text-sm text-slate-600 mt-1">Selecciona un proyecto para votar con tu RUT o escanea el código QR ubicado en cada stand.</p>
+        </div>
+        <div class="relative w-full sm:w-72">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="search-input" oninput="renderProjects()" placeholder="Buscar proyecto, equipo o área..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] focus:border-transparent transition-all shadow-sm" />
+        </div>
+      </div>
 
-                <!-- Navegación Desktop & Tablet -->
-                <nav class="hidden md:flex items-center gap-1.5 bg-st-700/70 p-1.5 rounded-xl border border-white/10">
-                    <button onclick="switchTab('galeria')" id="nav-galeria" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-white text-st-600 shadow-sm">
-                        <i data-lucide="layout-grid" class="w-4 h-4"></i> Proyectos
-                    </button>
-                    <button onclick="switchTab('resultados')" id="nav-resultados" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
-                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Resultados en Vivo
-                    </button>
-                    <button onclick="switchTab('qr')" id="nav-qr" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
-                        <i data-lucide="printer" class="w-4 h-4"></i> Códigos QR
-                    </button>
-                    <button onclick="switchTab('admin')" id="nav-admin" class="tab-btn hidden md:flex px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
-                        <i data-lucide="settings-2" class="w-4 h-4"></i> Administrar
-                    </button>
-                </nav>
+      <!-- Grid de Proyectos -->
+      <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        <!-- Se llena dinámicamente -->
+      </div>
+    </section>
 
-                <!-- Estado de conexión en vivo -->
-                <div class="flex items-center gap-2">
-                    <span id="connection-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white border border-white/20 backdrop-blur-sm">
-                        <span class="w-2 h-2 rounded-full bg-amber-300 animate-pulse"></span>
-                        Conectando...
-                    </span>
-                </div>
-            </div>
+    <!-- VISTA 2: RANKING EN VIVO -->
+    <section id="view-ranking" class="hidden animate-fade-up">
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#008556]">Resultados en Tiempo Real</span>
+            <h2 class="text-2xl font-extrabold text-slate-900 mt-0.5">Tabla de Posiciones</h2>
+            <p class="text-sm text-slate-500 mt-1">Actualización automática con cada voto validado.</p>
+          </div>
+          <div class="bg-[#E6F4EF] border border-[#008556]/20 rounded-2xl px-5 py-3 text-center sm:text-right">
+            <span class="text-xs font-semibold text-[#005C3E] uppercase tracking-wider block">Total Votos Emitidos</span>
+            <span id="total-votes-badge" class="text-3xl font-extrabold text-[#005C3E]">0</span>
+          </div>
         </div>
 
-        <!-- Navegación Móvil Adaptativa (Sin acceso a Administración en celulares) -->
-        <div class="md:hidden border-t border-white/15 bg-st-700 px-2 py-1.5 flex justify-around">
-            <button onclick="switchTab('galeria')" id="mnav-galeria" class="mtab-btn flex flex-col items-center py-1 px-4 rounded-lg bg-white text-st-600 font-bold text-xs transition-all">
-                <i data-lucide="layout-grid" class="w-4 h-4 mb-0.5"></i> Proyectos
-            </button>
-            <button onclick="switchTab('resultados')" id="mnav-resultados" class="mtab-btn flex flex-col items-center py-1 px-4 rounded-lg text-st-100 font-medium text-xs transition-all">
-                <i data-lucide="bar-chart-3" class="w-4 h-4 mb-0.5"></i> Ranking
-            </button>
-            <button onclick="switchTab('qr')" id="mnav-qr" class="mtab-btn flex flex-col items-center py-1 px-4 rounded-lg text-st-100 font-medium text-xs transition-all">
-                <i data-lucide="printer" class="w-4 h-4 mb-0.5"></i> QRs
-            </button>
+        <div id="ranking-list" class="mt-6 space-y-4">
+          <!-- Se llena dinámicamente -->
         </div>
-    </header>
+      </div>
+    </section>
 
-    <!-- Notificación Toast Flotante -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0 no-print"></div>
-
-    <!-- Contenido Principal -->
-    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-
-        <!-- Banner de Proyecto Escaneado por QR (Visible solo si viene ?proyecto=ID) -->
-        <div id="qr-direct-banner" class="hidden mb-6 bg-gradient-to-r from-st-700 to-st-600 text-white rounded-2xl p-4 sm:p-5 shadow-lg border border-st-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-up no-print">
-            <div class="flex items-center gap-3.5">
-                <div class="bg-white/15 p-2.5 rounded-xl shrink-0">
-                    <i data-lucide="scan-line" class="w-6 h-6 text-st-100"></i>
-                </div>
-                <div>
-                    <p class="text-[11px] uppercase tracking-wider font-bold text-st-200">Acceso directo mediante código QR</p>
-                    <p class="text-sm sm:text-base font-medium">Estás viendo el proyecto escaneado. Ingresa tu RUT para registrar tu voto.</p>
-                </div>
-            </div>
-            <button onclick="clearUrlParam()" class="w-full sm:w-auto px-4 py-2 bg-white text-st-700 hover:bg-st-50 font-bold text-sm rounded-xl transition shrink-0 text-center shadow-sm cursor-pointer">
-                Ver todos los proyectos
-            </button>
+    <!-- VISTA 3: CÓDIGOS QR ESTÁTICOS -->
+    <section id="view-qr" class="hidden animate-fade-up">
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-8 mb-6 no-print">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#008556]">Material Imprimible</span>
+            <h2 class="text-2xl font-extrabold text-slate-900 mt-0.5">Códigos QR Estáticos por Stand</h2>
+            <p class="text-sm text-slate-600 mt-1">Cada código apunta de forma permanente a su proyecto. Imprímelos y pégalos en cada stand.</p>
+          </div>
+          <button onclick="window.print()" class="btn-st text-white font-semibold px-5 py-3 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md shrink-0">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Imprimir Tarjetas QR</span>
+          </button>
         </div>
+      </div>
 
-        <!-- VISTA 1: GALERÍA DE PROYECTOS -->
-        <section id="view-galeria" class="space-y-6 animate-fade-up">
-            <!-- Encabezado y Filtros -->
-            <div class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div>
-                    <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-st-600 bg-st-50 px-2.5 py-1 rounded-md mb-1.5">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Votación Participativa
-                    </div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Proyectos en Exposición</h1>
-                    <p class="text-slate-600 text-sm mt-1">Explora los stands o escanea su QR. Puedes emitir <strong>1 voto por proyecto</strong> validando tu RUT.</p>
-                </div>
+      <div id="print-qr-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Se llena dinámicamente -->
+      </div>
+    </section>
 
-                <!-- Buscador y Filtro -->
-                <div class="flex flex-col sm:flex-row gap-2.5 w-full lg:w-auto shrink-0">
-                    <div class="relative flex-grow sm:w-64">
-                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                        <input type="text" id="search-input" placeholder="Buscar proyecto, código o equipo..." 
-                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500 focus:border-transparent transition">
-                    </div>
-                    <select id="category-filter" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500 transition">
-                        <option value="TODAS">Todas las categorías</option>
-                    </select>
-                </div>
+    <!-- VISTA 4: ADMINISTRAR PROYECTOS (EXCLUSIVA PARA PC, OCULTA EN CELULARES, SIN PIN) -->
+    <section id="view-admin" class="hidden md:block animate-fade-up" style="display: none;">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Formulario Crear / Editar -->
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sticky top-24">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <span id="form-badge" class="text-xs font-bold uppercase tracking-wider text-[#008556]">Nuevo Stand</span>
+                <h2 id="form-title" class="text-xl font-extrabold text-slate-900">Agregar Proyecto</h2>
+              </div>
+              <button type="button" id="cancel-edit-btn" onclick="resetAdminForm()" class="hidden text-xs font-semibold text-slate-500 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg">
+                Cancelar edición
+              </button>
             </div>
 
-            <!-- Estado de Carga -->
-            <div id="loading-projects" class="py-16 text-center">
-                <div class="inline-block w-9 h-9 border-4 border-st-600 border-t-transparent rounded-full animate-spin mb-3"></div>
-                <p class="text-slate-600 text-sm font-medium">Cargando proyectos de la feria Santo Tomás...</p>
-            </div>
+            <form id="project-form" onsubmit="handleSaveProject(event)" class="space-y-4">
+              <input type="hidden" id="edit-project-id" value="" />
 
-            <!-- Grid de Tarjetas de Proyectos -->
-            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
-                <!-- Inyectado dinámicamente -->
-            </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Código Fijo (Para QR)</label>
+                <input type="text" id="proj-code" required placeholder="Ej: PROY-01" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold text-[#005C3E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#008556]" />
+                <p class="text-[11px] text-slate-400 mt-1">Este código define la URL estática del QR.</p>
+              </div>
 
-            <!-- Estado Vacío -->
-            <div id="empty-projects" class="hidden py-16 text-center bg-white rounded-2xl border border-slate-200 p-6">
-                <i data-lucide="folder-search" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
-                <h3 class="text-lg font-bold text-slate-800">No se encontraron proyectos</h3>
-                <p class="text-slate-500 text-sm mt-1">Intenta con otro término de búsqueda o cambia la categoría seleccionada.</p>
-            </div>
-        </section>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre del Proyecto</label>
+                <input type="text" id="proj-title" required placeholder="Ej: Sistema de Riego Automatizado IoT" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556]" />
+              </div>
 
-        <!-- VISTA 2: RESULTADOS EN VIVO -->
-        <section id="view-resultados" class="hidden space-y-6 animate-fade-up">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-                    <div>
-                        <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-st-600 bg-st-50 border border-st-200 px-3 py-1 rounded-full mb-2">
-                            <span class="w-2 h-2 rounded-full bg-st-500 animate-ping"></span> Sincronización en Tiempo Real
-                        </span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Ranking Oficial de Proyectos</h2>
-                        <p class="text-slate-500 text-sm mt-0.5">Conteo transparente de votos válidos registrados por RUT.</p>
-                    </div>
-                    <div class="bg-st-50 px-6 py-3.5 rounded-2xl border border-st-200 text-right">
-                        <span class="text-xs font-semibold text-st-700 uppercase tracking-wider block">Total Votos Emitidos</span>
-                        <span id="total-votes-counter" class="text-3xl sm:text-4xl font-black text-st-600">0</span>
-                    </div>
-                </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Área / Carrera</label>
+                <input type="text" id="proj-category" required placeholder="Ej: Ingeniería en Informática" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556]" />
+              </div>
 
-                <!-- Lista de Barras de Progreso -->
-                <div id="results-list" class="mt-6 space-y-4">
-                    <!-- Inyectado dinámicamente -->
-                </div>
-            </div>
-        </section>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Integrantes / Equipo</label>
+                <input type="text" id="proj-team" required placeholder="Ej: Camila Soto, Diego Rojas" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556]" />
+              </div>
 
-        <!-- VISTA 3: CÓDIGOS QR ESTÁTICOS PARA IMPRIMIR -->
-        <section id="view-qr" class="hidden space-y-6 animate-fade-up">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
-                <div>
-                    <h2 class="text-2xl font-extrabold text-slate-900">Códigos QR Estáticos por Stand</h2>
-                    <p class="text-slate-600 text-sm mt-1">Cada QR apunta de forma permanente a su proyecto. Imprime estas tarjetas y colócalas en cada stand de la feria.</p>
-                </div>
-                <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-st-600 hover:bg-st-700 text-white font-bold text-sm rounded-xl shadow-sm transition cursor-pointer shrink-0">
-                    <i data-lucide="printer" class="w-4 h-4"></i> Imprimir Tarjetas QR
-                </button>
-            </div>
-        <!-- VISTA 4: ADMINISTRACIÓN COMPLETA DE PROYECTOS (Solo visible en PC/Escritorio) -->
-        <section id="view-admin" class="hidden max-w-5xl mx-auto animate-fade-up space-y-6">
-            <!-- Aviso exclusivo si se redimensiona a móvil -->
-            <div class="md:hidden bg-white rounded-2xl border border-slate-200 p-6 text-center shadow-sm">
-                <i data-lucide="monitor" class="w-10 h-10 text-st-600 mx-auto mb-2"></i>
-                <h3 class="text-base font-bold text-slate-900">Panel disponible solo en PC</h3>
-                <p class="text-xs text-slate-500 mt-1">Por seguridad, la administración de proyectos solo está habilitada desde un computador de escritorio.</p>
-            </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Descripción Breve</label>
+                <textarea id="proj-desc" rows="3" required placeholder="Explica en qué consiste el proyecto y qué problema resuelve..." class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556]"></textarea>
+              </div>
 
-            <!-- Panel Directo de Administración (Oculto en móviles) -->
-            <div id="admin-unlocked-panel" class="hidden md:block space-y-6">
-                <!-- Barra Superior de Acciones Globales -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-st-600 bg-st-50 px-2.5 py-1 rounded-md mb-1">
-                            <i data-lucide="settings-2" class="w-3.5 h-3.5"></i> Panel de Administración
-                        </div>
-                        <h2 class="text-2xl font-extrabold text-slate-900">Gestión de Stands y Proyectos</h2>
-                        <p class="text-slate-500 text-sm">Administra los proyectos reales, edita sus datos sin cambiar sus QR o limpia los stands de prueba.</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                        <button type="button" onclick="confirmGlobalAction('reset_all_votes')" class="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 cursor-pointer">
-                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reiniciar Todos los Votos
-                        </button>
-                        <button type="button" onclick="confirmGlobalAction('clear_all_projects')" class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 cursor-pointer">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar Todos los Proyectos
-                        </button>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <!-- Columna Izquierda: Formulario Registrar Nuevo Proyecto -->
-                    <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                        <div class="mb-5 pb-3 border-b border-slate-100">
-                            <span class="text-xs font-bold uppercase tracking-wider text-st-600">Alta de Stand</span>
-                            <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Agregar Nuevo Proyecto</h3>
-                            <p class="text-slate-500 text-xs mt-1">Se creará con un código estático único para su tarjeta QR.</p>
-                        </div>
-
-                        <form id="add-project-form" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">Código Stand *</label>
-                                    <input type="text" id="proj-code" required placeholder="Ej: PROY-05" maxlength="15"
-                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono uppercase focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">Área / Categoría *</label>
-                                    <input type="text" id="proj-category" required placeholder="Ej: Salud, Ingeniería..."
-                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Título del Proyecto *</label>
-                                <input type="text" id="proj-title" required placeholder="Nombre descriptivo del proyecto"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Equipo / Estudiantes *</label>
-                                <input type="text" id="proj-authors" required placeholder="Ej: Camila Rojas, Matías Soto"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Descripción Breve *</label>
-                                <textarea id="proj-desc" required rows="3" placeholder="Explica en qué consiste el proyecto..."
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500"></textarea>
-                            </div>
-
-                            <button type="submit" id="btn-save-project" class="w-full py-3 bg-st-600 hover:bg-st-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
-                                <i data-lucide="plus-circle" class="w-4 h-4"></i> Guardar Proyecto y Generar QR
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Columna Derecha: Listado de Proyectos Registrados con Edición y Eliminación -->
-                    <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                        <div class="flex items-center justify-between gap-2 mb-5 pb-3 border-b border-slate-100">
-                            <div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-st-600">Inventario Activo</span>
-                                <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Proyectos Registrados (<span id="admin-projects-count">0</span>)</h3>
-                            </div>
-                        </div>
-
-                        <div id="admin-projects-list" class="space-y-3">
-                            <!-- Listado inyectado dinámicamente -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL DE EDICIÓN DE PROYECTO (Mantiene ID estático intacto) -->
-    <div id="edit-project-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm no-print">
-        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] animate-modal-pop">
-            <div class="px-6 py-4 bg-st-600 text-white flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="edit-3" class="w-4 h-4"></i>
-                    <h3 class="font-bold text-base">Editar Proyecto</h3>
-                </div>
-                <button type="button" onclick="closeEditModal()" class="p-1.5 text-white/80 hover:text-white hover:bg-white/15 rounded-lg transition cursor-pointer">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <form id="edit-project-form" class="p-6 overflow-y-auto space-y-4">
-                <input type="hidden" id="edit-proj-id">
-                <div class="bg-st-50 border border-st-200 rounded-xl p-3 flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-st-700 block">Código Estático (Protegido para QR)</span>
-                        <span id="edit-proj-code-display" class="font-mono font-extrabold text-base text-st-800">PROY-01</span>
-                    </div>
-                    <span class="text-xs text-st-700 bg-white px-2.5 py-1 rounded-lg border border-st-200 font-medium">QR Invariable</span>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Área / Categoría *</label>
-                    <input type="text" id="edit-proj-category" required
-                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Título del Proyecto *</label>
-                    <input type="text" id="edit-proj-title" required
-                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Equipo / Estudiantes *</label>
-                    <input type="text" id="edit-proj-authors" required
-                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Descripción Breve *</label>
-                    <textarea id="edit-proj-desc" required rows="3"
-                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500"></textarea>
-                </div>
-
-                <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
-                    <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">
-                        Cancelar
-                    </button>
-                    <button type="submit" id="btn-update-project" class="px-5 py-2.5 bg-st-600 hover:bg-st-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios
-                    </button>
-                </div>
+              <button type="submit" id="save-project-btn" class="w-full btn-st text-white font-bold py-3 rounded-xl text-sm shadow-md flex items-center justify-center gap-2">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>Guardar Proyecto</span>
+              </button>
             </form>
+          </div>
         </div>
+
+        <!-- Lista de Administración y Limpieza -->
+        <div class="lg:col-span-7 space-y-5">
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">Proyectos Registrados</h3>
+                <p class="text-xs text-slate-500">Edita información sin cambiar el QR, o elimina proyectos de prueba.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="resetAllVotes()" class="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors flex items-center gap-1.5">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                  <span>Reiniciar Votos a 0</span>
+                </button>
+                <button onclick="deleteAllProjects()" class="px-3 py-2 rounded-xl text-xs font-bold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-colors flex items-center gap-1.5">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  <span>Borrar Todos</span>
+                </button>
+              </div>
+            </div>
+
+            <div id="admin-projects-list" class="mt-4 divide-y divide-slate-100">
+              <!-- Se llena dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DE VOTACIÓN POR RUT -->
+  <div id="vote-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-100 animate-modal">
+      <div class="bg-[#005C3E] px-6 py-5 text-white flex items-start justify-between gap-3">
+        <div>
+          <span id="modal-proj-code" class="inline-block text-[11px] font-mono font-bold bg-white/20 px-2.5 py-0.5 rounded-md mb-1.5">PROY-01</span>
+          <h3 id="modal-proj-title" class="text-lg sm:text-xl font-extrabold leading-snug">Título del Proyecto</h3>
+          <p id="modal-proj-team" class="text-xs text-emerald-100 mt-1">Equipo</p>
+        </div>
+        <button onclick="closeVoteModal()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6">
+        <p id="modal-proj-desc" class="text-sm text-slate-600 leading-relaxed mb-5 bg-slate-50 p-3.5 rounded-xl border border-slate-100"></p>
+
+        <form id="vote-form" onsubmit="submitVote(event)" class="space-y-4">
+          <div>
+            <label for="voter-rut" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Ingresa tu RUT para validar tu voto
+            </label>
+            <div class="relative">
+              <i data-lucide="id-card" class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input
+                type="text"
+                id="voter-rut"
+                required
+                maxlength="12"
+                oninput="handleRutInput(this)"
+                placeholder="Ej: 12.345.678-9"
+                class="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-base font-semibold tracking-wide text-slate-900 focus:outline-none focus:border-[#008556] transition-colors"
+              />
+            </div>
+            <p id="rut-feedback" class="text-xs mt-1.5 text-slate-500">
+              Puedes votar una vez en este proyecto y también apoyar a otros stands.
+            </p>
+          </div>
+
+          <button type="submit" id="confirm-vote-btn" class="w-full btn-st text-white font-bold py-3.5 rounded-xl text-sm sm:text-base shadow-lg flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            <span>Confirmar Mi Voto</span>
+          </button>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO (Sin window.confirm) -->
-    <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm no-print">
-        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200 animate-modal-pop p-6 space-y-5">
-            <div class="flex items-start gap-3.5">
-                <div id="confirm-icon-wrap" class="w-11 h-11 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h3 id="confirm-title" class="text-lg font-extrabold text-slate-900">Confirmar Acción</h3>
-                    <p id="confirm-message" class="text-sm text-slate-600 mt-1 leading-relaxed">¿Estás seguro de continuar?</p>
-                </div>
-            </div>
-            <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeConfirmModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">
-                    Cancelar
-                </button>
-                <button type="button" id="btn-confirm-execute" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
-                    Sí, confirmar
-                </button>
-            </div>
-        </div>
+  <!-- Toast de Notificación -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-slate-900 text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-slate-700/80 items-center gap-3 animate-fade-up">
+    <div id="toast-icon" class="shrink-0"></div>
+    <p id="toast-msg" class="text-xs sm:text-sm font-medium leading-snug"></p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200/80 py-5 mt-12 no-print">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+      <p class="font-semibold text-[#005C3E]">Santo Tomás — Sistema de Votación de Proyectos</p>
+      <p>Sincronizado en tiempo real · Códigos QR Estáticos</p>
     </div>
+  </footer>
 
-    <!-- MODAL DE VOTACIÓN (Se abre al hacer clic en "Votar" o al entrar con ?proyecto=ID) -->
-    <div id="vote-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm no-print">
-        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] animate-modal-pop">
-            <!-- Header Institucional del Modal -->
-            <div class="px-6 py-4 bg-st-600 text-white flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <span id="modal-proj-code" class="px-2.5 py-1 bg-white text-st-700 font-mono text-xs font-extrabold rounded-lg shadow-xs">PROY-01</span>
-                    <span id="modal-proj-category" class="text-xs font-medium text-st-100">Categoría</span>
-                </div>
-                <button onclick="closeVoteModal()" class="p-1.5 text-white/80 hover:text-white hover:bg-white/15 rounded-lg transition cursor-pointer">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
+  <!-- Lógica Firebase y Aplicación -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      getDoc,
+      deleteDoc,
+      onSnapshot,
+      runTransaction,
+      getDocs,
+      writeBatch
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-            <!-- Cuerpo del Modal -->
-            <div class="p-6 overflow-y-auto space-y-5">
-                <div>
-                    <h3 id="modal-proj-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">Título del Proyecto</h3>
-                    <p class="text-xs sm:text-sm font-medium text-slate-500 mt-1.5 flex items-center gap-1.5">
-                        <i data-lucide="users" class="w-4 h-4 text-st-600 shrink-0"></i>
-                        <span id="modal-proj-authors">Autores</span>
-                    </p>
-                </div>
+    // Configuración oficial de tu proyecto Firebase: feria-proyectos-st
+    const firebaseConfig = {
+      apiKey: "AIzaSyDis2WFXehN98Q3X1gK3-_ekuySBPChHyg",
+      authDomain: "feria-proyectos-st.firebaseapp.com",
+      projectId: "feria-proyectos-st",
+      storageBucket: "feria-proyectos-st.firebasestorage.app",
+      messagingSenderId: "973437935970",
+      appId: "1:973437935970:web:25cf78ef8678522809cc3b",
+      measurementId: "G-EGL2KWN54X"
+    };
 
-                <p id="modal-proj-desc" class="text-sm text-slate-600 leading-relaxed bg-st-50/60 p-4 rounded-xl border border-st-100">
-                    Descripción completa del proyecto...
-                </p>
+    const appId = "feria-proyectos-st";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-                <!-- Formulario de Voto con RUT -->
-                <form id="vote-form" class="space-y-4 pt-1">
-                    <input type="hidden" id="modal-proj-id">
-                    <div>
-                        <label for="voter-rut" class="block text-sm font-bold text-slate-800 mb-1.5">
-                            Ingresa tu RUT para registrar tu voto
-                        </label>
-                        <div class="relative">
-                            <input type="text" id="voter-rut" required autocomplete="off" placeholder="Ej: 12.345.678-9" maxlength="12"
-                                class="w-full px-4 py-3 text-base font-mono bg-white border-2 border-slate-300 rounded-xl focus:outline-none focus:border-st-600 transition">
-                            <div id="rut-status-icon" class="absolute right-3.5 top-1/2 -translate-y-1/2 hidden"></div>
-                        </div>
-                        <p id="rut-helper-text" class="text-xs text-slate-500 mt-1.5">
-                            Solo se permite 1 voto por RUT en este stand. Puedes votar por otros proyectos libremente.
-                        </p>
-                    </div>
+    // Colecciones en Firestore
+    const projectsCol = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
+    const votesCol = collection(db, 'artifacts', appId, 'public', 'data', 'votes');
+    const metaDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'meta', 'config');
 
-                    <!-- Caja de Alerta dentro del modal (Errores o Éxito) -->
-                    <div id="modal-feedback" class="hidden p-3.5 rounded-xl text-sm font-medium flex items-start gap-2.5 transition-all">
-                        <i id="modal-feedback-icon" data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
-                        <span id="modal-feedback-msg"></span>
-                    </div>
+    // Estado global
+    let projectsList = [];
+    let selectedProject = null;
+    let initialDeepLinkHandled = false;
 
-                    <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
-                        <button type="submit" id="btn-submit-vote" class="btn-vote-glow w-full py-3.5 px-5 bg-st-600 hover:bg-st-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold text-sm rounded-xl shadow-md shadow-st-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                            <i data-lucide="check-circle-2" class="w-5 h-5"></i> Confirmar Voto
-                        </button>
-                    </div>
-                </form>
-            </div>
+    // Proyectos iniciales de demostración (solo se cargan la primera vez si nunca se han inicializado)
+    const demoProjects = [
+      {
+        id: "PROY-01",
+        title: "EcoSensor: Monitoreo Hídrico Inteligente",
+        category: "Ingeniería en Informática",
+        team: "Valentina Pérez, Martín Muñoz",
+        description: "Sistema con sensores IoT de bajo costo para medir calidad y caudal de agua en comunidades rurales con alertas en tiempo real.",
+        votes: 0
+      },
+      {
+        id: "PROY-02",
+        title: "NutriScan: Asistente Nutricional Inclusivo",
+        category: "Nutrición y Dietética",
+        team: "Sofía Contreras, Lucas Silva",
+        description: "Aplicación móvil accesible que traduce etiquetas nutricionales mediante lectura de voz y alertas personalizadas de alérgenos.",
+        votes: 0
+      },
+      {
+        id: "PROY-03",
+        title: "RehabilitaVR: Terapia Motriz Gamificada",
+        category: "Kinesiología",
+        team: "Matías Rojas, Antonia Vargas",
+        description: "Plataforma interactiva de ejercicios guiados para recuperación post-operatoria de extremidades superiores con seguimiento de progreso.",
+        votes: 0
+      }
+    ];
 
-            <!-- Footer del Modal -->
-            <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
-                <span>Votos actuales: <strong id="modal-proj-votes" class="text-st-700 text-sm">0</strong></span>
-                <button type="button" onclick="closeVoteModalAndShowAll()" class="text-st-600 hover:text-st-800 hover:underline font-bold cursor-pointer">
-                    Ver todos los proyectos →
-                </button>
-            </div>
-        </div>
-    </div>
+    // Mostrar advertencia si se abre desde file://
+    if (window.location.protocol === 'file:') {
+      document.getElementById('local-warning').classList.remove('hidden');
+    }
 
-    <!-- Pie de página Institucional -->
-    <footer class="bg-st-800 text-st-100 py-6 mt-12 no-print">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-            <div class="flex items-center gap-2">
-                <span class="font-display font-bold text-white tracking-wider">SANTO TOMÁS</span>
-                <span class="text-st-200">• Feria de Innovación y Proyectos</span>
-            </div>
-            <p class="text-st-200">Validación oficial mediante algoritmo Módulo 11 (RUT Chileno)</p>
-        </div>
-    </footer>
+    // Inicializar Autenticación Anónima y Escucha en Tiempo Real
+    signInAnonymously(auth).catch((err) => {
+      console.error("Error de autenticación:", err);
+      updateConnectionStatus(false, "Error de conexión con Firebase");
+    });
 
-    <!-- Lógica de la Aplicación con Firebase Firestore -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, 
-            runTransaction, serverTimestamp, getDocs, query, where, writeBatch 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      updateConnectionStatus(true, "Conectado en vivo · Sincronización activa");
 
-        // ==========================================
-        // 1. CONFIGURACIÓN E INICIALIZACIÓN FIREBASE
-        // ==========================================
-        const defaultFirebaseConfig = {
-            apiKey: "AIzaSyDis2WFXehN98Q3X1gK3-_ekuySBPChHyg",
-            authDomain: "feria-proyectos-st.firebaseapp.com",
-            projectId: "feria-proyectos-st",
-            storageBucket: "feria-proyectos-st.firebasestorage.app",
-            messagingSenderId: "973437935970",
-            appId: "1:973437935970:web:25cf78ef8678522809cc3b",
-            measurementId: "G-EGL2KWN54X"
-        };
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : defaultFirebaseConfig;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'feria-proyectos-st';
-
-        let app, auth, db, currentUser = null;
-        let allProjects = [];
-        let initialUrlProjectHandled = false;
-        let pendingConfirmAction = null;
-// ... existing code ... -->
-        // ==========================================
-        // 6. MÓDULO DE ADMINISTRACIÓN DE PROYECTOS
-        // ==========================================
-        function renderAdminProjectsList() {
-            const listContainer = document.getElementById('admin-projects-list');
-            const countBadge = document.getElementById('admin-projects-count');
-// ... existing code ... -->
-        // Agregar nuevo proyecto
-        document.getElementById('add-project-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) return;
-
-            const rawCode = document.getElementById('proj-code').value.trim().toUpperCase().replace(/[^A-Z0-9-_]/g, '-');
-// ... existing code ... -->
-        document.getElementById('edit-project-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) return;
-
-            const projectId = document.getElementById('edit-proj-id').value;
-// ... existing code ... -->
-        document.getElementById('btn-confirm-execute').addEventListener('click', async () => {
-            if (!pendingConfirmAction || !currentUser) return;
-
-            const action = pendingConfirmAction;
-// ... existing code ... -->
-            if (tabName === 'admin') {
-                renderAdminProjectsList();
+      try {
+        const metaSnap = await getDoc(metaDocRef);
+        if (!metaSnap.exists()) {
+          const existingSnap = await getDocs(projectsCol);
+          if (existingSnap.empty) {
+            for (const p of demoProjects) {
+              await setDoc(doc(projectsCol, p.id), p);
             }
-        };
-// ... existing code ... -->
+          }
+          await setDoc(metaDocRef, { initialized: true, createdAt: Date.now() });
+        }
+      } catch (e) {
+        console.warn("Verificación inicial:", e);
+      }
+
+      // Escuchar cambios en tiempo real de todos los proyectos
+      onSnapshot(projectsCol, (snapshot) => {
+        projectsList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        projectsList.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+
+        renderProjects();
+        renderRanking();
+        renderQRCodes();
+        renderAdminList();
+        suggestNextCode();
+
+        // Si el usuario llegó escaneando un QR (?proyecto=PROY-01), abrir modal automáticamente
+        if (!initialDeepLinkHandled && projectsList.length > 0) {
+          initialDeepLinkHandled = true;
+          const params = new URLSearchParams(window.location.search);
+          const targetId = params.get('proyecto');
+          if (targetId) {
+            const found = projectsList.find(p => p.id.toLowerCase() === targetId.toLowerCase());
+            if (found) {
+              openVoteModal(found.id);
+            } else {
+              showToast(`El proyecto "${targetId}" no se encuentra disponible.`, "warning");
+            }
+          }
+        }
+      }, (error) => {
+        console.error("Error en Firestore:", error);
+        updateConnectionStatus(false, "Sin acceso a datos (revisa reglas de Firestore)");
+      });
+    });
+
+    function updateConnectionStatus(online, text) {
+      const dot = document.getElementById('connection-dot');
+      const label = document.getElementById('connection-text');
+      label.textContent = text;
+      if (online) {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-live";
+      } else {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+      }
+    }
+
+    // Cambio de pestañas
+    window.switchTab = function(tabName) {
+      // Bloquear acceso a 'admin' si está en pantalla de celular (< 768px)
+      if (tabName === 'admin' && window.innerWidth < 768) {
+        tabName = 'proyectos';
+      }
+
+      const views = ['proyectos', 'ranking', 'qr', 'admin'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`tab-btn-${v}`);
+        if (!el || !btn) return;
+
+        if (v === tabName) {
+          el.classList.remove('hidden');
+          if (v === 'admin') el.style.display = '';
+          btn.classList.remove('text-emerald-100', 'hover:text-white');
+          btn.classList.add('bg-white', 'text-[#005C3E]', 'shadow-sm');
+        } else {
+          el.classList.add('hidden');
+          if (v === 'admin') el.style.display = 'none';
+          btn.classList.add('text-emerald-100', 'hover:text-white');
+          btn.classList.remove('bg-white', 'text-[#005C3E]', 'shadow-sm');
+        }
+      });
+
+      if (tabName === 'qr') {
+        renderQRCodes();
+      }
+      lucide.createIcons();
+    };
+
+    // Asegurar que si se redimensiona a móvil estando en admin, vuelva a proyectos
+    window.addEventListener('resize', () => {
+      const adminView = document.getElementById('view-admin');
+      if (window.innerWidth < 768 && adminView && !adminView.classList.contains('hidden')) {
+        switchTab('proyectos');
+      }
+    });
+
+    // Renderizar Catálogo de Proyectos
+    window.renderProjects = function() {
+      const grid = document.getElementById('projects-grid');
+      const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+
+      const filtered = projectsList.filter(p =>
+        p.title.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query) ||
+        p.team.toLowerCase().includes(query) ||
+        p.id.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-10 text-center">
+            <i data-lucide="folder-open" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+            <p class="font-bold text-slate-700">No se encontraron proyectos</p>
+            <p class="text-xs text-slate-500 mt-1">Intenta con otro término o agrega nuevos proyectos desde un computador.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => `
+        <article class="project-card bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 flex flex-col justify-between shadow-sm">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="font-mono text-xs font-extrabold text-[#005C3E] bg-[#E6F4EF] px-2.5 py-1 rounded-lg border border-[#008556]/20">
+                ${escapeHtml(p.id)}
+              </span>
+              <span class="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full">
+                <i data-lucide="thumbs-up" class="w-3.5 h-3.5 text-[#008556]"></i>
+                ${p.votes || 0} ${(p.votes || 0) === 1 ? 'voto' : 'votos'}
+              </span>
+            </div>
+
+            <span class="text-[11px] font-bold uppercase tracking-wider text-[#008556] block mb-1">
+              ${escapeHtml(p.category)}
+            </span>
+            <h3 class="text-lg font-extrabold text-slate-900 leading-snug mb-2">
+              ${escapeHtml(p.title)}
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed mb-4">
+              ${escapeHtml(p.description)}
+            </p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100">
+            <div class="flex items-center gap-1.5 text-xs text-slate-500 mb-3.5">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+              <span class="truncate font-medium">${escapeHtml(p.team)}</span>
+            </div>
+            <button onclick="openVoteModal('${escapeHtml(p.id)}')" class="w-full btn-st text-white font-bold py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="vote" class="w-4 h-4"></i>
+              <span>Votar por este proyecto</span>
+            </button>
+          </div>
+        </article>
+      `).join('');
+
+      lucide.createIcons();
+    };
+
+    // Renderizar Ranking en Vivo
+    function renderRanking() {
+      const list = document.getElementById('ranking-list');
+      const totalBadge = document.getElementById('total-votes-badge');
+
+      const sorted = [...projectsList].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+      const totalVotes = sorted.reduce((acc, p) => acc + (p.votes || 0), 0);
+      totalBadge.textContent = totalVotes;
+
+      if (sorted.length === 0) {
+        list.innerHTML = `<p class="text-sm text-slate-500 text-center py-6">Aún no hay proyectos registrados.</p>`;
+        return;
+      }
+
+      list.innerHTML = sorted.map((p, idx) => {
+        const votes = p.votes || 0;
+        const pct = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+        const isFirst = idx === 0 && votes > 0;
+
+        return `
+          <div class="p-4 rounded-2xl border ${isFirst ? 'border-[#C5A059] bg-amber-50/30' : 'border-slate-100 bg-slate-50/60'} transition-all">
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="w-8 h-8 rounded-xl font-extrabold text-sm flex items-center justify-center shrink-0 ${
+                  idx === 0 ? 'bg-[#005C3E] text-white shadow-sm' :
+                  idx === 1 ? 'bg-[#008556]/20 text-[#005C3E]' :
+                  idx === 2 ? 'bg-slate-200 text-slate-700' : 'bg-white border border-slate-200 text-slate-500'
+                }">
+                  #${idx + 1}
+                </span>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-mono font-bold text-[#005C3E]">${escapeHtml(p.id)}</span>
+                    ${isFirst ? '<span class="text-[10px] font-extrabold uppercase bg-[#C5A059] text-white px-2 py-0.5 rounded-full">Líder</span>' : ''}
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm sm:text-base truncate">${escapeHtml(p.title)}</h4>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-lg sm:text-xl font-extrabold text-[#005C3E]">${votes}</span>
+                <span class="text-xs text-slate-500 block">${pct}%</span>
+              </div>
+            </div>
+            <div class="w-full h-2.5 bg-slate-200/80 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-[#005C3E] to-[#008556] rounded-full transition-all duration-700" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Generar URL Estática para cada proyecto
+    function getStaticProjectUrl(projectId) {
+      const url = new URL(window.location.href);
+      url.search = `?proyecto=${encodeURIComponent(projectId)}`;
+      url.hash = '';
+      return url.toString();
+    }
+
+    // Renderizar Códigos QR Estáticos
+    function renderQRCodes() {
+      const container = document.getElementById('print-qr-area');
+      if (!container) return;
+
+      if (projectsList.length === 0) {
+        container.innerHTML = `<div class="col-span-full bg-white p-8 rounded-2xl text-center text-sm text-slate-500">No hay proyectos para generar códigos QR.</div>`;
+        return;
+      }
+
+      container.innerHTML = projectsList.map(p => {
+        const targetUrl = getStaticProjectUrl(p.id);
+        return `
+          <div class="qr-print-card bg-white rounded-2xl border-2 border-slate-200 p-6 flex flex-col items-center text-center shadow-sm">
+            <div class="w-full flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-[#005C3E]">Santo Tomás</span>
+              <span class="font-mono text-xs font-extrabold bg-[#E6F4EF] text-[#005C3E] px-2.5 py-0.5 rounded-md">${escapeHtml(p.id)}</span>
+            </div>
+
+            <div id="qr-canvas-${escapeHtml(p.id)}" class="p-3 bg-white rounded-xl border border-slate-200 shadow-inner mb-4 flex items-center justify-center"></div>
+
+            <h3 class="font-extrabold text-slate-900 text-base leading-snug mb-1">${escapeHtml(p.title)}</h3>
+            <p class="text-xs text-slate-500 mb-3">${escapeHtml(p.team)}</p>
+
+            <div class="w-full bg-[#005C3E] text-white text-xs font-bold py-2 px-3 rounded-xl">
+              Escanea con tu celular para votar con tu RUT
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 break-all select-all">${escapeHtml(targetUrl)}</p>
+          </div>
+        `;
+      }).join('');
+
+      // Dibujar los QR estáticos
+      projectsList.forEach(p => {
+        const targetEl = document.getElementById(`qr-canvas-${p.id}`);
+        if (targetEl) {
+          targetEl.innerHTML = '';
+          new QRCode(targetEl, {
+            text: getStaticProjectUrl(p.id),
+            width: 176,
+            height: 176,
+            colorDark: "#00432D",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        }
+      });
+    }
+
+    // Renderizar Lista en Panel de Administración
+    function renderAdminList() {
+      const container = document.getElementById('admin-projects-list');
+      if (!container) return;
+
+      if (projectsList.length === 0) {
+        container.innerHTML = `
+          <div class="py-10 text-center">
+            <p class="text-sm font-bold text-slate-700">No hay proyectos registrados</p>
+            <p class="text-xs text-slate-500 mt-1">Usa el formulario de la izquierda para agregar los stands reales de tu feria.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = projectsList.map(p => `
+        <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-extrabold text-[#005C3E] bg-[#E6F4EF] px-2 py-0.5 rounded">${escapeHtml(p.id)}</span>
+              <span class="text-xs font-semibold text-slate-500">${p.votes || 0} votos</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm mt-1 truncate">${escapeHtml(p.title)}</h4>
+            <p class="text-xs text-slate-500 truncate">${escapeHtml(p.category)} · ${escapeHtml(p.team)}</p>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="editProject('${escapeHtml(p.id)}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors flex items-center gap-1">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+              <span>Editar</span>
+            </button>
+            <button onclick="deleteSingleProject('${escapeHtml(p.id)}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors flex items-center gap-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function suggestNextCode() {
+      const editId = document.getElementById('edit-project-id').value;
+      if (editId) return;
+      const nextNum = projectsList.length + 1;
+      const padded = String(nextNum).padStart(2, '0');
+      document.getElementById('proj-code').value = `PROY-${padded}`;
+    }
+
+    // Guardar o Actualizar Proyecto
+    window.handleSaveProject = async function(e) {
+      e.preventDefault();
+      const editId = document.getElementById('edit-project-id').value.trim();
+      const rawCode = document.getElementById('proj-code').value.trim().toUpperCase().replace(/[^A-Z0-9-_]/g, '');
+      const title = document.getElementById('proj-title').value.trim();
+      const category = document.getElementById('proj-category').value.trim();
+      const team = document.getElementById('proj-team').value.trim();
+      const description = document.getElementById('proj-desc').value.trim();
+
+      if (!rawCode || !title) return;
+
+      const btn = document.getElementById('save-project-btn');
+      btn.disabled = true;
+
+      try {
+        const docId = editId || rawCode;
+        const existing = projectsList.find(p => p.id === docId);
+        const currentVotes = existing ? (existing.votes || 0) : 0;
+
+        await setDoc(doc(projectsCol, docId), {
+          id: docId,
+          title,
+          category,
+          team,
+          description,
+          votes: currentVotes
+        });
+
+        await setDoc(metaDocRef, { initialized: true }, { merge: true });
+        showToast(editId ? "Proyecto actualizado correctamente." : "Proyecto agregado y QR listo.", "success");
+        resetAdminForm();
+      } catch (err) {
+        console.error(err);
+        showToast("No se pudo guardar el proyecto. Revisa tu conexión.", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.editProject = function(id) {
+      const p = projectsList.find(item => item.id === id);
+      if (!p) return;
+
+      document.getElementById('edit-project-id').value = p.id;
+      const codeInput = document.getElementById('proj-code');
+      codeInput.value = p.id;
+      codeInput.readOnly = true;
+      codeInput.classList.add('opacity-70', 'cursor-not-allowed');
+
+      document.getElementById('proj-title').value = p.title;
+      document.getElementById('proj-category').value = p.category;
+      document.getElementById('proj-team').value = p.team;
+      document.getElementById('proj-desc').value = p.description;
+
+      document.getElementById('form-badge').textContent = `Editando ${p.id}`;
+      document.getElementById('form-title').textContent = "Modificar Stand";
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      document.getElementById('save-project-btn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i><span>Guardar Cambios</span>`;
+      lucide.createIcons();
+    };
+
+    window.resetAdminForm = function() {
+      document.getElementById('project-form').reset();
+      document.getElementById('edit-project-id').value = '';
+      const codeInput = document.getElementById('proj-code');
+      codeInput.readOnly = false;
+      codeInput.classList.remove('opacity-70', 'cursor-not-allowed');
+
+      document.getElementById('form-badge').textContent = "Nuevo Stand";
+      document.getElementById('form-title').textContent = "Agregar Proyecto";
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      document.getElementById('save-project-btn').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i><span>Guardar Proyecto</span>`;
+      suggestNextCode();
+      lucide.createIcons();
+    };
+
+    window.deleteSingleProject = async function(id) {
+      if (!confirm(`¿Seguro que deseas eliminar el proyecto ${id} y sus votos asociados?`)) return;
+      try {
+        await deleteDoc(doc(projectsCol, id));
+        const votesSnap = await getDocs(votesCol);
+        const batch = writeBatch(db);
+        votesSnap.forEach(vDoc => {
+          if (vDoc.id.startsWith(`${id}_`)) {
+            batch.delete(vDoc.ref);
+          }
+        });
+        await batch.commit();
+        await setDoc(metaDocRef, { initialized: true }, { merge: true });
+        showToast(`Proyecto ${id} eliminado.`, "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Error al eliminar el proyecto.", "error");
+      }
+    };
+
+    window.deleteAllProjects = async function() {
+      if (!confirm("¿Estás seguro de borrar TODOS los proyectos y registros de votos para empezar desde cero?")) return;
+      try {
+        const batch = writeBatch(db);
+        const projSnap = await getDocs(projectsCol);
+        projSnap.forEach(d => batch.delete(d.ref));
+
+        const votesSnap = await getDocs(votesCol);
+        votesSnap.forEach(d => batch.delete(d.ref));
+
+        batch.set(metaDocRef, { initialized: true }, { merge: true });
+        await batch.commit();
+        showToast("Todos los proyectos de prueba fueron eliminados.", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Error al vaciar los proyectos.", "error");
+      }
+    };
+
+    window.resetAllVotes = async function() {
+      if (!confirm("¿Deseas reiniciar a 0 los votos de todos los proyectos?")) return;
+      try {
+        const batch = writeBatch(db);
+        const projSnap = await getDocs(projectsCol);
+        projSnap.forEach(d => batch.update(d.ref, { votes: 0 }));
+
+        const votesSnap = await getDocs(votesCol);
+        votesSnap.forEach(d => batch.delete(d.ref));
+
+        await batch.commit();
+        showToast("Contadores de votos reiniciados a 0.", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Error al reiniciar votos.", "error");
+      }
+    };
+
+    // Modal de Votación
+    window.openVoteModal = function(projectId) {
+      const p = projectsList.find(item => item.id === projectId);
+      if (!p) return;
+
+      selectedProject = p;
+      document.getElementById('modal-proj-code').textContent = p.id;
+      document.getElementById('modal-proj-title').textContent = p.title;
+      document.getElementById('modal-proj-team').textContent = `${p.category} · ${p.team}`;
+      document.getElementById('modal-proj-desc').textContent = p.description;
+
+      const rutInput = document.getElementById('voter-rut');
+      rutInput.value = '';
+      document.getElementById('rut-feedback').textContent = "Puedes votar una vez en este proyecto y también apoyar a otros stands.";
+      document.getElementById('rut-feedback').className = "text-xs mt-1.5 text-slate-500";
+
+      const modal = document.getElementById('vote-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => rutInput.focus(), 100);
+    };
+
+    window.closeVoteModal = function() {
+      const modal = document.getElementById('vote-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      selectedProject = null;
+
+      // Limpiar parámetro ?proyecto= de la barra de direcciones al cerrar para navegación libre
+      if (window.location.search.includes('proyecto=')) {
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+    };
+
+    // Formateo y Validación de RUT Chileno (Módulo 11)
+    window.handleRutInput = function(input) {
+      let clean = input.value.replace(/[^0-9kK]/g, '').toUpperCase();
+      if (clean.length > 9) clean = clean.slice(0, 9);
+
+      if (clean.length > 1) {
+        const body = clean.slice(0, -1);
+        const dv = clean.slice(-1);
+        const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        input.value = `${formattedBody}-${dv}`;
+      } else {
+        input.value = clean;
+      }
+
+      const feedback = document.getElementById('rut-feedback');
+      if (clean.length >= 8) {
+        if (validateRut(clean)) {
+          feedback.textContent = "RUT válido listo para registrar voto.";
+          feedback.className = "text-xs mt-1.5 text-emerald-600 font-semibold";
+        } else {
+          feedback.textContent = "El dígito verificador del RUT no coincide.";
+          feedback.className = "text-xs mt-1.5 text-red-600 font-semibold";
+        }
+      } else {
+        feedback.textContent = "Ingresa tu RUT sin espacios (ej: 19.456.789-K).";
+        feedback.className = "text-xs mt-1.5 text-slate-500";
+      }
+    };
+
+    function cleanRutString(rut) {
+      return rut.replace(/[^0-9kK]/g, '').toUpperCase();
+    }
+
+    function validateRut(rutRaw) {
+      const clean = cleanRutString(rutRaw);
+      if (clean.length < 8 || clean.length > 9) return false;
+
+      const body = clean.slice(0, -1);
+      const dv = clean.slice(-1);
+
+      if (/^(\d)\1+$/.test(body)) return false;
+
+      let sum = 0;
+      let multiplier = 2;
+
+      for (let i = body.length - 1; i >= 0; i--) {
+        sum += parseInt(body[i], 10) * multiplier;
+        multiplier = multiplier === 7 ? 2 : multiplier + 1;
+      }
+
+      const expectedMod = 11 - (sum % 11);
+      const expectedDv = expectedMod === 11 ? '0' : expectedMod === 10 ? 'K' : String(expectedMod);
+
+      return dv === expectedDv;
+    }
+
+    // Registrar Voto con Transacción Atómica (1 RUT por proyecto)
+    window.submitVote = async function(e) {
+      e.preventDefault();
+      if (!selectedProject) return;
+
+      const rutInput = document.getElementById('voter-rut');
+      const cleanRut = cleanRutString(rutInput.value);
+
+      if (!validateRut(cleanRut)) {
+        showToast("Por favor ingresa un RUT chileno válido.", "error");
+        rutInput.focus();
+        return;
+      }
+
+      const btn = document.getElementById('confirm-vote-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Validando voto...</span>`;
+
+      const voteDocId = `${selectedProject.id}_${cleanRut}`;
+      const voteRef = doc(votesCol, voteDocId);
+      const projectRef = doc(projectsCol, selectedProject.id);
+
+      try {
+        await runTransaction(db, async (transaction) => {
+          const voteSnap = await transaction.get(voteRef);
+          if (voteSnap.exists()) {
+            throw new Error("ALREADY_VOTED");
+          }
+
+          const projSnap = await transaction.get(projectRef);
+          if (!projSnap.exists()) {
+            throw new Error("PROJECT_NOT_FOUND");
+          }
+
+          const currentVotes = projSnap.data().votes || 0;
+          transaction.set(voteRef, {
+            projectId: selectedProject.id,
+            rut: cleanRut,
+            timestamp: Date.now()
+          });
+          transaction.update(projectRef, {
+            votes: currentVotes + 1
+          });
+        });
+
+        const votedTitle = selectedProject.title;
+        closeVoteModal();
+        showToast(`¡Voto registrado con éxito para "${votedTitle}"! Puedes seguir votando por otros proyectos.`, "success");
+      } catch (err) {
+        if (err.message === "ALREADY_VOTED") {
+          showToast(`El RUT ${rutInput.value} ya registró un voto en este proyecto. Puedes votar por los demás stands.`, "warning");
+        } else {
+          console.error(err);
+          showToast("No se pudo registrar el voto. Verifica tu conexión a internet.", "error");
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i><span>Confirmar Mi Voto</span>`;
+        lucide.createIcons();
+      }
+    };
+
+    // Notificaciones Toast
+    let toastTimer;
+    function showToast(message, type = "success") {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toast-icon');
+      const msg = document.getElementById('toast-msg');
+
+      msg.textContent = message;
+      if (type === "success") {
+        icon.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>`;
+      } else if (type === "warning") {
+        icon.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-amber-400"></i>`;
+      } else {
+        icon.innerHTML = `<i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i>`;
+      }
+
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      lucide.createIcons();
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 4500);
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Inicializar íconos al cargar
+    lucide.createIcons();
+  </script>
+</body>
+</html>
