@@ -182,7 +182,7 @@
                         <i data-lucide="printer" class="w-4 h-4"></i> Códigos QR
                     </button>
                     <button onclick="switchTab('admin')" id="nav-admin" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Nuevo Stand
+                        <i data-lucide="settings-2" class="w-4 h-4"></i> Administrar
                     </button>
                 </nav>
 
@@ -208,7 +208,7 @@
                 <i data-lucide="printer" class="w-4 h-4 mb-0.5"></i> QRs
             </button>
             <button onclick="switchTab('admin')" id="mnav-admin" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all">
-                <i data-lucide="plus-circle" class="w-4 h-4 mb-0.5"></i> Nuevo
+                <i data-lucide="settings-2" class="w-4 h-4 mb-0.5"></i> Admin
             </button>
         </div>
     </header>
@@ -321,61 +321,176 @@
             </div>
         </section>
 
-        <!-- VISTA 4: ADMINISTRAR / AGREGAR PROYECTO -->
-        <section id="view-admin" class="hidden max-w-2xl mx-auto animate-fade-up">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-                <div class="mb-6 pb-4 border-b border-slate-100">
-                    <span class="text-xs font-bold uppercase tracking-wider text-st-600">Gestión de Feria</span>
-                    <h2 class="text-2xl font-extrabold text-slate-900 mt-0.5">Registrar Nuevo Proyecto</h2>
-                    <p class="text-slate-600 text-sm mt-1">Se generará automáticamente un identificador fijo y su código QR permanente.</p>
+        <!-- VISTA 4: ADMINISTRACIÓN COMPLETA DE PROYECTOS -->
+        <section id="view-admin" class="hidden max-w-5xl mx-auto animate-fade-up space-y-6">
+            <!-- Panel Directo de Administración -->
+            <div id="admin-unlocked-panel" class="space-y-6">
+                <!-- Barra Superior de Acciones Globales -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-st-600 bg-st-50 px-2.5 py-1 rounded-md mb-1">
+                            <i data-lucide="settings-2" class="w-3.5 h-3.5"></i> Panel de Administración
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-slate-900">Gestión de Stands y Proyectos</h2>
+                        <p class="text-slate-500 text-sm">Administra los proyectos reales, edita sus datos sin cambiar sus QR o limpia los stands de prueba.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                        <button type="button" onclick="confirmGlobalAction('reset_all_votes')" class="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 cursor-pointer">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reiniciar Todos los Votos
+                        </button>
+                        <button type="button" onclick="confirmGlobalAction('clear_all_projects')" class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 cursor-pointer">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar Todos los Proyectos
+                        </button>
+                    </div>
                 </div>
 
-                <form id="add-project-form" class="space-y-5">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="sm:col-span-1">
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Código Stand *</label>
-                            <input type="text" id="proj-code" required placeholder="Ej: PROY-05" maxlength="15"
-                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono uppercase focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                            <p class="text-[11px] text-slate-400 mt-1">ID único para el QR</p>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <!-- Columna Izquierda: Formulario Registrar Nuevo Proyecto -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="mb-5 pb-3 border-b border-slate-100">
+                            <span class="text-xs font-bold uppercase tracking-wider text-st-600">Alta de Stand</span>
+                            <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Agregar Nuevo Proyecto</h3>
+                            <p class="text-slate-500 text-xs mt-1">Se creará con un código estático único para su tarjeta QR.</p>
                         </div>
-                        <div class="sm:col-span-2">
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Área / Carrera / Categoría *</label>
-                            <input type="text" id="proj-category" required placeholder="Ej: Ingeniería, Salud, Recursos Naturales..."
-                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+
+                        <form id="add-project-form" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Código Stand *</label>
+                                    <input type="text" id="proj-code" required placeholder="Ej: PROY-05" maxlength="15"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono uppercase focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Área / Categoría *</label>
+                                    <input type="text" id="proj-category" required placeholder="Ej: Salud, Ingeniería..."
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Título del Proyecto *</label>
+                                <input type="text" id="proj-title" required placeholder="Nombre descriptivo del proyecto"
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Equipo / Estudiantes *</label>
+                                <input type="text" id="proj-authors" required placeholder="Ej: Camila Rojas, Matías Soto"
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Descripción Breve *</label>
+                                <textarea id="proj-desc" required rows="3" placeholder="Explica en qué consiste el proyecto..."
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500"></textarea>
+                            </div>
+
+                            <button type="submit" id="btn-save-project" class="w-full py-3 bg-st-600 hover:bg-st-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i> Guardar Proyecto y Generar QR
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Columna Derecha: Listado de Proyectos Registrados con Edición y Eliminación -->
+                    <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="flex items-center justify-between gap-2 mb-5 pb-3 border-b border-slate-100">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-st-600">Inventario Activo</span>
+                                <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Proyectos Registrados (<span id="admin-projects-count">0</span>)</h3>
+                            </div>
+                        </div>
+
+                        <div id="admin-projects-list" class="space-y-3">
+                            <!-- Listado inyectado dinámicamente -->
                         </div>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Título del Proyecto *</label>
-                        <input type="text" id="proj-title" required placeholder="Nombre descriptivo del proyecto"
-                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Equipo / Estudiantes *</label>
-                        <input type="text" id="proj-authors" required placeholder="Ej: Camila Rojas, Matías Soto"
-                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Descripción Breve *</label>
-                        <textarea id="proj-desc" required rows="3" placeholder="Explica en qué consiste el proyecto y qué problema resuelve..."
-                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500"></textarea>
-                    </div>
-
-                    <div class="pt-2 flex items-center justify-end gap-3">
-                        <button type="button" onclick="switchTab('galeria')" class="px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">
-                            Cancelar
-                        </button>
-                        <button type="submit" id="btn-save-project" class="px-6 py-2.5 bg-st-600 hover:bg-st-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
-                            <i data-lucide="save" class="w-4 h-4"></i> Guardar Proyecto y Generar QR
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </section>
 
     </main>
+
+    <!-- MODAL DE EDICIÓN DE PROYECTO (Mantiene ID estático intacto) -->
+    <div id="edit-project-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm no-print">
+        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] animate-modal-pop">
+            <div class="px-6 py-4 bg-st-600 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    <h3 class="font-bold text-base">Editar Proyecto</h3>
+                </div>
+                <button type="button" onclick="closeEditModal()" class="p-1.5 text-white/80 hover:text-white hover:bg-white/15 rounded-lg transition cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="edit-project-form" class="p-6 overflow-y-auto space-y-4">
+                <input type="hidden" id="edit-proj-id">
+                <div class="bg-st-50 border border-st-200 rounded-xl p-3 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-st-700 block">Código Estático (Protegido para QR)</span>
+                        <span id="edit-proj-code-display" class="font-mono font-extrabold text-base text-st-800">PROY-01</span>
+                    </div>
+                    <span class="text-xs text-st-700 bg-white px-2.5 py-1 rounded-lg border border-st-200 font-medium">QR Invariable</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Área / Categoría *</label>
+                    <input type="text" id="edit-proj-category" required
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Título del Proyecto *</label>
+                    <input type="text" id="edit-proj-title" required
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Equipo / Estudiantes *</label>
+                    <input type="text" id="edit-proj-authors" required
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Descripción Breve *</label>
+                    <textarea id="edit-proj-desc" required rows="3"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-st-500"></textarea>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btn-update-project" class="px-5 py-2.5 bg-st-600 hover:bg-st-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
+                        <i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO (Sin window.confirm) -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200 animate-modal-pop p-6 space-y-5">
+            <div class="flex items-start gap-3.5">
+                <div id="confirm-icon-wrap" class="w-11 h-11 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 id="confirm-title" class="text-lg font-extrabold text-slate-900">Confirmar Acción</h3>
+                    <p id="confirm-message" class="text-sm text-slate-600 mt-1 leading-relaxed">¿Estás seguro de continuar?</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeConfirmModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">
+                    Cancelar
+                </button>
+                <button type="button" id="btn-confirm-execute" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
+                    Sí, confirmar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL DE VOTACIÓN (Se abre al hacer clic en "Votar" o al entrar con ?proyecto=ID) -->
     <div id="vote-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm no-print">
@@ -462,8 +577,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
-            getFirestore, collection, doc, getDoc, setDoc, onSnapshot, 
-            runTransaction, serverTimestamp, getDocs 
+            getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, 
+            runTransaction, serverTimestamp, getDocs, query, where, writeBatch 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
@@ -487,731 +602,35 @@
         let app, auth, db, currentUser = null;
         let allProjects = [];
         let initialUrlProjectHandled = false;
-
-        // Proyectos iniciales de demostración
-        const SAMPLE_PROJECTS = [
-            {
-                id: "PROY-01",
-                code: "PROY-01",
-                title: "EcoRiego IoT: Agricultura Inteligente",
-                category: "Recursos Naturales",
-                authors: "Valentina Muñoz, Sebastián Silva",
-                description: "Sistema automatizado de riego por goteo controlado mediante sensores de humedad del suelo y pronóstico meteorológico en tiempo real, reduciendo el consumo hídrico hasta en un 45%.",
-                votes: 0
-            },
-            {
-                id: "PROY-02",
-                code: "PROY-02",
-                title: "MediAlert: Asistente de Medicación para Adultos Mayores",
-                category: "Área Salud",
-                authors: "Camila Contreras, Diego Araya, Javiera Soto",
-                description: "Dispositivo dispensador conectado a una aplicación móvil que alerta con luz y voz las dosis exactas de medicamentos, notificando a familiares en caso de omisión.",
-                votes: 0
-            },
-            {
-                id: "PROY-03",
-                code: "PROY-03",
-                title: "RutaSegura: Movilidad Urbana Colaborativa",
-                category: "Ingeniería e Informática",
-                authors: "Matías Rojas, Fernanda Valenzuela",
-                description: "Plataforma ciudadana que mapea en tiempo real ciclovías obstruidas, luminarias apagadas y zonas seguras para peatones y ciclistas nocturnos.",
-                votes: 0
-            },
-            {
-                id: "PROY-04",
-                code: "PROY-04",
-                title: "BioEnvase: Empaques Comestibles de Algas",
-                category: "Innovación y Sustentabilidad",
-                authors: "Ignacio Pérez, Sofía Morales",
-                description: "Alternativa biodegradable al plástico de un solo uso fabricada a partir de extractos de algas marinas chilenas, ideal para alimentos y delivery.",
-                votes: 0
-            }
-        ];
-
-        async function initFirebase() {
-            const badge = document.getElementById('connection-badge');
-            try {
-                if (!firebaseConfig) {
-                    throw new Error("Configuración de Firebase no encontrada en el entorno.");
-                }
-
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    const cred = await signInWithCustomToken(auth, __initial_auth_token);
-                    currentUser = cred.user;
-                } else {
-                    const cred = await signInAnonymously(auth);
-                    currentUser = cred.user;
-                }
-
-                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white border border-white/25";
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span> En Vivo`;
-
-                await seedSampleProjectsIfEmpty();
-                listenToProjects();
-
-            } catch (error) {
-                console.error("Error inicializando Firebase:", error);
-                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/90 text-white border border-rose-300/40";
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-white"></span> Sin conexión`;
-                showToast("Error de conexión con la base de datos en la nube.", "error");
-            }
-        }
-
-        async function seedSampleProjectsIfEmpty() {
-            if (!currentUser) return;
-            const projectsCol = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
-            const snapshot = await getDocs(projectsCol);
-            if (snapshot.empty) {
-                for (const proj of SAMPLE_PROJECTS) {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', proj.id);
-                    await setDoc(docRef, {
-                        ...proj,
-                        createdAt: serverTimestamp()
-                    });
-                }
-            }
-        }
-
-        function listenToProjects() {
-            if (!currentUser) return;
-            const projectsCol = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
-
-            onSnapshot(projectsCol, (snapshot) => {
-                const list = [];
-                snapshot.forEach((docSnap) => {
-                    list.push({ id: docSnap.id, ...docSnap.data() });
-                });
-
-                list.sort((a, b) => (a.code || a.id).localeCompare(b.code || b.id, undefined, { numeric: true }));
-                allProjects = list;
-
-                document.getElementById('loading-projects').classList.add('hidden');
-                updateCategoryFilterOptions();
-                renderGallery();
-                renderResults();
-                renderQRCodes();
-                updateOpenModalVotes();
-
-                if (!initialUrlProjectHandled) {
-                    initialUrlProjectHandled = true;
-                    checkUrlForDirectProject();
-                }
-            }, (error) => {
-                console.error("Error escuchando proyectos:", error);
-                showToast("No se pudieron sincronizar los proyectos.", "error");
-            });
-        }
-
+        let pendingConfirmAction = null;
+// ... existing code ... -->
         // ==========================================
-        // 2. VALIDACIÓN Y FORMATO DE RUT CHILENO
+        // 6. MÓDULO DE ADMINISTRACIÓN DE PROYECTOS
         // ==========================================
-        function cleanRut(rut) {
-            return typeof rut === 'string' ? rut.replace(/[^0-9kK]/g, '').toUpperCase() : '';
-        }
-
-        function formatRut(value) {
-            const clean = cleanRut(value);
-            if (clean.length <= 1) return clean;
-
-            const body = clean.slice(0, -1);
-            const dv = clean.slice(-1);
-
-            let formattedBody = '';
-            for (let i = body.length - 1, j = 1; i >= 0; i--, j++) {
-                formattedBody = body[i] + formattedBody;
-                if (j % 3 === 0 && i !== 0) {
-                    formattedBody = '.' + formattedBody;
-                }
-            }
-            return `${formattedBody}-${dv}`;
-        }
-
-        function validateChileanRut(rut) {
-            const clean = cleanRut(rut);
-            if (clean.length < 7 || clean.length > 9) return false;
-
-            const body = clean.slice(0, -1);
-            const dv = clean.slice(-1);
-
-            if (!/^\d+$/.test(body)) return false;
-            if (/^(\d)\1+$/.test(body)) return false;
-
-            let sum = 0;
-            let multiplier = 2;
-
-            for (let i = body.length - 1; i >= 0; i--) {
-                sum += parseInt(body[i], 10) * multiplier;
-                multiplier = multiplier === 7 ? 2 : multiplier + 1;
-            }
-
-            const remainder = sum % 11;
-            const calculatedDv = 11 - remainder;
-
-            let expectedDv = '';
-            if (calculatedDv === 11) expectedDv = '0';
-            else if (calculatedDv === 10) expectedDv = 'K';
-            else expectedDv = String(calculatedDv);
-
-            return dv === expectedDv;
-        }
-
-        const rutInput = document.getElementById('voter-rut');
-        rutInput.addEventListener('input', (e) => {
-            const formatted = formatRut(e.target.value);
-            e.target.value = formatted;
-
-            const statusIcon = document.getElementById('rut-status-icon');
-            const clean = cleanRut(formatted);
-
-            if (clean.length >= 7) {
-                statusIcon.classList.remove('hidden');
-                if (validateChileanRut(formatted)) {
-                    e.target.classList.remove('border-rose-400', 'border-slate-300');
-                    e.target.classList.add('border-st-500');
-                    statusIcon.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-st-600"></i>`;
-                } else {
-                    e.target.classList.remove('border-st-500', 'border-slate-300');
-                    e.target.classList.add('border-rose-400');
-                    statusIcon.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-rose-500"></i>`;
-                }
-                lucide.createIcons();
-            } else {
-                statusIcon.classList.add('hidden');
-                e.target.classList.remove('border-st-500', 'border-rose-400');
-                e.target.classList.add('border-slate-300');
-            }
-        });
-
-        // ==========================================
-        // 3. LÓGICA DE VOTACIÓN EN FIRESTORE
-        // ==========================================
-        document.getElementById('vote-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) {
-                showModalFeedback("Aún conectando con el servidor. Intenta en un segundo.", "error");
-                return;
-            }
-
-            const projectId = document.getElementById('modal-proj-id').value;
-            const rawRut = rutInput.value;
-            const cleanedRut = cleanRut(rawRut);
-            const formattedRut = formatRut(rawRut);
-
-            if (!validateChileanRut(rawRut)) {
-                showModalFeedback("El RUT ingresado no es válido. Verifica el número y su dígito verificador.", "error");
-                rutInput.focus();
-                return;
-            }
-
-            const submitBtn = document.getElementById('btn-submit-vote');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Verificando voto...`;
-
-            try {
-                const voteDocId = `${projectId}_${cleanedRut}`;
-                const voteRef = doc(db, 'artifacts', appId, 'public', 'data', 'votes', voteDocId);
-                const projectRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', projectId);
-
-                await runTransaction(db, async (transaction) => {
-                    const voteSnap = await transaction.get(voteRef);
-                    if (voteSnap.exists()) {
-                        throw new Error("ALREADY_VOTED");
-                    }
-
-                    const projSnap = await transaction.get(projectRef);
-                    if (!projSnap.exists()) {
-                        throw new Error("PROJECT_NOT_FOUND");
-                    }
-
-                    const currentVotes = projSnap.data().votes || 0;
-
-                    transaction.set(voteRef, {
-                        projectId: projectId,
-                        rut: cleanedRut,
-                        rutFormatted: formattedRut,
-                        timestamp: serverTimestamp()
-                    });
-
-                    transaction.update(projectRef, {
-                        votes: currentVotes + 1
-                    });
-                });
-
-                showModalFeedback(`¡Voto registrado con éxito para el RUT ${formattedRut}! Puedes seguir votando por otros proyectos.`, "success");
-                showToast(`¡Voto confirmado! (${formattedRut})`, "success");
-                
-                window.lastUsedRut = formattedRut;
-
-            } catch (err) {
-                if (err.message === "ALREADY_VOTED") {
-                    showModalFeedback(`El RUT ${formattedRut} ya registró un voto en este proyecto. ¡Recuerda que puedes votar por los demás stands!`, "warning");
-                } else if (err.message === "PROJECT_NOT_FOUND") {
-                    showModalFeedback("El proyecto seleccionado ya no está disponible.", "error");
-                } else {
-                    console.error("Error al registrar voto:", err);
-                    showModalFeedback("Ocurrió un error al registrar tu voto. Por favor intenta nuevamente.", "error");
-                }
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i> Confirmar Voto`;
-                lucide.createIcons();
-            }
-        });
-
-        // ==========================================
-        // 4. MANEJO DE URL DIRECTA (ESCANEO DE QR)
-        // ==========================================
-        function getProjectDirectUrl(projectId) {
-            const baseUrl = window.location.origin + window.location.pathname;
-            return `${baseUrl}?proyecto=${encodeURIComponent(projectId)}`;
-        }
-
-        function checkUrlForDirectProject() {
-            const params = new URLSearchParams(window.location.search);
-            const targetId = params.get('proyecto');
-
-            if (targetId) {
-                const found = allProjects.find(p => p.id.toLowerCase() === targetId.toLowerCase());
-                document.getElementById('qr-direct-banner').classList.remove('hidden');
-                if (found) {
-                    openVoteModal(found.id);
-                } else {
-                    showToast(`No se encontró el proyecto "${targetId}". Mostrando todos los stands.`, "warning");
-                }
-            }
-        }
-
-        window.clearUrlParam = function() {
-            const cleanUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
-            document.getElementById('qr-direct-banner').classList.add('hidden');
-            closeVoteModal();
-        };
-
-        // ==========================================
-        // 5. RENDERIZADO DE VISTAS (GALERÍA, RANKING, QR)
-        // ==========================================
-        function updateCategoryFilterOptions() {
-            const select = document.getElementById('category-filter');
-            const currentVal = select.value;
-            const categories = [...new Set(allProjects.map(p => p.category).filter(Boolean))];
-
-            select.innerHTML = `<option value="TODAS">Todas las categorías</option>`;
-            categories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                select.appendChild(opt);
-            });
-            if (categories.includes(currentVal)) {
-                select.value = currentVal;
-            }
-        }
-
-        function renderGallery() {
-            const grid = document.getElementById('projects-grid');
-            const emptyState = document.getElementById('empty-projects');
-            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
-            const categoryFilter = document.getElementById('category-filter').value;
-
-            const filtered = allProjects.filter(p => {
-                const matchesCat = categoryFilter === 'TODAS' || p.category === categoryFilter;
-                const matchesSearch = !searchTerm || 
-                    (p.title && p.title.toLowerCase().includes(searchTerm)) ||
-                    (p.code && p.code.toLowerCase().includes(searchTerm)) ||
-                    (p.authors && p.authors.toLowerCase().includes(searchTerm)) ||
-                    (p.description && p.description.toLowerCase().includes(searchTerm));
-                return matchesCat && matchesSearch;
-            });
-
-            if (filtered.length === 0) {
-                grid.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            grid.classList.remove('hidden');
-
-            grid.innerHTML = filtered.map((proj, index) => `
-                <article style="animation-delay: ${index * 45}ms" class="project-card animate-fade-up bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm flex flex-col justify-between">
-                    <!-- Barra superior de acento institucional -->
-                    <div class="h-1.5 w-full bg-gradient-to-r from-st-600 to-st-500"></div>
-                    
-                    <div class="p-6 flex-grow flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between gap-2 mb-3">
-                                <span class="px-2.5 py-1 bg-st-50 text-st-700 font-mono text-xs font-extrabold rounded-lg border border-st-200">
-                                    ${escapeHtml(proj.code || proj.id)}
-                                </span>
-                                <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
-                                    ${escapeHtml(proj.category || 'General')}
-                                </span>
-                            </div>
-
-                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-1.5 leading-snug">
-                                ${escapeHtml(proj.title)}
-                            </h3>
-
-                            <p class="text-xs font-medium text-slate-500 mb-3 flex items-center gap-1.5">
-                                <i data-lucide="users" class="w-3.5 h-3.5 text-st-600 shrink-0"></i>
-                                <span>${escapeHtml(proj.authors)}</span>
-                            </p>
-
-                            <p class="text-sm text-slate-600 line-clamp-3 leading-relaxed mb-5">
-                                ${escapeHtml(proj.description)}
-                            </p>
-                        </div>
-
-                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
-                            <div class="flex items-center gap-2 text-slate-700">
-                                <div class="bg-st-50 text-st-600 p-2 rounded-xl border border-st-100">
-                                    <i data-lucide="award" class="w-4 h-4"></i>
-                                </div>
-                                <div>
-                                    <span class="text-base font-black text-slate-900 leading-none block">${proj.votes || 0}</span>
-                                    <span class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">votos</span>
-                                </div>
-                            </div>
-
-                            <button onclick="openVoteModal('${escapeHtml(proj.id)}')" 
-                                class="btn-vote-glow px-5 py-2.5 bg-st-600 hover:bg-st-700 active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer">
-                                <i data-lucide="vote" class="w-4 h-4"></i> Votar Proyecto
-                            </button>
-                        </div>
-                    </div>
-                </article>
-            `).join('');
-
-            lucide.createIcons();
-        }
-
-        function renderResults() {
-            const container = document.getElementById('results-list');
-            const totalCounter = document.getElementById('total-votes-counter');
-
-            const sorted = [...allProjects].sort((a, b) => (b.votes || 0) - (a.votes || 0));
-            const totalVotes = sorted.reduce((acc, p) => acc + (p.votes || 0), 0);
-            const maxVotes = sorted.length > 0 ? Math.max(...sorted.map(p => p.votes || 0), 1) : 1;
-
-            totalCounter.textContent = totalVotes;
-
-            if (sorted.length === 0) {
-                container.innerHTML = `<p class="text-center text-slate-500 py-8 text-sm">Aún no hay proyectos registrados.</p>`;
-                return;
-            }
-
-            container.innerHTML = sorted.map((proj, idx) => {
-                const votes = proj.votes || 0;
-                const pctOfTotal = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
-                const barWidth = totalVotes > 0 ? Math.round((votes / maxVotes) * 100) : 0;
-                
-                let medalBadge = `<span class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0">#${idx + 1}</span>`;
-                if (idx === 0 && votes > 0) medalBadge = `<span class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-black text-xs flex items-center justify-center shrink-0 shadow-xs">1°</span>`;
-                if (idx === 1 && votes > 0) medalBadge = `<span class="w-8 h-8 rounded-full bg-slate-200 text-slate-800 border border-slate-300 font-black text-xs flex items-center justify-center shrink-0">2°</span>`;
-                if (idx === 2 && votes > 0) medalBadge = `<span class="w-8 h-8 rounded-full bg-orange-100 text-orange-800 border border-orange-300 font-black text-xs flex items-center justify-center shrink-0">3°</span>`;
-
-                return `
-                    <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-st-200 transition-colors">
-                        <div class="flex items-center justify-between gap-3 mb-2.5">
-                            <div class="flex items-center gap-3 min-w-0">
-                                ${medalBadge}
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-mono font-extrabold text-st-600 bg-st-50 px-2 py-0.5 rounded">${escapeHtml(proj.code || proj.id)}</span>
-                                        <h4 class="font-bold text-slate-900 text-sm sm:text-base truncate">${escapeHtml(proj.title)}</h4>
-                                    </div>
-                                    <p class="text-xs text-slate-500 truncate mt-0.5">${escapeHtml(proj.authors)}</p>
-                                </div>
-                            </div>
-                            <div class="text-right shrink-0">
-                                <span class="text-xl font-black text-slate-900">${votes}</span>
-                                <span class="text-xs font-semibold text-st-600 block">${pctOfTotal}%</span>
-                            </div>
-                        </div>
-                        <div class="w-full bg-slate-200/90 rounded-full h-3 overflow-hidden">
-                            <div class="progress-bar-shimmer bg-gradient-to-r from-st-600 to-st-500 h-3 rounded-full" style="width: ${barWidth}%"></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderQRCodes() {
-            const printArea = document.getElementById('print-area');
-            if (allProjects.length === 0) {
-                printArea.innerHTML = `<p class="col-span-full text-center text-slate-500 py-10">No hay proyectos disponibles para generar QR.</p>`;
-                return;
-            }
-
-            printArea.innerHTML = allProjects.map(proj => {
-                const directUrl = getProjectDirectUrl(proj.id);
-                return `
-                    <div class="qr-card-print bg-white rounded-2xl border-2 border-st-600/30 p-6 flex flex-col items-center text-center shadow-sm">
-                        <div class="flex items-center gap-1.5 text-st-600 font-display font-extrabold text-xs tracking-wider mb-2">
-                            <span>SANTO TOMÁS</span>
-                        </div>
-                        <span class="px-3.5 py-1 bg-st-600 text-white font-mono text-xs font-bold rounded-full mb-3">
-                            STAND ${escapeHtml(proj.code || proj.id)}
-                        </span>
-                        <h3 class="font-extrabold text-slate-900 text-lg leading-tight mb-1 line-clamp-2">
-                            ${escapeHtml(proj.title)}
-                        </h3>
-                        <p class="text-xs text-slate-500 mb-4 line-clamp-1">${escapeHtml(proj.authors)}</p>
-                        
-                        <!-- Contenedor donde QRCode.js dibujará el QR estático -->
-                        <div id="qrcode-${escapeHtml(proj.id)}" class="p-3 bg-white border-2 border-st-100 rounded-xl mb-4 flex items-center justify-center"></div>
-                        
-                        <p class="text-xs font-extrabold text-st-600 uppercase tracking-wide mb-1">Escanea para votar con tu RUT</p>
-                        <p class="text-[10px] text-slate-400 font-mono break-all max-w-full px-2">${escapeHtml(directUrl)}</p>
-
-                        <div class="mt-4 pt-3 border-t border-slate-100 w-full flex justify-center gap-2 no-print">
-                            <button onclick="copyProjectLink('${escapeHtml(proj.id)}')" class="text-xs font-semibold text-slate-600 hover:text-st-600 flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-st-50 transition cursor-pointer">
-                                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar enlace directo
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            allProjects.forEach(proj => {
-                const container = document.getElementById(`qrcode-${proj.id}`);
-                if (container) {
-                    container.innerHTML = '';
-                    new QRCode(container, {
-                        text: getProjectDirectUrl(proj.id),
-                        width: 170,
-                        height: 170,
-                        colorDark: "#003826",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                }
-            });
-
-            lucide.createIcons();
-        }
-
-        // ==========================================
-        // 6. AGREGAR NUEVO PROYECTO (ADMIN)
-        // ==========================================
+        function renderAdminProjectsList() {
+            const listContainer = document.getElementById('admin-projects-list');
+            const countBadge = document.getElementById('admin-projects-count');
+// ... existing code ... -->
+        // Agregar nuevo proyecto
         document.getElementById('add-project-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
 
             const rawCode = document.getElementById('proj-code').value.trim().toUpperCase().replace(/[^A-Z0-9-_]/g, '-');
-            const category = document.getElementById('proj-category').value.trim();
-            const title = document.getElementById('proj-title').value.trim();
-            const authors = document.getElementById('proj-authors').value.trim();
-            const description = document.getElementById('proj-desc').value.trim();
+// ... existing code ... -->
+        document.getElementById('edit-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
 
-            if (!rawCode || !title || !authors || !description) return;
+            const projectId = document.getElementById('edit-proj-id').value;
+// ... existing code ... -->
+        document.getElementById('btn-confirm-execute').addEventListener('click', async () => {
+            if (!pendingConfirmAction || !currentUser) return;
 
-            const btn = document.getElementById('btn-save-project');
-            btn.disabled = true;
-            btn.textContent = "Guardando...";
-
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', rawCode);
-                const existing = await getDoc(docRef);
-
-                if (existing.exists()) {
-                    showToast(`Ya existe un proyecto con el código "${rawCode}". Usa otro código.`, "error");
-                    btn.disabled = false;
-                    btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Guardar Proyecto y Generar QR`;
-                    lucide.createIcons();
-                    return;
-                }
-
-                await setDoc(docRef, {
-                    id: rawCode,
-                    code: rawCode,
-                    category,
-                    title,
-                    authors,
-                    description,
-                    votes: 0,
-                    createdAt: serverTimestamp()
-                });
-
-                document.getElementById('add-project-form').reset();
-                showToast(`Proyecto ${rawCode} creado y su QR estático está listo.`, "success");
-                switchTab('qr');
-
-            } catch (error) {
-                console.error("Error guardando proyecto:", error);
-                showToast("Error al guardar el proyecto.", "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Guardar Proyecto y Generar QR`;
-                lucide.createIcons();
-            }
-        });
-
-        // ==========================================
-        // 7. CONTROLADORES DE UI Y MODALES
-        // ==========================================
-        window.openVoteModal = function(projectId) {
-            const proj = allProjects.find(p => p.id === projectId);
-            if (!proj) return;
-
-            document.getElementById('modal-proj-id').value = proj.id;
-            document.getElementById('modal-proj-code').textContent = proj.code || proj.id;
-            document.getElementById('modal-proj-category').textContent = proj.category || 'General';
-            document.getElementById('modal-proj-title').textContent = proj.title;
-            document.getElementById('modal-proj-authors').textContent = proj.authors;
-            document.getElementById('modal-proj-desc').textContent = proj.description;
-            document.getElementById('modal-proj-votes').textContent = proj.votes || 0;
-
-            const feedback = document.getElementById('modal-feedback');
-            feedback.classList.add('hidden');
-
-            if (window.lastUsedRut) {
-                rutInput.value = window.lastUsedRut;
-                rutInput.dispatchEvent(new Event('input'));
-            } else {
-                rutInput.value = '';
-                document.getElementById('rut-status-icon').classList.add('hidden');
-                rutInput.classList.remove('border-st-500', 'border-rose-400');
-                rutInput.classList.add('border-slate-300');
-            }
-
-            const modal = document.getElementById('vote-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            lucide.createIcons();
-        };
-
-        window.closeVoteModal = function() {
-            const modal = document.getElementById('vote-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
-
-        window.closeVoteModalAndShowAll = function() {
-            closeVoteModal();
-            switchTab('galeria');
-        };
-
-        function updateOpenModalVotes() {
-            const modal = document.getElementById('vote-modal');
-            if (!modal.classList.contains('hidden')) {
-                const openId = document.getElementById('modal-proj-id').value;
-                const proj = allProjects.find(p => p.id === openId);
-                if (proj) {
-                    document.getElementById('modal-proj-votes').textContent = proj.votes || 0;
-                }
-            }
-        }
-
-        function showModalFeedback(message, type = "info") {
-            const box = document.getElementById('modal-feedback');
-            const msg = document.getElementById('modal-feedback-msg');
-            const icon = document.getElementById('modal-feedback-icon');
-
-            box.classList.remove('hidden', 'bg-st-50', 'text-st-800', 'border-st-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'bg-amber-50', 'text-amber-800', 'border-amber-200');
-            box.classList.add('border', 'animate-fade-up');
-
-            if (type === 'success') {
-                box.classList.add('bg-st-50', 'text-st-800', 'border-st-200');
-                icon.setAttribute('data-lucide', 'check-circle-2');
-            } else if (type === 'warning') {
-                box.classList.add('bg-amber-50', 'text-amber-800', 'border-amber-200');
-                icon.setAttribute('data-lucide', 'alert-triangle');
-            } else {
-                box.classList.add('bg-rose-50', 'text-rose-800', 'border-rose-200');
-                icon.setAttribute('data-lucide', 'x-circle');
-            }
-
-            msg.textContent = message;
-            lucide.createIcons();
-        }
-
-        window.switchTab = function(tabName) {
-            const views = ['galeria', 'resultados', 'qr', 'admin'];
-            views.forEach(v => {
-                document.getElementById(`view-${v}`).classList.add('hidden');
-                
-                // Desktop nav
-                const navBtn = document.getElementById(`nav-${v}`);
-                if (navBtn) {
-                    navBtn.className = "tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10";
-                }
-                // Mobile nav
-                const mnavBtn = document.getElementById(`mnav-${v}`);
-                if (mnavBtn) {
-                    mnavBtn.className = "mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all";
-                }
-            });
-
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            
-            const activeNav = document.getElementById(`nav-${tabName}`);
-            if (activeNav) {
-                activeNav.className = "tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 bg-white text-st-600 shadow-sm";
-            }
-            const activeMnav = document.getElementById(`mnav-${tabName}`);
-            if (activeMnav) {
-                activeMnav.className = "mtab-btn flex flex-col items-center py-1 px-3 rounded-lg bg-white text-st-600 font-bold text-xs transition-all";
+            const action = pendingConfirmAction;
+// ... existing code ... -->
+            if (tabName === 'admin') {
+                renderAdminProjectsList();
             }
         };
-
-        window.copyProjectLink = function(projectId) {
-            const url = getProjectDirectUrl(projectId);
-            const tempInput = document.createElement('input');
-            tempInput.value = url;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            showToast(`Enlace directo copiado para ${projectId}`, "success");
-        };
-
-        function showToast(text, type = "info") {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            let colors = "bg-slate-900 text-white";
-            if (type === "success") colors = "bg-st-600 text-white border border-st-500";
-            if (type === "error") colors = "bg-rose-600 text-white";
-            if (type === "warning") colors = "bg-amber-600 text-white";
-
-            toast.className = `${colors} px-4 py-3 rounded-xl shadow-lg text-sm font-semibold flex items-center justify-between gap-3 pointer-events-auto animate-fade-up`;
-            toast.innerHTML = `<span>${escapeHtml(text)}</span>`;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3800);
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        document.getElementById('search-input').addEventListener('input', renderGallery);
-        document.getElementById('category-filter').addEventListener('change', renderGallery);
-
-        document.getElementById('vote-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'vote-modal') closeVoteModal();
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            initFirebase();
-        });
-    </script>
-</body>
-</html>
+// ... existing code ... -->
