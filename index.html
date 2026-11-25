@@ -181,7 +181,7 @@
                     <button onclick="switchTab('qr')" id="nav-qr" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
                         <i data-lucide="printer" class="w-4 h-4"></i> Códigos QR
                     </button>
-                    <button onclick="switchTab('admin')" id="nav-admin" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
+                    <button onclick="switchTab('admin')" id="nav-admin" class="tab-btn hidden md:flex px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 items-center gap-2 text-st-100 hover:text-white hover:bg-white/10">
                         <i data-lucide="settings-2" class="w-4 h-4"></i> Administrar
                     </button>
                 </nav>
@@ -196,19 +196,16 @@
             </div>
         </div>
 
-        <!-- Navegación Móvil Adaptativa -->
+        <!-- Navegación Móvil Adaptativa (Sin acceso a Administración en celulares) -->
         <div class="md:hidden border-t border-white/15 bg-st-700 px-2 py-1.5 flex justify-around">
-            <button onclick="switchTab('galeria')" id="mnav-galeria" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg bg-white text-st-600 font-bold text-xs transition-all">
+            <button onclick="switchTab('galeria')" id="mnav-galeria" class="mtab-btn flex flex-col items-center py-1 px-4 rounded-lg bg-white text-st-600 font-bold text-xs transition-all">
                 <i data-lucide="layout-grid" class="w-4 h-4 mb-0.5"></i> Proyectos
             </button>
-            <button onclick="switchTab('resultados')" id="mnav-resultados" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all">
+            <button onclick="switchTab('resultados')" id="mnav-resultados" class="mtab-btn flex flex-col items-center py-1 px-4 rounded-lg text-st-100 font-medium text-xs transition-all">
                 <i data-lucide="bar-chart-3" class="w-4 h-4 mb-0.5"></i> Ranking
             </button>
-            <button onclick="switchTab('qr')" id="mnav-qr" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all">
+            <button onclick="switchTab('qr')" id="mnav-qr" class="mtab-btn flex flex-col items-center py-1 px-4 rounded-lg text-st-100 font-medium text-xs transition-all">
                 <i data-lucide="printer" class="w-4 h-4 mb-0.5"></i> QRs
-            </button>
-            <button onclick="switchTab('admin')" id="mnav-admin" class="mtab-btn flex flex-col items-center py-1 px-3 rounded-lg text-st-100 font-medium text-xs transition-all">
-                <i data-lucide="settings-2" class="w-4 h-4 mb-0.5"></i> Admin
             </button>
         </div>
     </header>
@@ -314,17 +311,17 @@
                     <i data-lucide="printer" class="w-4 h-4"></i> Imprimir Tarjetas QR
                 </button>
             </div>
-
-            <!-- Área Imprimible -->
-            <div id="print-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Tarjetas QR inyectadas dinámicamente -->
-            </div>
-        </section>
-
-        <!-- VISTA 4: ADMINISTRACIÓN COMPLETA DE PROYECTOS -->
+        <!-- VISTA 4: ADMINISTRACIÓN COMPLETA DE PROYECTOS (Solo visible en PC/Escritorio) -->
         <section id="view-admin" class="hidden max-w-5xl mx-auto animate-fade-up space-y-6">
-            <!-- Panel Directo de Administración -->
-            <div id="admin-unlocked-panel" class="space-y-6">
+            <!-- Aviso exclusivo si se redimensiona a móvil -->
+            <div class="md:hidden bg-white rounded-2xl border border-slate-200 p-6 text-center shadow-sm">
+                <i data-lucide="monitor" class="w-10 h-10 text-st-600 mx-auto mb-2"></i>
+                <h3 class="text-base font-bold text-slate-900">Panel disponible solo en PC</h3>
+                <p class="text-xs text-slate-500 mt-1">Por seguridad, la administración de proyectos solo está habilitada desde un computador de escritorio.</p>
+            </div>
+
+            <!-- Panel Directo de Administración (Oculto en móviles) -->
+            <div id="admin-unlocked-panel" class="hidden md:block space-y-6">
                 <!-- Barra Superior de Acciones Globales -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
