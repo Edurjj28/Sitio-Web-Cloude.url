@@ -132,28 +132,29 @@
 <body class="min-h-screen flex flex-col">
 
   <!-- Barra Superior Institucional -->
-  <header class="bg-[#005C3E] text-white sticky top-0 z-30 shadow-lg border-b border-[#00432D]">
+ <header class="bg-[#005C3E] text-white sticky top-0 z-30 shadow-lg border-b border-[#00432D] no-print">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2">
       <!-- Logo Santo Tomás en esquina superior izquierda -->
-      <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('proyectos')">
-        <div class="bg-white p-1.5 sm:p-2 rounded-xl shadow-md transition-transform duration-300 group-hover:scale-105 shrink-0">
-         <img
-  src="./logo-st.png"
-  alt="Logo Santo Tomás"
-  class="w-8 h-8 sm:w-9 sm:h-9 object-contain"
-/>
+      <div class="flex items-center gap-3 cursor-pointer group min-w-0" onclick="switchTab('proyectos')">
+        <div class="bg-white px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl shadow-md transition-transform duration-300 group-hover:scale-105 shrink-0 flex items-center justify-center">
+          <img
+            src="./logo-st.png"
+            alt="Logo Santo Tomás"
+            class="h-7 sm:h-9 w-auto max-w-[105px] sm:max-w-[130px] object-contain"
+            onerror="this.onerror=null; this.src='./Logo-ST.png';"
+          />
         </div>
-        <div class="leading-tight">
+        <div class="leading-tight min-w-0">
           <div class="flex items-center gap-1.5">
-            <span class="font-extrabold text-sm sm:text-lg tracking-tight text-white uppercase">Santo Tomás</span>
-            <span class="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-[#C5A059]"></span>
+            <span class="font-extrabold text-sm sm:text-lg tracking-tight text-white uppercase truncate">Santo Tomás</span>
+            <span class="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0"></span>
           </div>
-          <p class="text-[11px] sm:text-xs text-emerald-100/90 font-medium">Feria de Proyectos e Innovación</p>
+          <p class="text-[11px] sm:text-xs text-emerald-100/90 font-medium truncate">Feria de Proyectos e Innovación</p>
         </div>
       </div>
 
       <!-- Navegación Responsiva -->
-      <nav class="flex items-center gap-1 sm:gap-2 bg-[#00432D]/70 p-1 rounded-xl border border-white/10">
+      <nav class="flex items-center gap-1 sm:gap-2 bg-[#00432D]/70 p-1 rounded-xl border border-white/10 shrink-0">
         <button id="tab-btn-proyectos" onclick="switchTab('proyectos')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-[#005C3E] shadow-sm flex items-center gap-1.5">
           <i data-lucide="layout-grid" class="w-4 h-4"></i>
           <span>Proyectos</span>
