@@ -37,13 +37,28 @@
     }
 
     @keyframes modalScaleIn {
-      from {
+      0% {
         opacity: 0;
-        transform: scale(0.95) translateY(10px);
+        transform: scale(0.94) translateY(14px);
       }
-      to {
+      70% {
+        opacity: 1;
+        transform: scale(1.015) translateY(-2px);
+      }
+      100% {
         opacity: 1;
         transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes modalScaleOut {
+      from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
       }
     }
 
@@ -56,12 +71,64 @@
       }
     }
 
+    /* Animación de palpitar al rellenarse cada estrella */
+    @keyframes starBeat {
+      0% {
+        transform: scale(0.75);
+      }
+      45% {
+        transform: scale(1.32);
+      }
+      72% {
+        transform: scale(0.94);
+      }
+      100% {
+        transform: scale(1.08);
+      }
+    }
+
+    /* Animación de serpentinas y cotillón detrás del modal */
+    @keyframes confettiFall {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, -24px, 0) rotate(0deg) scale(0.7);
+      }
+      12% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--drift-x, 20px), 105vh, 0) rotate(var(--rot-end, 540deg)) scale(1);
+      }
+    }
+
+    @keyframes streamerSway {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, -30px, 0) rotate(-18deg) scaleX(0.8);
+      }
+      15% {
+        opacity: 0.95;
+      }
+      50% {
+        transform: translate3d(var(--drift-x, -28px), 48vh, 0) rotate(22deg) scaleX(1.1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(calc(var(--drift-x, -28px) * -0.6), 108vh, 0) rotate(-26deg) scaleX(0.9);
+      }
+    }
+
     .animate-fade-up {
       animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     .animate-modal {
-      animation: modalScaleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: modalScaleIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .animate-modal-out {
+      animation: modalScaleOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
     }
 
     .project-card {
@@ -88,19 +155,77 @@
     }
 
     .btn-st:active {
-      transform: translateY(0);
+      transform: translateY(0) scale(0.99);
     }
 
     .pulse-live {
       animation: subtlePulse 2.4s infinite;
     }
 
-    .star-choice {
-      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s ease, background-color 0.18s ease;
+    #star-selector {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    .star-choice:hover {
-      transform: scale(1.14);
+    .star-choice {
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .star-choice svg {
+      transition: color 0.18s ease, filter 0.18s ease, transform 0.2s ease;
+    }
+
+    .star-choice.is-active svg {
+      filter: drop-shadow(0 3px 8px rgba(245, 158, 11, 0.45));
+    }
+
+    .star-choice.is-beating {
+      animation: starBeat 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #celebration-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 45;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      top: -20px;
+      border-radius: 3px;
+      animation-name: confettiFall;
+      animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      animation-fill-mode: forwards;
+    }
+
+    .streamer-ribbon {
+      position: absolute;
+      top: -40px;
+      width: 8px;
+      height: 44px;
+      border-radius: 999px;
+      animation-name: streamerSway;
+      animation-timing-function: ease-in-out;
+      animation-fill-mode: forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-fade-up,
+      .animate-modal,
+      .animate-modal-out,
+      .project-card,
+      .btn-st,
+      .pulse-live,
+      .star-choice,
+      .confetti-piece,
+      .streamer-ribbon {
+        animation: none !important;
+        transition: none !important;
+      }
     }
 
     @media print {
@@ -131,8 +256,11 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
+  <!-- Capa de serpentinas y cotillón detrás de la ventana de votación (z-45 < modal z-50) -->
+  <div id="celebration-layer" aria-hidden="true"></div>
+
   <!-- Barra Superior Institucional -->
- <header class="bg-[#005C3E] text-white sticky top-0 z-30 shadow-lg border-b border-[#00432D] no-print">
+  <header class="bg-[#005C3E] text-white sticky top-0 z-30 shadow-lg border-b border-[#00432D] no-print">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2">
       <!-- Logo Santo Tomás en esquina superior izquierda -->
       <div class="flex items-center gap-3 cursor-pointer group min-w-0" onclick="switchTab('proyectos')">
@@ -155,21 +283,21 @@
 
       <!-- Navegación Responsiva -->
       <nav class="flex items-center gap-1 sm:gap-2 bg-[#00432D]/70 p-1 rounded-xl border border-white/10 shrink-0">
-        <button id="tab-btn-proyectos" onclick="switchTab('proyectos')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-[#005C3E] shadow-sm flex items-center gap-1.5">
+        <button id="tab-btn-proyectos" onclick="switchTab('proyectos')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 bg-white text-[#005C3E] shadow-sm flex items-center gap-1.5">
           <i data-lucide="layout-grid" class="w-4 h-4"></i>
           <span>Proyectos</span>
         </button>
-        <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-emerald-100 hover:text-white flex items-center gap-1.5">
+        <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-emerald-100 hover:text-white flex items-center gap-1.5">
           <i data-lucide="trophy" class="w-4 h-4"></i>
           <span>Ranking</span>
         </button>
-        <button id="tab-btn-qr" onclick="switchTab('qr')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-emerald-100 hover:text-white flex items-center gap-1.5">
+        <button id="tab-btn-qr" onclick="switchTab('qr')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-emerald-100 hover:text-white flex items-center gap-1.5">
           <i data-lucide="qr-code" class="w-4 h-4"></i>
           <span class="hidden sm:inline">Códigos QR</span>
           <span class="sm:hidden">QRs</span>
         </button>
         <!-- Pestaña Administrar: OCULTA EN CELULARES (hidden md:flex) Y SIN PIN -->
-        <button id="tab-btn-admin" onclick="switchTab('admin')" class="tab-btn hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold transition-all text-emerald-100 hover:text-white items-center gap-1.5">
+        <button id="tab-btn-admin" onclick="switchTab('admin')" class="tab-btn hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-emerald-100 hover:text-white items-center gap-1.5">
           <i data-lucide="settings" class="w-4 h-4"></i>
           <span>Administrar</span>
         </button>
@@ -231,11 +359,11 @@
             <p class="text-sm text-slate-500 mt-1">Ordenado por total de estrellas obtenidas al final de cada evaluación.</p>
           </div>
           <div class="flex items-center gap-3">
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-center">
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-center transition-transform duration-300 hover:scale-[1.02]">
               <span class="text-[11px] font-bold text-amber-700 uppercase tracking-wider block">Total Estrellas</span>
               <span id="total-stars-badge" class="text-2xl sm:text-3xl font-extrabold text-amber-600">0</span>
             </div>
-            <div class="bg-[#E6F4EF] border border-[#008556]/20 rounded-2xl px-4 py-3 text-center">
+            <div class="bg-[#E6F4EF] border border-[#008556]/20 rounded-2xl px-4 py-3 text-center transition-transform duration-300 hover:scale-[1.02]">
               <span class="text-[11px] font-bold text-[#005C3E] uppercase tracking-wider block">Total Votos</span>
               <span id="total-votes-badge" class="text-2xl sm:text-3xl font-extrabold text-[#005C3E]">0</span>
             </div>
@@ -276,7 +404,7 @@
                 <span id="form-badge" class="text-xs font-bold uppercase tracking-wider text-[#008556]">Nuevo Stand</span>
                 <h2 id="form-title" class="text-xl font-extrabold text-slate-900">Agregar Proyecto</h2>
               </div>
-              <button type="button" id="cancel-edit-btn" onclick="resetAdminForm()" class="hidden text-xs font-semibold text-slate-500 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg">
+              <button type="button" id="cancel-edit-btn" onclick="resetAdminForm()" class="hidden text-xs font-semibold text-slate-500 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">
                 Cancelar edición
               </button>
             </div>
@@ -286,28 +414,28 @@
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Código Fijo (Para QR)</label>
-                <input type="text" id="proj-code" required placeholder="Ej: PROY-01" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold text-[#005C3E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#008556]" />
+                <input type="text" id="proj-code" required placeholder="Ej: PROY-01" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold text-[#005C3E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
                 <p class="text-[11px] text-slate-400 mt-1">Este código define la URL estática del QR.</p>
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre del Proyecto</label>
-                <input type="text" id="proj-title" required placeholder="Ej: Sistema de Riego Automatizado IoT" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556]" />
+                <input type="text" id="proj-title" required placeholder="Ej: Sistema de Riego Automatizado IoT" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Área / Carrera</label>
-                <input type="text" id="proj-category" required placeholder="Ej: Ingeniería en Informática" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556]" />
+                <input type="text" id="proj-category" required placeholder="Ej: Ingeniería en Informática" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Integrantes / Equipo</label>
-                <input type="text" id="proj-team" required placeholder="Ej: Camila Soto, Diego Rojas" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556]" />
+                <input type="text" id="proj-team" required placeholder="Ej: Camila Soto, Diego Rojas" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Descripción Breve</label>
-                <textarea id="proj-desc" rows="3" required placeholder="Explica en qué consiste el proyecto y qué problema resuelve..." class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556]"></textarea>
+                <textarea id="proj-desc" rows="3" required placeholder="Explica en qué consiste el proyecto y qué problema resuelve..." class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all"></textarea>
               </div>
 
               <button type="submit" id="save-project-btn" class="w-full btn-st text-white font-bold py-3 rounded-xl text-sm shadow-md flex items-center justify-center gap-2">
@@ -345,9 +473,9 @@
     </section>
   </main>
 
-  <!-- MODAL DE VOTACIÓN POR ESTRELLAS (1 A 5) Y RUT -->
-  <div id="vote-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-100 animate-modal">
+  <!-- MODAL DE VOTACIÓN POR ESTRELLAS (1 A 5) Y RUT (z-50 sobre serpentinas z-45) -->
+  <div id="vote-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-200">
+    <div id="vote-modal-card" class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-100 animate-modal">
       <div class="bg-[#005C3E] px-6 py-5 text-white flex items-start justify-between gap-3">
         <div>
           <span id="modal-proj-code" class="inline-block text-[11px] font-mono font-bold bg-white/20 px-2.5 py-0.5 rounded-md mb-1.5">PROY-01</span>
@@ -363,40 +491,41 @@
         <p id="modal-proj-desc" class="text-sm text-slate-600 leading-relaxed mb-5 bg-slate-50 p-3.5 rounded-xl border border-slate-100"></p>
 
         <form id="vote-form" onsubmit="submitVote(event)" class="space-y-5">
-          <!-- Selector de Estrellas (1 a 5) -->
+          <!-- Selector de Estrellas (1 a 5) con soporte táctil deslizante y palpitar -->
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
               Tu calificación (1 = Lo peor · 5 = Lo mejor)
             </label>
-            <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3.5 flex flex-col items-center">
-              <div id="star-selector" class="flex items-center justify-center gap-2 sm:gap-3">
-                <button type="button" data-star="1" onclick="selectStar(1)" onmouseenter="previewStar(1)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="1 estrella">
-                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current transition-colors" viewBox="0 0 24 24">
+            <div class="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-3.5 flex flex-col items-center">
+              <div id="star-selector" class="flex items-center justify-center gap-2 sm:gap-3 py-1">
+                <button type="button" data-star="1" onclick="selectStar(1, true)" onmouseenter="previewStar(1)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="1 estrella">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
                     <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
                   </svg>
                 </button>
-                <button type="button" data-star="2" onclick="selectStar(2)" onmouseenter="previewStar(2)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="2 estrellas">
-                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current transition-colors" viewBox="0 0 24 24">
+                <button type="button" data-star="2" onclick="selectStar(2, true)" onmouseenter="previewStar(2)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="2 estrellas">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
                     <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
                   </svg>
                 </button>
-                <button type="button" data-star="3" onclick="selectStar(3)" onmouseenter="previewStar(3)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="3 estrellas">
-                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current transition-colors" viewBox="0 0 24 24">
+                <button type="button" data-star="3" onclick="selectStar(3, true)" onmouseenter="previewStar(3)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="3 estrellas">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
                     <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
                   </svg>
                 </button>
-                <button type="button" data-star="4" onclick="selectStar(4)" onmouseenter="previewStar(4)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="4 estrellas">
-                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current transition-colors" viewBox="0 0 24 24">
+                <button type="button" data-star="4" onclick="selectStar(4, true)" onmouseenter="previewStar(4)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="4 estrellas">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
                     <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
                   </svg>
                 </button>
-                <button type="button" data-star="5" onclick="selectStar(5)" onmouseenter="previewStar(5)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="5 estrellas">
-                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current transition-colors" viewBox="0 0 24 24">
+                <button type="button" data-star="5" onclick="selectStar(5, true)" onmouseenter="previewStar(5)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="5 estrellas">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
                     <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
                   </svg>
                 </button>
               </div>
-              <p id="star-label" class="text-xs font-bold text-amber-800 mt-2">5 estrellas — Excelente (Lo mejor)</p>
+              <p id="star-label" class="text-xs font-bold text-amber-800 mt-2 transition-all duration-200">5 estrellas — Excelente (Lo mejor)</p>
+              <p class="text-[11px] text-amber-700/80 mt-0.5">Toca una estrella o desliza el dedo para elegir</p>
             </div>
           </div>
 
@@ -483,6 +612,7 @@
     let projectsList = [];
     let selectedProject = null;
     let selectedStars = 5;
+    let lastRenderedStars = 0;
     let initialDeepLinkHandled = false;
 
     const starDescriptions = {
@@ -604,6 +734,9 @@
 
         if (v === tabName) {
           el.classList.remove('hidden');
+          el.classList.remove('animate-fade-up');
+          void el.offsetWidth;
+          el.classList.add('animate-fade-up');
           if (v === 'admin') el.style.display = '';
           btn.classList.remove('text-emerald-100', 'hover:text-white');
           btn.classList.add('bg-white', 'text-[#005C3E]', 'shadow-sm');
@@ -742,7 +875,7 @@
         const isFirst = idx === 0 && stars > 0;
 
         return `
-          <div class="p-4 rounded-2xl border ${isFirst ? 'border-[#C5A059] bg-amber-50/40' : 'border-slate-100 bg-slate-50/60'} transition-all">
+          <div class="p-4 rounded-2xl border ${isFirst ? 'border-[#C5A059] bg-amber-50/40' : 'border-slate-100 bg-slate-50/60'} transition-all duration-300">
             <div class="flex items-center justify-between gap-3 mb-2">
               <div class="flex items-center gap-3 min-w-0">
                 <span class="w-8 h-8 rounded-xl font-extrabold text-sm flex items-center justify-center shrink-0 ${
@@ -1013,35 +1146,189 @@
       }
     };
 
-    // Control de Estrellas (1 a 5)
-    function paintStars(count) {
+    // Control de Estrellas (1 a 5) con animación de palpitar al rellenarse
+    function triggerBeatOnNewlyFilled(prevCount, newCount) {
+      if (newCount <= prevCount) return;
       const buttons = document.querySelectorAll('#star-selector button[data-star]');
+      let step = 0;
+      buttons.forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-star'), 10);
+        if (val > prevCount && val <= newCount) {
+          const delay = step * 55;
+          step++;
+          setTimeout(() => {
+            btn.classList.remove('is-beating');
+            void btn.offsetWidth;
+            btn.classList.add('is-beating');
+            setTimeout(() => btn.classList.remove('is-beating'), 450);
+          }, delay);
+        }
+      });
+    }
+
+    function paintStars(count, animateNewlyFilled = true) {
+      const buttons = document.querySelectorAll('#star-selector button[data-star]');
+      if (animateNewlyFilled && count > lastRenderedStars) {
+        triggerBeatOnNewlyFilled(lastRenderedStars, count);
+      }
+      lastRenderedStars = count;
+
       buttons.forEach(btn => {
         const val = parseInt(btn.getAttribute('data-star'), 10);
         const svg = btn.querySelector('svg');
         if (val <= count) {
+          btn.classList.add('is-active');
           svg.classList.remove('text-slate-300');
           svg.classList.add('text-amber-400');
         } else {
+          btn.classList.remove('is-active');
           svg.classList.remove('text-amber-400');
           svg.classList.add('text-slate-300');
         }
       });
-      document.getElementById('star-label').textContent = starDescriptions[count] || starDescriptions[5];
+
+      const label = document.getElementById('star-label');
+      label.textContent = starDescriptions[count] || starDescriptions[5];
+      label.classList.remove('scale-105');
+      void label.offsetWidth;
+      label.classList.add('scale-105');
+      setTimeout(() => label.classList.remove('scale-105'), 180);
     }
 
-    window.selectStar = function(val) {
+    function computeStarFromPointerX(clientX) {
+      const selector = document.getElementById('star-selector');
+      if (!selector) return selectedStars;
+      const buttons = Array.from(selector.querySelectorAll('button[data-star]'));
+      if (buttons.length === 0) return selectedStars;
+
+      const firstRect = buttons[0].getBoundingClientRect();
+      const lastRect = buttons[buttons.length - 1].getBoundingClientRect();
+
+      if (clientX <= firstRect.left + firstRect.width * 0.2) return 1;
+      if (clientX >= lastRect.right - lastRect.width * 0.1) return 5;
+
+      for (let i = 0; i < buttons.length; i++) {
+        const rect = buttons[i].getBoundingClientRect();
+        if (clientX <= rect.right) {
+          return i + 1;
+        }
+      }
+      return 5;
+    }
+
+    // Soporte suave de deslizamiento con dedo o puntero en las estrellas
+    (function initStarDragGesture() {
+      const selector = document.getElementById('star-selector');
+      if (!selector) return;
+      let isDragging = false;
+
+      selector.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        try {
+          selector.setPointerCapture(e.pointerId);
+        } catch (_) {}
+        const starVal = computeStarFromPointerX(e.clientX);
+        if (starVal !== selectedStars) {
+          selectedStars = starVal;
+          paintStars(selectedStars, true);
+        } else {
+          paintStars(selectedStars, true);
+        }
+      });
+
+      selector.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const starVal = computeStarFromPointerX(e.clientX);
+        if (starVal !== selectedStars) {
+          selectedStars = starVal;
+          paintStars(selectedStars, true);
+        }
+      });
+
+      const endDrag = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        try {
+          if (e && selector.hasPointerCapture(e.pointerId)) {
+            selector.releasePointerCapture(e.pointerId);
+          }
+        } catch (_) {}
+      };
+
+      selector.addEventListener('pointerup', endDrag);
+      selector.addEventListener('pointercancel', endDrag);
+    })();
+
+    window.selectStar = function(val, withBeat = true) {
       selectedStars = val;
-      paintStars(selectedStars);
+      paintStars(selectedStars, withBeat);
     };
 
     window.previewStar = function(val) {
-      paintStars(val);
+      paintStars(val, true);
     };
 
     window.resetStarPreview = function() {
-      paintStars(selectedStars);
+      lastRenderedStars = Math.min(lastRenderedStars, selectedStars);
+      paintStars(selectedStars, false);
     };
+
+    // Animación extra de serpentinas y cotillón detrás de la ventana de votación al dar 5 estrellas
+    function launchFiveStarCelebration() {
+      const layer = document.getElementById('celebration-layer');
+      if (!layer) return;
+      layer.innerHTML = '';
+
+      const palette = ['#008556', '#C5A059', '#F59E0B', '#10B981', '#38BDF8', '#F43F5E', '#A855F7'];
+      const totalConfetti = 52;
+      const totalStreamers = 14;
+
+      for (let i = 0; i < totalConfetti; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        const isCircle = i % 3 === 0;
+        const width = isCircle ? 9 : 7 + (i % 5);
+        const height = isCircle ? 9 : 11 + (i % 7);
+        const leftPct = Math.random() * 100;
+        const driftX = (Math.random() - 0.5) * 180;
+        const rotEnd = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 540);
+        const duration = 1.6 + Math.random() * 1.1;
+        const delay = Math.random() * 0.35;
+
+        piece.style.left = `${leftPct}%`;
+        piece.style.width = `${width}px`;
+        piece.style.height = `${height}px`;
+        piece.style.borderRadius = isCircle ? '999px' : '3px';
+        piece.style.backgroundColor = palette[i % palette.length];
+        piece.style.setProperty('--drift-x', `${driftX}px`);
+        piece.style.setProperty('--rot-end', `${rotEnd}deg`);
+        piece.style.animationDuration = `${duration}s`;
+        piece.style.animationDelay = `${delay}s`;
+
+        layer.appendChild(piece);
+      }
+
+      for (let j = 0; j < totalStreamers; j++) {
+        const ribbon = document.createElement('span');
+        ribbon.className = 'streamer-ribbon';
+        const leftPct = 4 + (j * (92 / totalStreamers)) + (Math.random() - 0.5) * 4;
+        const driftX = (Math.random() - 0.5) * 90;
+        const duration = 1.9 + Math.random() * 0.9;
+        const delay = Math.random() * 0.25;
+
+        ribbon.style.left = `${leftPct}%`;
+        ribbon.style.background = `linear-gradient(180deg, ${palette[j % palette.length]} 0%, ${palette[(j + 2) % palette.length]} 100%)`;
+        ribbon.style.setProperty('--drift-x', `${driftX}px`);
+        ribbon.style.animationDuration = `${duration}s`;
+        ribbon.style.animationDelay = `${delay}s`;
+
+        layer.appendChild(ribbon);
+      }
+
+      setTimeout(() => {
+        if (layer) layer.innerHTML = '';
+      }, 3200);
+    }
 
     // Modal de Votación
     window.openVoteModal = function(projectId) {
@@ -1050,7 +1337,8 @@
 
       selectedProject = p;
       selectedStars = 5;
-      paintStars(selectedStars);
+      lastRenderedStars = 0;
+      paintStars(selectedStars, true);
 
       document.getElementById('modal-proj-code').textContent = p.id;
       document.getElementById('modal-proj-title').textContent = p.title;
@@ -1063,21 +1351,35 @@
       document.getElementById('rut-feedback').className = "text-xs mt-1.5 text-slate-500";
 
       const modal = document.getElementById('vote-modal');
+      const card = document.getElementById('vote-modal-card');
+      card.classList.remove('animate-modal-out');
+      card.classList.remove('animate-modal');
+      void card.offsetWidth;
+      card.classList.add('animate-modal');
+
       modal.classList.remove('hidden');
       modal.classList.add('flex');
-      setTimeout(() => rutInput.focus(), 100);
+      setTimeout(() => rutInput.focus(), 120);
     };
 
     window.closeVoteModal = function() {
       const modal = document.getElementById('vote-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      selectedProject = null;
+      const card = document.getElementById('vote-modal-card');
 
-      if (window.location.search.includes('proyecto=')) {
-        const cleanUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-      }
+      card.classList.remove('animate-modal');
+      card.classList.add('animate-modal-out');
+
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        card.classList.remove('animate-modal-out');
+        selectedProject = null;
+
+        if (window.location.search.includes('proyecto=')) {
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+      }, 200);
     };
 
     // RUT Chileno (Módulo 11)
@@ -1192,8 +1494,16 @@
         });
 
         const votedTitle = selectedProject.title;
+        if (starsToAdd === 5) {
+          launchFiveStarCelebration();
+        }
         closeVoteModal();
-        showToast(`¡Registraste ${starsToAdd} ${starsToAdd === 1 ? 'estrella' : 'estrellas'} para "${votedTitle}"!`, "success");
+        showToast(
+          starsToAdd === 5
+            ? `¡5 estrellas! Serpentinas y cotillón para "${votedTitle}"!`
+            : `¡Registraste ${starsToAdd} ${starsToAdd === 1 ? 'estrella' : 'estrellas'} para "${votedTitle}"!`,
+          "success"
+        );
       } catch (err) {
         if (err.message === "ALREADY_VOTED") {
           showToast(`El RUT ${rutInput.value} ya calificó este proyecto. Puedes calificar otros stands.`, "warning");
