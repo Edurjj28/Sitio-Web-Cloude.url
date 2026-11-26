@@ -896,40 +896,23 @@
       return `./logos/${project.id}.png`;
     }
 
-    function buildLogoAvatarHtml(project, sizeClasses = "w-14 h-14", iconSize = "w-6 h-6") {
-      const src = resolveProjectLogo(project);
-      const fallbackLower = `./logos/${String(project.id || '').toLowerCase()}.png`;
-      return `
-        <div class="${sizeClasses} rounded-2xl bg-white border border-slate-200/90 shadow-sm flex items-center justify-center overflow-hidden shrink-0 p-1.5">
-          <img
-            src="${escapeHtml(src)}"
-            alt="Logo ${escapeHtml(project.title)}"
-            class="w-full h-full object-contain"
-            onerror="if(!this.dataset.triedLower){this.dataset.triedLower='1';this.src='${escapeHtml(fallbackLower)}';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}"
-          />
-          <div style="display:none;" class="w-full h-full rounded-xl bg-[#E6F4EF] text-[#005C3E] items-center justify-center">
-            <i data-lucide="folder-kanban" class="${iconSize}"></i>
-          </div>
-        </div>
-      `;
-    }
-
-    window.updateAdminLogoPreview = function() {
-      const input = document.getElementById('proj-logo');
-      const preview = document.getElementById('admin-logo-preview');
-      const placeholder = document.getElementById('admin-logo-placeholder');
-      if (!input || !preview || !placeholder) return;
-
-      const val = input.value.trim();
-      if (!val) {
-        preview.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-        return;
-      }
-      preview.src = val;
-      preview.classList.remove('hidden');
-      placeholder.classList.add('hidden');
-    };
+    function buildLogoAvatarHtml(project, heightClass = "h-32", iconSize = "w-8 h-8") {
+  const src = resolveProjectLogo(project);
+  const fallbackLower = `./logos/${String(project.id || '').toLowerCase()}.png`;
+  return `
+    <div class="w-full ${heightClass} rounded-2xl bg-white border border-slate-200/90 shadow-sm flex items-center justify-center overflow-hidden p-2 mb-3">
+      <img
+        src="${escapeHtml(src)}"
+        alt="Logo ${escapeHtml(project.title)}"
+        class="w-full h-full object-contain"
+        onerror="if(!this.dataset.triedLower){this.dataset.triedLower='1';this.src='${escapeHtml(fallbackLower)}';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}"
+      />
+      <div style="display:none;" class="w-full h-full rounded-xl bg-[#E6F4EF] text-[#005C3E] items-center justify-center">
+        <i data-lucide="folder-kanban" class="${iconSize}"></i>
+      </div>
+    </div>
+  `;
+}
 
     function getLocalVoteRecord() {
       try {
@@ -1149,21 +1132,13 @@
               </p>
             </div>
 
-            <div class="pt-4 border-t border-slate-100">
-              <div class="flex items-center justify-between gap-2 text-xs text-slate-500 mb-3.5">
-                <span class="flex items-center gap-1.5 min-w-0">
-                  <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                  <span class="truncate font-medium">${escapeHtml(p.team)}</span>
-                </span>
-                <span class="font-semibold text-slate-600 shrink-0">${votes} ${votes === 1 ? 'voto' : 'votos'}</span>
-              </div>
-              <button onclick="openVoteModal('${escapeHtml(p.id)}')" class="w-full btn-st text-white font-bold py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
-                <i data-lucide="star" class="w-4 h-4"></i>
-                <span>Calificar con Estrellas (1 a 5)</span>
-              </button>
-            </div>
-          </article>
-        `;
+           <span class="text-[11px] font-bold uppercase tracking-wider text-[#008556] block mb-1 truncate">
+  ${escapeHtml(p.category)}
+</span>
+<h3 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug line-clamp-2 mb-3">
+  ${escapeHtml(p.title)}
+</h3>
+${buildLogoAvatarHtml(p, "h-36", "w-8 h-8")}
       }).join('');
 
       lucide.createIcons();
