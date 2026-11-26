@@ -1,0 +1,157 @@
+:root {
+  --st-green-dark: #00432D;
+  --st-green-primary: #005C3E;
+  --st-green-vibrant: #008556;
+  --st-green-light: #E6F4EF;
+  --st-gold: #C5A059;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #f4f7f6;
+  color: #0f172a;
+  overflow-x: hidden;
+}
+
+/* ---------- Animaciones ---------- */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes modalScaleIn {
+  0%   { opacity: 0; transform: scale(0.94) translateY(14px); }
+  70%  { opacity: 1; transform: scale(1.015) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes modalScaleOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(8px); }
+}
+@keyframes subtlePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 133, 86, 0.35); }
+  50%      { box-shadow: 0 0 0 8px rgba(0, 133, 86, 0); }
+}
+@keyframes starBeat {
+  0%   { transform: scale(0.75); }
+  45%  { transform: scale(1.32); }
+  72%  { transform: scale(0.94); }
+  100% { transform: scale(1.08); }
+}
+@keyframes confettiFall {
+  0%   { opacity: 0; transform: translate3d(0, -24px, 0) rotate(0deg) scale(0.7); }
+  12%  { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--drift-x, 20px), 105vh, 0) rotate(var(--rot-end, 540deg)) scale(1); }
+}
+@keyframes streamerSway {
+  0%   { opacity: 0; transform: translate3d(0, -30px, 0) rotate(-18deg) scaleX(0.8); }
+  15%  { opacity: 0.95; }
+  50%  { transform: translate3d(var(--drift-x, -28px), 48vh, 0) rotate(22deg) scaleX(1.1); }
+  100% { opacity: 0; transform: translate3d(calc(var(--drift-x, -28px) * -0.6), 108vh, 0) rotate(-26deg) scaleX(0.9); }
+}
+
+.animate-fade-up  { animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-modal    { animation: modalScaleIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.animate-modal-out{ animation: modalScaleOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards; }
+.pulse-live       { animation: subtlePulse 2.4s infinite; }
+
+/* ---------- Componentes ---------- */
+.project-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease;
+}
+.project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 32px -10px rgba(0, 92, 62, 0.16);
+  border-color: #008556;
+}
+
+.btn-st {
+  background: linear-gradient(135deg, #005C3E 0%, #007A52 100%);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-st:hover:not(:disabled) {
+  background: linear-gradient(135deg, #004A32 0%, #006644 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -4px rgba(0, 92, 62, 0.35);
+}
+.btn-st:active:not(:disabled) { transform: translateY(0) scale(0.99); }
+.btn-st:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Foco visible para teclado */
+button:focus-visible, a:focus-visible {
+  outline: 2px solid #C5A059;
+  outline-offset: 2px;
+}
+
+/* ---------- Estrellas ---------- */
+#star-selector {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.star-choice {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.star-choice svg {
+  transition: color 0.18s ease, filter 0.18s ease, transform 0.2s ease;
+}
+.star-choice.is-active svg { filter: drop-shadow(0 3px 8px rgba(245, 158, 11, 0.45)); }
+.star-choice.is-beating    { animation: starBeat 0.42s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* ---------- Celebración ---------- */
+#celebration-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 3px;
+  animation-name: confettiFall;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation-fill-mode: forwards;
+}
+.streamer-ribbon {
+  position: absolute;
+  top: -40px;
+  width: 8px;
+  height: 44px;
+  border-radius: 999px;
+  animation-name: streamerSway;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+/* ---------- Accesibilidad: menos movimiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up, .animate-modal, .animate-modal-out, .project-card,
+  .btn-st, .pulse-live, .star-choice, .confetti-piece, .streamer-ribbon {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Impresión de tarjetas QR ---------- */
+@media print {
+  body * { visibility: hidden; }
+  #print-qr-area, #print-qr-area * { visibility: visible; }
+  #print-qr-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+  }
+  .no-print { display: none !important; }
+  .qr-print-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 2px solid #005C3E !important;
+    box-shadow: none !important;
+  }
+}
