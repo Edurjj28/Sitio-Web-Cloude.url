@@ -368,51 +368,28 @@
     <span class="text-[10px] font-extrabold tracking-wider uppercase text-amber-300">?</span>
   </button>
 
-  <!-- Gato Meme Girando y Rebotando por toda la pantalla (sin texto de voz) -->
-  <div id="bouncing-meme-cat" class="hidden no-print" onclick="boostMemeCat()" title="Tócame o usa el botón para detener">
-    <div id="meme-cat-spin-box" class="cat-spin-visual w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-emerald-500 via-amber-300 to-fuchsia-500 p-1.5 shadow-2xl flex items-center justify-center">
-      <div class="w-full h-full rounded-full bg-slate-900/95 flex items-center justify-center overflow-hidden relative">
+  <!-- Gato Meme Girando y Rebotando por toda la pantalla (únicamente tu GIF) -->
+  <div id="bouncing-meme-cat" class="hidden no-print" onclick="boostMemeCat()" title="Tócame o pulsa Detener">
+    <div id="meme-cat-spin-box" class="cat-spin-visual w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-tr from-emerald-500 via-amber-300 to-fuchsia-500 p-1.5 shadow-2xl flex items-center justify-center">
+      <div class="w-full h-full rounded-full bg-slate-900/95 flex items-center justify-center overflow-hidden">
         <img
           src="./gato-meme.gif"
-          alt="Gato meme girando"
+          alt="Gato meme"
           class="w-full h-full object-cover"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
         />
-        <div style="display:flex;" class="w-full h-full flex-col items-center justify-center text-center select-none">
-          <svg viewBox="0 0 120 120" class="w-20 h-20 sm:w-24 sm:h-24">
-            <polygon points="22,48 30,14 52,36" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>
-            <polygon points="98,48 90,14 68,36" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>
-            <polygon points="28,44 33,22 47,36" fill="#fda4af"/>
-            <polygon points="92,44 87,22 73,36" fill="#fda4af"/>
-            <ellipse cx="60" cy="66" rx="40" ry="34" fill="#cbd5e1" stroke="#1e293b" stroke-width="3"/>
-            <path d="M52,35 L55,44 M60,33 L60,44 M68,35 L65,44" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
-            <circle cx="44" cy="60" r="10" fill="#fef08a" stroke="#1e293b" stroke-width="2.5"/>
-            <circle cx="76" cy="60" r="10" fill="#fef08a" stroke="#1e293b" stroke-width="2.5"/>
-            <circle cx="44" cy="60" r="5.5" fill="#0f172a"/>
-            <circle cx="76" cy="60" r="5.5" fill="#0f172a"/>
-            <circle cx="42" cy="58" r="2" fill="#ffffff"/>
-            <circle cx="74" cy="58" r="2" fill="#ffffff"/>
-            <polygon points="56,70 64,70 60,75" fill="#fb7185"/>
-            <ellipse cx="60" cy="83" rx="8" ry="9" fill="#be123c" stroke="#1e293b" stroke-width="2.5"/>
-            <ellipse cx="60" cy="86" rx="5" ry="4" fill="#fda4af"/>
-            <line x1="16" y1="68" x2="38" y2="71" stroke="#334155" stroke-width="2"/>
-            <line x1="16" y1="76" x2="38" y2="75" stroke="#334155" stroke-width="2"/>
-            <line x1="104" y1="68" x2="82" y2="71" stroke="#334155" stroke-width="2"/>
-            <line x1="104" y1="76" x2="82" y2="75" stroke="#334155" stroke-width="2"/>
-          </svg>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- Botón flotante discreto para detener el modo gato cuando está activo -->
+  <!-- Botón grande y visible tanto en PC como en celular para detener -->
   <button
     id="stop-meme-cat-btn"
     type="button"
     onclick="stopMemeCat()"
-    class="hidden no-print fixed bottom-4 left-4 z-[75] bg-slate-900/90 hover:bg-red-600 text-white text-xs font-extrabold px-3.5 py-2 rounded-full shadow-xl border border-white/20 items-center gap-1.5 backdrop-blur-sm transition-colors"
+    aria-label="Detener música y animación"
+    class="hidden no-print fixed bottom-5 left-1/2 -translate-x-1/2 sm:left-6 sm:translate-x-0 z-[80] bg-red-600 hover:bg-red-700 active:scale-95 text-white text-base sm:text-lg font-extrabold px-6 py-3.5 sm:px-7 sm:py-4 rounded-2xl shadow-2xl border-2 border-white items-center justify-center gap-2.5 transition-all cursor-pointer"
   >
-    <span>🔇</span>
+    <span class="text-xl sm:text-2xl leading-none">⏹️</span>
     <span>Detener</span>
   </button>
 
@@ -2169,7 +2146,7 @@
     }
 
     // =========================================================================
-    // EASTER EGG: MÚSICA DE FONDO + GIRO LENTO -> RÁPIDO + REBOTE + FIESTA
+    // EASTER EGG: SOLO MP3 + TU GIF GIRANDO LENTO -> RÁPIDO + REBOTE + FIESTA
     // =========================================================================
     let memeCatActive = false;
     let memeFastPhase = false;
@@ -2179,8 +2156,6 @@
     let memeY = 120;
     let memeVx = 2.1;
     let memeVy = 1.8;
-    let audioCtx = null;
-    let bgBeatTimer = null;
     let externalBgAudio = null;
 
     // El botón escondido a la izquierda asoma solo a veces
@@ -2206,83 +2181,20 @@
     })();
 
     function startBackgroundMusic() {
-      // Reproduce el archivo ./oiia.mp3 del repo si existe
+      stopBackgroundMusic();
       try {
         externalBgAudio = new Audio('./oiia.mp3');
         externalBgAudio.loop = true;
-        externalBgAudio.volume = 0.8;
-        externalBgAudio.play().catch(() => {
-          externalBgAudio = null;
+        externalBgAudio.volume = 1.0;
+        externalBgAudio.play().catch((err) => {
+          console.warn("No se pudo reproducir ./oiia.mp3:", err);
         });
-      } catch (_) {
-        externalBgAudio = null;
+      } catch (err) {
+        console.warn("Error cargando ./oiia.mp3:", err);
       }
-
-      // Base instrumental de fondo (sin voz) que acompaña al ritmo lento -> rápido
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-      if (!audioCtx) {
-        audioCtx = new AudioContextClass();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-
-      const bassSlow = [110, 110, 146.83, 130.81];
-      const bassFast = [110, 146.83, 164.81, 196.00, 146.83, 164.81, 220.00, 196.00];
-      let step = 0;
-
-      const playBeatStep = () => {
-        if (!memeCatActive || !audioCtx) return;
-
-        const now = audioCtx.currentTime;
-        const notes = memeFastPhase ? bassFast : bassSlow;
-        const freq = notes[step % notes.length];
-        step++;
-
-        // Bombo suave
-        const kickOsc = audioCtx.createOscillator();
-        const kickGain = audioCtx.createGain();
-        kickOsc.type = 'sine';
-        kickOsc.frequency.setValueAtTime(135, now);
-        kickOsc.frequency.exponentialRampToValueAtTime(42, now + 0.11);
-
-        kickGain.gain.setValueAtTime(0.001, now);
-        kickGain.gain.linearRampToValueAtTime(memeFastPhase ? 0.24 : 0.15, now + 0.01);
-        kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
-
-        kickOsc.connect(kickGain);
-        kickGain.connect(audioCtx.destination);
-        kickOsc.start(now);
-        kickOsc.stop(now + 0.14);
-
-        // Bajo instrumental de fondo
-        const subOsc = audioCtx.createOscillator();
-        const subGain = audioCtx.createGain();
-        subOsc.type = 'triangle';
-        subOsc.frequency.setValueAtTime(freq, now);
-
-        subGain.gain.setValueAtTime(0.001, now);
-        subGain.gain.linearRampToValueAtTime(memeFastPhase ? 0.14 : 0.09, now + 0.02);
-        subGain.gain.exponentialRampToValueAtTime(0.001, now + (memeFastPhase ? 0.14 : 0.34));
-
-        subOsc.connect(subGain);
-        subGain.connect(audioCtx.destination);
-        subOsc.start(now);
-        subOsc.stop(now + (memeFastPhase ? 0.15 : 0.36));
-
-        const intervalMs = memeFastPhase ? 155 : 380;
-        bgBeatTimer = setTimeout(playBeatStep, intervalMs);
-      };
-
-      playBeatStep();
     }
 
     function stopBackgroundMusic() {
-      if (bgBeatTimer) {
-        clearTimeout(bgBeatTimer);
-        bgBeatTimer = null;
-      }
       if (externalBgAudio) {
         try {
           externalBgAudio.pause();
@@ -2338,8 +2250,8 @@
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const rect = catEl.getBoundingClientRect();
-      const w = rect.width || 110;
-      const h = rect.height || 110;
+      const w = rect.width || 120;
+      const h = rect.height || 120;
 
       memeX += memeVx;
       memeY += memeVy;
@@ -2390,7 +2302,7 @@
 
       if (peekBtn) peekBtn.classList.remove('is-peeking');
       if (catEl) {
-        memeX = Math.min(window.innerWidth - 125, 28);
+        memeX = Math.min(window.innerWidth - 135, 28);
         memeY = Math.max(85, Math.floor(window.innerHeight * 0.35));
         catEl.classList.remove('hidden');
       }
@@ -2399,7 +2311,6 @@
         stopBtn.classList.add('flex');
       }
 
-      // Empieza lento y a los 3.2 segundos cambia a rápido + modo fiesta con colores en toda la página
       applyCatPhaseSpeed(false);
       startBackgroundMusic();
 
