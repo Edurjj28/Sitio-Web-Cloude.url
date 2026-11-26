@@ -24,6 +24,7 @@
       background-color: #f4f7f6;
       color: #0f172a;
       overflow-x: hidden;
+      transition: background-color 0.25s ease;
     }
 
     @keyframes fadeSlideUp {
@@ -118,32 +119,49 @@
       }
     }
 
-    /* Animaciones del Gato Meme (OIIA / uhhihihahu) */
-    @keyframes oiiaHyperSpin {
+    /* Giro del gato sincronizado con la música: primero lento y luego rápido */
+    @keyframes catSpinSlow {
       0% {
-        transform: rotateY(0deg) rotateZ(-8deg) scale(0.96);
-      }
-      25% {
-        transform: rotateY(90deg) rotateZ(8deg) scale(1.08);
+        transform: rotateY(0deg) rotateZ(-4deg) scale(0.98);
       }
       50% {
-        transform: rotateY(180deg) rotateZ(-8deg) scale(0.96);
-      }
-      75% {
-        transform: rotateY(270deg) rotateZ(8deg) scale(1.08);
+        transform: rotateY(180deg) rotateZ(4deg) scale(1.02);
       }
       100% {
-        transform: rotateY(360deg) rotateZ(-8deg) scale(0.96);
+        transform: rotateY(360deg) rotateZ(-4deg) scale(0.98);
       }
     }
 
-    @keyframes shoutPop {
-      0%, 100% {
-        transform: scale(1) rotate(-3deg);
+    @keyframes catSpinFast {
+      0% {
+        transform: rotateY(0deg) rotateZ(-12deg) scale(0.95);
+      }
+      25% {
+        transform: rotateY(90deg) rotateZ(12deg) scale(1.12);
       }
       50% {
-        transform: scale(1.14) rotate(3deg);
+        transform: rotateY(180deg) rotateZ(-12deg) scale(0.95);
       }
+      75% {
+        transform: rotateY(270deg) rotateZ(12deg) scale(1.12);
+      }
+      100% {
+        transform: rotateY(360deg) rotateZ(-12deg) scale(0.95);
+      }
+    }
+
+    /* Colores estilo fiesta en toda la página durante la fase rápida */
+    @keyframes partyPageColors {
+      0%   { background-color: #3b0764; filter: hue-rotate(0deg) saturate(1.45); }
+      20%  { background-color: #831843; filter: hue-rotate(72deg) saturate(1.55); }
+      40%  { background-color: #064e3b; filter: hue-rotate(144deg) saturate(1.55); }
+      60%  { background-color: #1e3a8a; filter: hue-rotate(216deg) saturate(1.55); }
+      80%  { background-color: #78350f; filter: hue-rotate(288deg) saturate(1.55); }
+      100% { background-color: #3b0764; filter: hue-rotate(360deg) saturate(1.45); }
+    }
+
+    body.party-mode-active {
+      animation: partyPageColors 1.4s linear infinite;
     }
 
     #secret-cat-peek-btn {
@@ -178,13 +196,19 @@
       perspective: 600px;
     }
 
-    .oiia-spin-visual {
-      animation: oiiaHyperSpin 0.36s linear infinite;
+    .cat-spin-visual {
+      animation: catSpinSlow 1.35s linear infinite;
       transform-style: preserve-3d;
+      transition: filter 0.25s ease;
     }
 
-    .oiia-shout-badge {
-      animation: shoutPop 0.28s ease-in-out infinite;
+    .cat-spin-visual.is-fast-mode {
+      animation: catSpinFast 0.2s linear infinite;
+      filter: drop-shadow(0 0 18px rgba(250, 204, 21, 0.9));
+    }
+
+    #bouncing-meme-cat.is-bouncing-bump {
+      transform: var(--cat-pos, translate3d(0px, 0px, 0px)) scale(1.16);
     }
 
     .animate-fade-up {
@@ -295,7 +319,9 @@
       .pulse-live,
       .star-choice,
       .confetti-piece,
-      .streamer-ribbon {
+      .streamer-ribbon,
+      body.party-mode-active,
+      .cat-spin-visual {
         animation: none !important;
         transition: none !important;
       }
@@ -342,50 +368,38 @@
     <span class="text-[10px] font-extrabold tracking-wider uppercase text-amber-300">?</span>
   </button>
 
-  <!-- Gato Meme Girando y Rebotando por toda la pantalla -->
+  <!-- Gato Meme Girando y Rebotando por toda la pantalla (sin texto de voz) -->
   <div id="bouncing-meme-cat" class="hidden no-print" onclick="boostMemeCat()" title="Tócame o usa el botón para detener">
-    <div class="relative flex flex-col items-center">
-      <div class="oiia-shout-badge mb-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[11px] sm:text-xs tracking-wider shadow-lg border-2 border-white whitespace-nowrap">
-        UHH-I-HI-HA-HU!
-      </div>
-      <div class="oiia-spin-visual w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-emerald-500 via-amber-300 to-fuchsia-500 p-1.5 shadow-2xl flex items-center justify-center">
-        <div class="w-full h-full rounded-full bg-slate-900/95 flex items-center justify-center overflow-hidden relative">
-          <!-- Si subes un archivo gato-meme.gif o gato-meme.png al repo se usa automáticamente; si no, muestra el gato ilustrado -->
-          <img
-            src="./gato-meme.gif"
-            alt="Gato meme girando"
-            class="w-full h-full object-cover"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-          />
-          <div style="display:none;" class="w-full h-full flex-col items-center justify-center text-center select-none">
-            <svg viewBox="0 0 120 120" class="w-20 h-20 sm:w-24 sm:h-24">
-              <!-- Orejas -->
-              <polygon points="22,48 30,14 52,36" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>
-              <polygon points="98,48 90,14 68,36" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>
-              <polygon points="28,44 33,22 47,36" fill="#fda4af"/>
-              <polygon points="92,44 87,22 73,36" fill="#fda4af"/>
-              <!-- Cabeza -->
-              <ellipse cx="60" cy="66" rx="40" ry="34" fill="#cbd5e1" stroke="#1e293b" stroke-width="3"/>
-              <!-- Manchas atigradas -->
-              <path d="M52,35 L55,44 M60,33 L60,44 M68,35 L65,44" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
-              <!-- Ojos grandes meme -->
-              <circle cx="44" cy="60" r="10" fill="#fef08a" stroke="#1e293b" stroke-width="2.5"/>
-              <circle cx="76" cy="60" r="10" fill="#fef08a" stroke="#1e293b" stroke-width="2.5"/>
-              <circle cx="44" cy="60" r="5.5" fill="#0f172a"/>
-              <circle cx="76" cy="60" r="5.5" fill="#0f172a"/>
-              <circle cx="42" cy="58" r="2" fill="#ffffff"/>
-              <circle cx="74" cy="58" r="2" fill="#ffffff"/>
-              <!-- Nariz y boca abierta cantando uhhihihahu -->
-              <polygon points="56,70 64,70 60,75" fill="#fb7185"/>
-              <ellipse cx="60" cy="83" rx="8" ry="9" fill="#be123c" stroke="#1e293b" stroke-width="2.5"/>
-              <ellipse cx="60" cy="86" rx="5" ry="4" fill="#fda4af"/>
-              <!-- Bigotes -->
-              <line x1="16" y1="68" x2="38" y2="71" stroke="#334155" stroke-width="2"/>
-              <line x1="16" y1="76" x2="38" y2="75" stroke="#334155" stroke-width="2"/>
-              <line x1="104" y1="68" x2="82" y2="71" stroke="#334155" stroke-width="2"/>
-              <line x1="104" y1="76" x2="82" y2="75" stroke="#334155" stroke-width="2"/>
-            </svg>
-          </div>
+    <div id="meme-cat-spin-box" class="cat-spin-visual w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-emerald-500 via-amber-300 to-fuchsia-500 p-1.5 shadow-2xl flex items-center justify-center">
+      <div class="w-full h-full rounded-full bg-slate-900/95 flex items-center justify-center overflow-hidden relative">
+        <img
+          src="./gato-meme.gif"
+          alt="Gato meme girando"
+          class="w-full h-full object-cover"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <div style="display:flex;" class="w-full h-full flex-col items-center justify-center text-center select-none">
+          <svg viewBox="0 0 120 120" class="w-20 h-20 sm:w-24 sm:h-24">
+            <polygon points="22,48 30,14 52,36" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>
+            <polygon points="98,48 90,14 68,36" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>
+            <polygon points="28,44 33,22 47,36" fill="#fda4af"/>
+            <polygon points="92,44 87,22 73,36" fill="#fda4af"/>
+            <ellipse cx="60" cy="66" rx="40" ry="34" fill="#cbd5e1" stroke="#1e293b" stroke-width="3"/>
+            <path d="M52,35 L55,44 M60,33 L60,44 M68,35 L65,44" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="44" cy="60" r="10" fill="#fef08a" stroke="#1e293b" stroke-width="2.5"/>
+            <circle cx="76" cy="60" r="10" fill="#fef08a" stroke="#1e293b" stroke-width="2.5"/>
+            <circle cx="44" cy="60" r="5.5" fill="#0f172a"/>
+            <circle cx="76" cy="60" r="5.5" fill="#0f172a"/>
+            <circle cx="42" cy="58" r="2" fill="#ffffff"/>
+            <circle cx="74" cy="58" r="2" fill="#ffffff"/>
+            <polygon points="56,70 64,70 60,75" fill="#fb7185"/>
+            <ellipse cx="60" cy="83" rx="8" ry="9" fill="#be123c" stroke="#1e293b" stroke-width="2.5"/>
+            <ellipse cx="60" cy="86" rx="5" ry="4" fill="#fda4af"/>
+            <line x1="16" y1="68" x2="38" y2="71" stroke="#334155" stroke-width="2"/>
+            <line x1="16" y1="76" x2="38" y2="75" stroke="#334155" stroke-width="2"/>
+            <line x1="104" y1="68" x2="82" y2="71" stroke="#334155" stroke-width="2"/>
+            <line x1="104" y1="76" x2="82" y2="75" stroke="#334155" stroke-width="2"/>
+          </svg>
         </div>
       </div>
     </div>
@@ -399,7 +413,7 @@
     class="hidden no-print fixed bottom-4 left-4 z-[75] bg-slate-900/90 hover:bg-red-600 text-white text-xs font-extrabold px-3.5 py-2 rounded-full shadow-xl border border-white/20 items-center gap-1.5 backdrop-blur-sm transition-colors"
   >
     <span>🔇</span>
-    <span>Detener gato</span>
+    <span>Detener</span>
   </button>
 
   <!-- Capa de serpentinas y cotillón detrás de la ventana de votación -->
@@ -2155,133 +2169,165 @@
     }
 
     // =========================================================================
-    // EASTER EGG: BOTÓN ESCONDIDO A LA IZQUIERDA + GATO MEME "UHH-I-HI-HA-HU"
+    // EASTER EGG: MÚSICA DE FONDO + GIRO LENTO -> RÁPIDO + REBOTE + FIESTA
     // =========================================================================
     let memeCatActive = false;
+    let memeFastPhase = false;
     let memeRafId = null;
+    let memePhaseTimer = null;
     let memeX = 40;
     let memeY = 120;
-    let memeVx = 3.6;
-    let memeVy = 3.1;
+    let memeVx = 2.1;
+    let memeVy = 1.8;
     let audioCtx = null;
-    let memeMusicTimer = null;
-    let externalAudio = null;
+    let bgBeatTimer = null;
+    let externalBgAudio = null;
 
-    // Hacer que el botón izquierdo asome solo a veces de manera aleatoria
+    // El botón escondido a la izquierda asoma solo a veces
     (function scheduleSecretCatPeek() {
       const btn = document.getElementById('secret-cat-peek-btn');
       if (!btn) return;
 
       const triggerPeek = () => {
         if (!memeCatActive) {
-          const randomTop = 26 + Math.floor(Math.random() * 52); // entre 26% y 78% de alto
+          const randomTop = 25 + Math.floor(Math.random() * 52);
           btn.style.top = `${randomTop}%`;
           btn.classList.add('is-peeking');
 
-          // Se esconde de nuevo después de unos segundos si no lo tocan
           setTimeout(() => {
             btn.classList.remove('is-peeking');
-          }, 3400);
+          }, 4200);
         }
-        // Vuelve a asomar en un intervalo aleatorio entre 8 y 17 segundos
-        const nextDelay = 8000 + Math.floor(Math.random() * 9000);
+        const nextDelay = 7000 + Math.floor(Math.random() * 9000);
         setTimeout(triggerPeek, nextDelay);
       };
 
-      // Primera aparición rápida a los 3.5 segundos para probarlo fácilmente
-      setTimeout(triggerPeek, 3500);
+      setTimeout(triggerPeek, 2500);
     })();
 
-    function startOiiaSynthMusic() {
-      // Si existe un archivo oiia.mp3 en la carpeta del sitio, intenta reproducirlo primero
+    function startBackgroundMusic() {
+      // Reproduce el archivo ./oiia.mp3 del repo si existe
       try {
-        externalAudio = new Audio('./oiia.mp3');
-        externalAudio.loop = true;
-        externalAudio.volume = 0.75;
-        externalAudio.play().catch(() => {
-          externalAudio = null;
+        externalBgAudio = new Audio('./oiia.mp3');
+        externalBgAudio.loop = true;
+        externalBgAudio.volume = 0.8;
+        externalBgAudio.play().catch(() => {
+          externalBgAudio = null;
         });
       } catch (_) {
-        externalAudio = null;
+        externalBgAudio = null;
       }
 
-      // Sintetizador rítmico "uhh-i-hi-ha-hu / O-I-I-A-I" con Web Audio API (cero dependencias)
+      // Base instrumental de fondo (sin voz) que acompaña al ritmo lento -> rápido
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       if (!AudioContextClass) return;
       if (!audioCtx) {
         audioCtx = new AudioContextClass();
       }
       if (audioCtx.state === 'suspended') {
-        audioCtx.resume().catch(() => {});
+        audioCtx.resume();
       }
 
-      // Patrón rítmico característico: "uhh - i - hi - ha - hu"
-      const pattern = [
-        { freq: 330, dur: 0.13, vowel: 650 },  // uhh
-        { freq: 440, dur: 0.09, vowel: 1850 }, // i
-        { freq: 494, dur: 0.09, vowel: 2100 }, // hi
-        { freq: 587, dur: 0.10, vowel: 1200 }, // ha
-        { freq: 392, dur: 0.14, vowel: 720 },  // hu
-        { freq: 0,   dur: 0.08, vowel: 700 },  // pausa breve
-        { freq: 330, dur: 0.09, vowel: 650 },  // u
-        { freq: 440, dur: 0.09, vowel: 1900 }, // i
-        { freq: 587, dur: 0.09, vowel: 1300 }, // a
-        { freq: 659, dur: 0.12, vowel: 2050 }, // i!
-        { freq: 494, dur: 0.14, vowel: 800 },  // hu
-        { freq: 0,   dur: 0.12, vowel: 700 }
-      ];
+      const bassSlow = [110, 110, 146.83, 130.81];
+      const bassFast = [110, 146.83, 164.81, 196.00, 146.83, 164.81, 220.00, 196.00];
+      let step = 0;
 
-      let stepIdx = 0;
-
-      const playStep = () => {
+      const playBeatStep = () => {
         if (!memeCatActive || !audioCtx) return;
-        const note = pattern[stepIdx % pattern.length];
-        stepIdx++;
 
-        if (note.freq > 0) {
-          const now = audioCtx.currentTime;
-          const osc = audioCtx.createOscillator();
-          const formant = audioCtx.createBiquadFilter();
-          const gain = audioCtx.createGain();
+        const now = audioCtx.currentTime;
+        const notes = memeFastPhase ? bassFast : bassSlow;
+        const freq = notes[step % notes.length];
+        step++;
 
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(note.freq, now);
-          osc.frequency.exponentialRampToValueAtTime(note.freq * 1.06, now + note.dur * 0.6);
+        // Bombo suave
+        const kickOsc = audioCtx.createOscillator();
+        const kickGain = audioCtx.createGain();
+        kickOsc.type = 'sine';
+        kickOsc.frequency.setValueAtTime(135, now);
+        kickOsc.frequency.exponentialRampToValueAtTime(42, now + 0.11);
 
-          formant.type = 'bandpass';
-          formant.frequency.setValueAtTime(note.vowel, now);
-          formant.Q.setValueAtTime(4.2, now);
+        kickGain.gain.setValueAtTime(0.001, now);
+        kickGain.gain.linearRampToValueAtTime(memeFastPhase ? 0.24 : 0.15, now + 0.01);
+        kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
 
-          gain.gain.setValueAtTime(0.001, now);
-          gain.gain.linearRampToValueAtTime(0.16, now + 0.015);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + note.dur);
+        kickOsc.connect(kickGain);
+        kickGain.connect(audioCtx.destination);
+        kickOsc.start(now);
+        kickOsc.stop(now + 0.14);
 
-          osc.connect(formant);
-          formant.connect(gain);
-          gain.connect(audioCtx.destination);
+        // Bajo instrumental de fondo
+        const subOsc = audioCtx.createOscillator();
+        const subGain = audioCtx.createGain();
+        subOsc.type = 'triangle';
+        subOsc.frequency.setValueAtTime(freq, now);
 
-          osc.start(now);
-          osc.stop(now + note.dur + 0.01);
-        }
+        subGain.gain.setValueAtTime(0.001, now);
+        subGain.gain.linearRampToValueAtTime(memeFastPhase ? 0.14 : 0.09, now + 0.02);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + (memeFastPhase ? 0.14 : 0.34));
 
-        memeMusicTimer = setTimeout(playStep, Math.round(note.dur * 1000));
+        subOsc.connect(subGain);
+        subGain.connect(audioCtx.destination);
+        subOsc.start(now);
+        subOsc.stop(now + (memeFastPhase ? 0.15 : 0.36));
+
+        const intervalMs = memeFastPhase ? 155 : 380;
+        bgBeatTimer = setTimeout(playBeatStep, intervalMs);
       };
 
-      playStep();
+      playBeatStep();
     }
 
-    function stopOiiaSynthMusic() {
-      if (memeMusicTimer) {
-        clearTimeout(memeMusicTimer);
-        memeMusicTimer = null;
+    function stopBackgroundMusic() {
+      if (bgBeatTimer) {
+        clearTimeout(bgBeatTimer);
+        bgBeatTimer = null;
       }
-      if (externalAudio) {
+      if (externalBgAudio) {
         try {
-          externalAudio.pause();
-          externalAudio.currentTime = 0;
+          externalBgAudio.pause();
+          externalBgAudio.currentTime = 0;
         } catch (_) {}
-        externalAudio = null;
+        externalBgAudio = null;
       }
+    }
+
+    function applyCatPhaseSpeed(isFast) {
+      memeFastPhase = isFast;
+      const spinBox = document.getElementById('meme-cat-spin-box');
+      if (spinBox) {
+        if (isFast) {
+          spinBox.classList.add('is-fast-mode');
+        } else {
+          spinBox.classList.remove('is-fast-mode');
+        }
+      }
+
+      if (isFast) {
+        document.body.classList.add('party-mode-active');
+      } else {
+        document.body.classList.remove('party-mode-active');
+      }
+
+      const slowSpeed = window.innerWidth < 640 ? 1.8 : 2.3;
+      const fastSpeed = window.innerWidth < 640 ? 5.6 : 7.8;
+      const targetSpeed = isFast ? fastSpeed : slowSpeed;
+
+      const dirX = memeVx >= 0 ? 1 : -1;
+      const dirY = memeVy >= 0 ? 1 : -1;
+      memeVx = dirX * targetSpeed;
+      memeVy = dirY * (targetSpeed * 0.86);
+    }
+
+    function triggerWallBumpEffect() {
+      const catEl = document.getElementById('bouncing-meme-cat');
+      if (!catEl) return;
+      catEl.classList.remove('is-bouncing-bump');
+      void catEl.offsetWidth;
+      catEl.classList.add('is-bouncing-bump');
+      setTimeout(() => {
+        catEl.classList.remove('is-bouncing-bump');
+      }, 140);
     }
 
     function animateBouncingCat() {
@@ -2293,28 +2339,41 @@
       const vh = window.innerHeight;
       const rect = catEl.getBoundingClientRect();
       const w = rect.width || 110;
-      const h = rect.height || 130;
+      const h = rect.height || 110;
 
       memeX += memeVx;
       memeY += memeVy;
 
+      let hitEdge = false;
+
       if (memeX <= 0) {
         memeX = 0;
         memeVx = Math.abs(memeVx);
+        hitEdge = true;
       } else if (memeX + w >= vw) {
         memeX = Math.max(0, vw - w);
         memeVx = -Math.abs(memeVx);
+        hitEdge = true;
       }
 
       if (memeY <= 0) {
         memeY = 0;
         memeVy = Math.abs(memeVy);
+        hitEdge = true;
       } else if (memeY + h >= vh) {
         memeY = Math.max(0, vh - h);
         memeVy = -Math.abs(memeVy);
+        hitEdge = true;
       }
 
-      catEl.style.transform = `translate3d(${memeX}px, ${memeY}px, 0)`;
+      const posTransform = `translate3d(${memeX}px, ${memeY}px, 0)`;
+      catEl.style.setProperty('--cat-pos', posTransform);
+      catEl.style.transform = posTransform;
+
+      if (hitEdge && memeFastPhase) {
+        triggerWallBumpEffect();
+      }
+
       memeRafId = requestAnimationFrame(animateBouncingCat);
     }
 
@@ -2331,11 +2390,8 @@
 
       if (peekBtn) peekBtn.classList.remove('is-peeking');
       if (catEl) {
-        memeX = Math.min(window.innerWidth - 130, 32);
-        memeY = Math.max(70, Math.floor(window.innerHeight * 0.35));
-        const speedBase = window.innerWidth < 640 ? 2.9 : 4.2;
-        memeVx = speedBase;
-        memeVy = speedBase * 0.85;
+        memeX = Math.min(window.innerWidth - 125, 28);
+        memeY = Math.max(85, Math.floor(window.innerHeight * 0.35));
         catEl.classList.remove('hidden');
       }
       if (stopBtn) {
@@ -2343,27 +2399,54 @@
         stopBtn.classList.add('flex');
       }
 
-      startOiiaSynthMusic();
+      // Empieza lento y a los 3.2 segundos cambia a rápido + modo fiesta con colores en toda la página
+      applyCatPhaseSpeed(false);
+      startBackgroundMusic();
+
+      clearTimeout(memePhaseTimer);
+      memePhaseTimer = setTimeout(() => {
+        if (memeCatActive) {
+          applyCatPhaseSpeed(true);
+        }
+      }, 3200);
+
       memeRafId = requestAnimationFrame(animateBouncingCat);
     };
 
     window.boostMemeCat = function() {
-      // Si el usuario toca al gato mientras rebota, cambia dirección y acelera un poco
-      memeVx = (memeVx >= 0 ? -1 : 1) * Math.min(9, Math.abs(memeVx) * 1.2 + 0.6);
-      memeVy = (memeVy >= 0 ? 1 : -1) * Math.min(9, Math.abs(memeVy) * 1.2 + 0.6);
+      if (!memeCatActive) return;
+      if (!memeFastPhase) {
+        clearTimeout(memePhaseTimer);
+        applyCatPhaseSpeed(true);
+      } else {
+        memeVx = (memeVx >= 0 ? -1 : 1) * Math.min(11, Math.abs(memeVx) * 1.15);
+        memeVy = (memeVy >= 0 ? 1 : -1) * Math.min(11, Math.abs(memeVy) * 1.15);
+        triggerWallBumpEffect();
+      }
     };
 
     window.stopMemeCat = function() {
       memeCatActive = false;
+      memeFastPhase = false;
+      clearTimeout(memePhaseTimer);
+
       if (memeRafId) {
         cancelAnimationFrame(memeRafId);
         memeRafId = null;
       }
-      stopOiiaSynthMusic();
+      stopBackgroundMusic();
+
+      document.body.classList.remove('party-mode-active');
+
+      const spinBox = document.getElementById('meme-cat-spin-box');
+      if (spinBox) spinBox.classList.remove('is-fast-mode');
 
       const catEl = document.getElementById('bouncing-meme-cat');
       const stopBtn = document.getElementById('stop-meme-cat-btn');
-      if (catEl) catEl.classList.add('hidden');
+      if (catEl) {
+        catEl.classList.add('hidden');
+        catEl.classList.remove('is-bouncing-bump');
+      }
       if (stopBtn) {
         stopBtn.classList.add('hidden');
         stopBtn.classList.remove('flex');
