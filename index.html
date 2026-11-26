@@ -620,6 +620,24 @@
               </div>
 
               <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Logo del Proyecto (Ruta o URL)</label>
+                <div class="flex items-center gap-3">
+                  <input
+                    type="text"
+                    id="proj-logo"
+                    oninput="updateAdminLogoPreview()"
+                    placeholder="Ej: ./logos/proy-01.png"
+                    class="flex-1 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all"
+                  />
+                  <div class="w-11 h-11 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                    <img id="admin-logo-preview" src="" alt="Vista previa" class="hidden w-full h-full object-contain p-1" onerror="this.classList.add('hidden'); document.getElementById('admin-logo-placeholder').classList.remove('hidden');" />
+                    <i id="admin-logo-placeholder" data-lucide="image" class="w-5 h-5 text-slate-400"></i>
+                  </div>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1">Sube la imagen a tu carpeta <code class="font-mono bg-slate-100 px-1 rounded">logos/</code> en GitHub (ej: <code class="font-mono bg-slate-100 px-1 rounded">./logos/proy-01.png</code>) o pega una URL directa. Si lo dejas vacío, buscará <code class="font-mono bg-slate-100 px-1 rounded">./logos/[CODIGO].png</code>.</p>
+              </div>
+
+              <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Área / Carrera</label>
                 <input type="text" id="proj-category" required placeholder="Ej: Ingeniería en Informática" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
               </div>
@@ -647,7 +665,7 @@
             <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div>
                 <h3 class="text-lg font-extrabold text-slate-900">Proyectos Registrados</h3>
-                <p class="text-xs text-slate-500">Gestiona los stands, exporta resultados a CSV o reinicia puntajes.</p>
+                <p class="text-xs text-slate-500">Gestiona los stands, logos, exporta resultados a CSV o reinicia puntajes.</p>
               </div>
               <div class="flex flex-wrap items-center gap-2">
                 <button onclick="exportRankingCSV()" class="px-3 py-2 rounded-xl text-xs font-bold bg-[#E6F4EF] text-[#005C3E] border border-[#008556]/25 hover:bg-[#d2ece3] transition-colors flex items-center gap-1.5">
@@ -676,12 +694,17 @@
   <div id="vote-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-200">
     <div id="vote-modal-card" class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-100 animate-modal">
       <div class="bg-[#005C3E] px-6 py-5 text-white flex items-start justify-between gap-3">
-        <div>
-          <span id="modal-proj-code" class="inline-block text-[11px] font-mono font-bold bg-white/20 px-2.5 py-0.5 rounded-md mb-1.5">PROY-01</span>
-          <h3 id="modal-proj-title" class="text-lg sm:text-xl font-extrabold leading-snug">Título del Proyecto</h3>
-          <p id="modal-proj-team" class="text-xs text-emerald-100 mt-1">Equipo</p>
+        <div class="flex items-center gap-3.5 min-w-0">
+          <div id="modal-proj-logo-wrap" class="w-14 h-14 rounded-2xl bg-white p-1.5 shadow-md flex items-center justify-center shrink-0 overflow-hidden">
+            <img id="modal-proj-logo" src="" alt="Logo proyecto" class="w-full h-full object-contain" />
+          </div>
+          <div class="min-w-0">
+            <span id="modal-proj-code" class="inline-block text-[11px] font-mono font-bold bg-white/20 px-2.5 py-0.5 rounded-md mb-1">PROY-01</span>
+            <h3 id="modal-proj-title" class="text-lg sm:text-xl font-extrabold leading-snug">Título del Proyecto</h3>
+            <p id="modal-proj-team" class="text-xs text-emerald-100 mt-0.5 truncate">Equipo</p>
+          </div>
         </div>
-        <button onclick="closeVoteModal()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors">
+        <button onclick="closeVoteModal()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -838,6 +861,7 @@
       {
         id: "PROY-01",
         title: "EcoSensor: Monitoreo Hídrico Inteligente",
+        logoUrl: "./logos/PROY-01.png",
         category: "Ingeniería en Informática",
         team: "Valentina Pérez, Martín Muñoz",
         description: "Sistema con sensores IoT de bajo costo para medir calidad y caudal de agua en comunidades rurales con alertas en tiempo real.",
@@ -847,6 +871,7 @@
       {
         id: "PROY-02",
         title: "NutriScan: Asistente Nutricional Inclusivo",
+        logoUrl: "./logos/PROY-02.png",
         category: "Nutrición y Dietética",
         team: "Sofía Contreras, Lucas Silva",
         description: "Aplicación móvil accesible que traduce etiquetas nutricionales mediante lectura de voz y alertas personalizadas de alérgenos.",
@@ -856,6 +881,7 @@
       {
         id: "PROY-03",
         title: "RehabilitaVR: Terapia Motriz Gamificada",
+        logoUrl: "./logos/PROY-03.png",
         category: "Kinesiología",
         team: "Matías Rojas, Antonia Vargas",
         description: "Plataforma interactiva de ejercicios guiados para recuperación post-operatoria de extremidades superiores con seguimiento de progreso.",
@@ -863,6 +889,47 @@
         starsTotal: 0
       }
     ];
+
+    function resolveProjectLogo(project) {
+      const explicit = (project.logoUrl || '').trim();
+      if (explicit) return explicit;
+      return `./logos/${project.id}.png`;
+    }
+
+    function buildLogoAvatarHtml(project, sizeClasses = "w-14 h-14", iconSize = "w-6 h-6") {
+      const src = resolveProjectLogo(project);
+      const fallbackLower = `./logos/${String(project.id || '').toLowerCase()}.png`;
+      return `
+        <div class="${sizeClasses} rounded-2xl bg-white border border-slate-200/90 shadow-sm flex items-center justify-center overflow-hidden shrink-0 p-1.5">
+          <img
+            src="${escapeHtml(src)}"
+            alt="Logo ${escapeHtml(project.title)}"
+            class="w-full h-full object-contain"
+            onerror="if(!this.dataset.triedLower){this.dataset.triedLower='1';this.src='${escapeHtml(fallbackLower)}';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}"
+          />
+          <div style="display:none;" class="w-full h-full rounded-xl bg-[#E6F4EF] text-[#005C3E] items-center justify-center">
+            <i data-lucide="folder-kanban" class="${iconSize}"></i>
+          </div>
+        </div>
+      `;
+    }
+
+    window.updateAdminLogoPreview = function() {
+      const input = document.getElementById('proj-logo');
+      const preview = document.getElementById('admin-logo-preview');
+      const placeholder = document.getElementById('admin-logo-placeholder');
+      if (!input || !preview || !placeholder) return;
+
+      const val = input.value.trim();
+      if (!val) {
+        preview.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        return;
+      }
+      preview.src = val;
+      preview.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+    };
 
     function getLocalVoteRecord() {
       try {
@@ -1052,7 +1119,7 @@
         return `
           <article class="project-card bg-white rounded-2xl border ${isVotedByThisDevice ? 'border-emerald-400 ring-2 ring-emerald-500/20' : 'border-slate-200/90'} p-5 sm:p-6 flex flex-col justify-between shadow-sm">
             <div>
-              <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="flex items-center justify-between gap-2 mb-3.5">
                 <span class="font-mono text-xs font-extrabold text-[#005C3E] bg-[#E6F4EF] px-2.5 py-1 rounded-lg border border-[#008556]/20">
                   ${escapeHtml(p.id)}
                 </span>
@@ -1065,12 +1132,18 @@
                 </div>
               </div>
 
-              <span class="text-[11px] font-bold uppercase tracking-wider text-[#008556] block mb-1">
-                ${escapeHtml(p.category)}
-              </span>
-              <h3 class="text-lg font-extrabold text-slate-900 leading-snug mb-2">
-                ${escapeHtml(p.title)}
-              </h3>
+              <div class="flex items-center gap-3.5 mb-3">
+                ${buildLogoAvatarHtml(p, "w-14 h-14", "w-6 h-6")}
+                <div class="min-w-0">
+                  <span class="text-[11px] font-bold uppercase tracking-wider text-[#008556] block mb-0.5 truncate">
+                    ${escapeHtml(p.category)}
+                  </span>
+                  <h3 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug line-clamp-2">
+                    ${escapeHtml(p.title)}
+                  </h3>
+                </div>
+              </div>
+
               <p class="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed mb-4">
                 ${escapeHtml(p.description)}
               </p>
@@ -1138,14 +1211,19 @@
         return `
           <div class="rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 ${item.cardClass}">
             <div>
-              <div class="flex items-center justify-between gap-2 mb-2">
+              <div class="flex items-center justify-between gap-2 mb-2.5">
                 <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full ${item.badgeClass}">
                   ${hasPoints ? item.label : `Puesto #${item.rank}`}
                 </span>
                 <span class="font-mono text-xs font-bold text-[#005C3E]">${escapeHtml(item.proj.id)}</span>
               </div>
-              <h4 class="font-extrabold text-slate-900 text-sm sm:text-base line-clamp-2">${escapeHtml(item.proj.title)}</h4>
-              <p class="text-xs text-slate-500 mt-1 truncate">${escapeHtml(item.proj.team)}</p>
+              <div class="flex items-center gap-3">
+                ${buildLogoAvatarHtml(item.proj, "w-11 h-11", "w-5 h-5")}
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm sm:text-base line-clamp-2">${escapeHtml(item.proj.title)}</h4>
+                  <p class="text-xs text-slate-500 mt-0.5 truncate">${escapeHtml(item.proj.team)}</p>
+                </div>
+              </div>
             </div>
             <div class="mt-3 pt-2.5 border-t border-slate-200/70 flex items-center justify-between text-xs">
               <span class="text-slate-500">${votes} ${votes === 1 ? 'voto' : 'votos'} · Prom. ${getAverageStars(item.proj)}★</span>
@@ -1154,6 +1232,7 @@
           </div>
         `;
       }).join('');
+      lucide.createIcons();
     }
 
     function updateRankingChart(sortedProjects, totalStars) {
@@ -1317,6 +1396,7 @@
                 }">
                   #${idx + 1}
                 </span>
+                ${buildLogoAvatarHtml(p, "w-10 h-10", "w-5 h-5")}
                 <div class="min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-[11px] font-mono font-bold text-[#005C3E]">${escapeHtml(p.id)}</span>
@@ -1337,6 +1417,7 @@
           </div>
         `;
       }).join('');
+      lucide.createIcons();
     }
 
     window.exportRankingCSV = function() {
@@ -1451,14 +1532,17 @@
 
       container.innerHTML = projectsList.map(p => `
         <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-mono text-xs font-extrabold text-[#005C3E] bg-[#E6F4EF] px-2 py-0.5 rounded">${escapeHtml(p.id)}</span>
-              <span class="text-xs font-bold text-amber-700">${p.starsTotal || 0} estrellas</span>
-              <span class="text-xs font-semibold text-slate-500">· ${p.votes || 0} votos</span>
+          <div class="flex items-center gap-3 min-w-0">
+            ${buildLogoAvatarHtml(p, "w-12 h-12", "w-5 h-5")}
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-mono text-xs font-extrabold text-[#005C3E] bg-[#E6F4EF] px-2 py-0.5 rounded">${escapeHtml(p.id)}</span>
+                <span class="text-xs font-bold text-amber-700">${p.starsTotal || 0} estrellas</span>
+                <span class="text-xs font-semibold text-slate-500">· ${p.votes || 0} votos</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm mt-1 truncate">${escapeHtml(p.title)}</h4>
+              <p class="text-xs text-slate-500 truncate">${escapeHtml(p.category)} · ${escapeHtml(p.team)}</p>
             </div>
-            <h4 class="font-bold text-slate-900 text-sm mt-1 truncate">${escapeHtml(p.title)}</h4>
-            <p class="text-xs text-slate-500 truncate">${escapeHtml(p.category)} · ${escapeHtml(p.team)}</p>
           </div>
 
           <div class="flex items-center gap-2 shrink-0">
@@ -1490,6 +1574,7 @@
       const editId = document.getElementById('edit-project-id').value.trim();
       const rawCode = document.getElementById('proj-code').value.trim().toUpperCase().replace(/[^A-Z0-9-_]/g, '');
       const title = document.getElementById('proj-title').value.trim();
+      const logoUrl = document.getElementById('proj-logo').value.trim();
       const category = document.getElementById('proj-category').value.trim();
       const team = document.getElementById('proj-team').value.trim();
       const description = document.getElementById('proj-desc').value.trim();
@@ -1508,6 +1593,7 @@
         await setDoc(doc(projectsCol, docId), {
           id: docId,
           title,
+          logoUrl,
           category,
           team,
           description,
@@ -1537,6 +1623,8 @@
       codeInput.classList.add('opacity-70', 'cursor-not-allowed');
 
       document.getElementById('proj-title').value = p.title;
+      document.getElementById('proj-logo').value = p.logoUrl || '';
+      updateAdminLogoPreview();
       document.getElementById('proj-category').value = p.category;
       document.getElementById('proj-team').value = p.team;
       document.getElementById('proj-desc').value = p.description;
@@ -1554,6 +1642,7 @@
       const codeInput = document.getElementById('proj-code');
       codeInput.readOnly = false;
       codeInput.classList.remove('opacity-70', 'cursor-not-allowed');
+      updateAdminLogoPreview();
 
       document.getElementById('form-badge').textContent = "Nuevo Stand";
       document.getElementById('form-title').textContent = "Agregar Proyecto";
@@ -1843,6 +1932,22 @@
       selectedStars = 5;
       lastRenderedStars = 0;
       paintStars(selectedStars, true);
+
+      const logoWrap = document.getElementById('modal-proj-logo-wrap');
+      const logoImg = document.getElementById('modal-proj-logo');
+      if (logoWrap && logoImg) {
+        logoWrap.classList.remove('hidden');
+        logoImg.dataset.triedLower = '';
+        logoImg.onerror = function() {
+          if (!this.dataset.triedLower) {
+            this.dataset.triedLower = '1';
+            this.src = `./logos/${String(p.id).toLowerCase()}.png`;
+          } else {
+            logoWrap.classList.add('hidden');
+          }
+        };
+        logoImg.src = resolveProjectLogo(p);
+      }
 
       document.getElementById('modal-proj-code').textContent = p.id;
       document.getElementById('modal-proj-title').textContent = p.title;
@@ -2158,7 +2263,6 @@
     let memeVy = 1.8;
     let externalBgAudio = null;
 
-    // El botón escondido a la izquierda asoma solo a veces
     (function scheduleSecretCatPeek() {
       const btn = document.getElementById('secret-cat-peek-btn');
       if (!btn) return;
