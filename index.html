@@ -71,7 +71,6 @@
       }
     }
 
-    /* Animación de palpitar al rellenarse cada estrella */
     @keyframes starBeat {
       0% {
         transform: scale(0.75);
@@ -87,7 +86,6 @@
       }
     }
 
-    /* Animación de serpentinas y cotillón detrás del modal */
     @keyframes confettiFall {
       0% {
         opacity: 0;
@@ -281,15 +279,11 @@
         </div>
       </div>
 
-      <!-- Navegación Responsiva -->
+      <!-- Navegación Responsiva (sin Ranking) -->
       <nav class="flex items-center gap-1 sm:gap-2 bg-[#00432D]/70 p-1 rounded-xl border border-white/10 shrink-0">
         <button id="tab-btn-proyectos" onclick="switchTab('proyectos')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 bg-white text-[#005C3E] shadow-sm flex items-center gap-1.5">
           <i data-lucide="layout-grid" class="w-4 h-4"></i>
           <span>Proyectos</span>
-        </button>
-        <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-emerald-100 hover:text-white flex items-center gap-1.5">
-          <i data-lucide="trophy" class="w-4 h-4"></i>
-          <span>Ranking</span>
         </button>
         <button id="tab-btn-qr" onclick="switchTab('qr')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-emerald-100 hover:text-white flex items-center gap-1.5">
           <i data-lucide="qr-code" class="w-4 h-4"></i>
@@ -315,7 +309,7 @@
       <div class="flex items-center gap-3 text-slate-500">
         <span class="inline-flex items-center gap-1 font-medium text-[#005C3E] bg-[#E6F4EF] px-2.5 py-0.5 rounded-full">
           <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-500"></i>
-          Calificación de 1 a 5 estrellas · 1 voto por RUT por proyecto
+          1 voto por RUT en total (solo 1 proyecto) · 1 a 5 estrellas
         </span>
       </div>
     </div>
@@ -338,7 +332,7 @@
         <div>
           <span class="text-xs font-bold uppercase tracking-wider text-[#008556]">Votación con Estrellas (1 a 5)</span>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">Proyectos Participantes</h1>
-          <p class="text-sm text-slate-600 mt-1">Selecciona un proyecto para calificarlo de 1 a 5 estrellas con tu RUT o escanea el código QR del stand.</p>
+          <p class="text-sm text-slate-600 mt-1">Escanea el código QR del stand o elige un proyecto. Recuerda que cada RUT puede votar solo por un proyecto.</p>
         </div>
         <div class="relative w-full sm:w-72">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
@@ -349,32 +343,7 @@
       <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6"></div>
     </section>
 
-    <!-- VISTA 2: RANKING EN VIVO POR ESTRELLAS -->
-    <section id="view-ranking" class="hidden animate-fade-up">
-      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-[#008556]">Resultados en Tiempo Real</span>
-            <h2 class="text-2xl font-extrabold text-slate-900 mt-0.5">Ranking por Estrellas Acumuladas</h2>
-            <p class="text-sm text-slate-500 mt-1">Ordenado por total de estrellas obtenidas al final de cada evaluación.</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-center transition-transform duration-300 hover:scale-[1.02]">
-              <span class="text-[11px] font-bold text-amber-700 uppercase tracking-wider block">Total Estrellas</span>
-              <span id="total-stars-badge" class="text-2xl sm:text-3xl font-extrabold text-amber-600">0</span>
-            </div>
-            <div class="bg-[#E6F4EF] border border-[#008556]/20 rounded-2xl px-4 py-3 text-center transition-transform duration-300 hover:scale-[1.02]">
-              <span class="text-[11px] font-bold text-[#005C3E] uppercase tracking-wider block">Total Votos</span>
-              <span id="total-votes-badge" class="text-2xl sm:text-3xl font-extrabold text-[#005C3E]">0</span>
-            </div>
-          </div>
-        </div>
-
-        <div id="ranking-list" class="mt-6 space-y-4"></div>
-      </div>
-    </section>
-
-    <!-- VISTA 3: CÓDIGOS QR ESTÁTICOS -->
+    <!-- VISTA 2: CÓDIGOS QR ESTÁTICOS -->
     <section id="view-qr" class="hidden animate-fade-up">
       <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-8 mb-6 no-print">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -393,7 +362,7 @@
       <div id="print-qr-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
-    <!-- VISTA 4: ADMINISTRAR PROYECTOS (EXCLUSIVA PARA PC, OCULTA EN CELULARES, SIN PIN) -->
+    <!-- VISTA 3: ADMINISTRAR PROYECTOS (EXCLUSIVA PARA PC, OCULTA EN CELULARES, SIN PIN) -->
     <section id="view-admin" class="hidden md:block animate-fade-up" style="display: none;">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Formulario Crear / Editar -->
@@ -546,7 +515,7 @@
               />
             </div>
             <p id="rut-feedback" class="text-xs mt-1.5 text-slate-500">
-              Puedes votar una vez en este proyecto y también calificar otros stands.
+              Solo puedes emitir un voto en total (en un único proyecto) por RUT.
             </p>
           </div>
 
@@ -569,7 +538,7 @@
   <footer class="bg-white border-t border-slate-200/80 py-5 mt-12 no-print">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
       <p class="font-semibold text-[#005C3E]">Santo Tomás — Sistema de Votación de Proyectos</p>
-      <p>Calificación por Estrellas (1 a 5) · Códigos QR Estáticos</p>
+      <p>1 Voto por RUT en Total · Calificación 1 a 5 Estrellas · QR Estáticos</p>
     </div>
   </footer>
 
@@ -607,6 +576,7 @@
 
     const projectsCol = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
     const votesCol = collection(db, 'artifacts', appId, 'public', 'data', 'votes');
+    const rutRegistryCol = collection(db, 'artifacts', appId, 'public', 'data', 'rut_votes');
     const metaDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'meta', 'config');
 
     let projectsList = [];
@@ -686,7 +656,6 @@
         projectsList.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
 
         renderProjects();
-        renderRanking();
         renderQRCodes();
         renderAdminList();
         suggestNextCode();
@@ -726,7 +695,7 @@
         tabName = 'proyectos';
       }
 
-      const views = ['proyectos', 'ranking', 'qr', 'admin'];
+      const views = ['proyectos', 'qr', 'admin'];
       views.forEach(v => {
         const el = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`tab-btn-${v}`);
@@ -842,71 +811,6 @@
       lucide.createIcons();
     };
 
-    function renderRanking() {
-      const list = document.getElementById('ranking-list');
-      const totalVotesBadge = document.getElementById('total-votes-badge');
-      const totalStarsBadge = document.getElementById('total-stars-badge');
-
-      const sorted = [...projectsList].sort((a, b) => {
-        const starsDiff = (b.starsTotal || 0) - (a.starsTotal || 0);
-        if (starsDiff !== 0) return starsDiff;
-        const avgA = (a.votes || 0) > 0 ? (a.starsTotal || 0) / a.votes : 0;
-        const avgB = (b.votes || 0) > 0 ? (b.starsTotal || 0) / b.votes : 0;
-        if (avgB !== avgA) return avgB - avgA;
-        return (b.votes || 0) - (a.votes || 0);
-      });
-
-      const totalVotes = sorted.reduce((acc, p) => acc + (p.votes || 0), 0);
-      const totalStars = sorted.reduce((acc, p) => acc + (p.starsTotal || 0), 0);
-
-      totalVotesBadge.textContent = totalVotes;
-      totalStarsBadge.textContent = totalStars;
-
-      if (sorted.length === 0) {
-        list.innerHTML = `<p class="text-sm text-slate-500 text-center py-6">Aún no hay proyectos registrados.</p>`;
-        return;
-      }
-
-      list.innerHTML = sorted.map((p, idx) => {
-        const votes = p.votes || 0;
-        const stars = p.starsTotal || 0;
-        const avg = getAverageStars(p);
-        const pct = totalStars > 0 ? Math.round((stars / totalStars) * 100) : 0;
-        const isFirst = idx === 0 && stars > 0;
-
-        return `
-          <div class="p-4 rounded-2xl border ${isFirst ? 'border-[#C5A059] bg-amber-50/40' : 'border-slate-100 bg-slate-50/60'} transition-all duration-300">
-            <div class="flex items-center justify-between gap-3 mb-2">
-              <div class="flex items-center gap-3 min-w-0">
-                <span class="w-8 h-8 rounded-xl font-extrabold text-sm flex items-center justify-center shrink-0 ${
-                  idx === 0 ? 'bg-[#005C3E] text-white shadow-sm' :
-                  idx === 1 ? 'bg-[#008556]/20 text-[#005C3E]' :
-                  idx === 2 ? 'bg-slate-200 text-slate-700' : 'bg-white border border-slate-200 text-slate-500'
-                }">
-                  #${idx + 1}
-                </span>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-[11px] font-mono font-bold text-[#005C3E]">${escapeHtml(p.id)}</span>
-                    ${isFirst ? '<span class="text-[10px] font-extrabold uppercase bg-[#C5A059] text-white px-2 py-0.5 rounded-full">1° Lugar en Estrellas</span>' : ''}
-                    <span class="text-[11px] text-slate-500">${votes} ${votes === 1 ? 'voto' : 'votos'} · Promedio ${avg} ★</span>
-                  </div>
-                  <h4 class="font-bold text-slate-900 text-sm sm:text-base truncate">${escapeHtml(p.title)}</h4>
-                </div>
-              </div>
-              <div class="text-right shrink-0">
-                <span class="text-lg sm:text-xl font-extrabold text-amber-600">${stars} ★</span>
-                <span class="text-xs text-slate-500 block">${pct}% del total</span>
-              </div>
-            </div>
-            <div class="w-full h-2.5 bg-slate-200/80 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-[#005C3E] via-[#008556] to-[#C5A059] rounded-full transition-all duration-700" style="width: ${pct}%"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
     function getStaticProjectUrl(projectId) {
       const url = new URL(window.location.href);
       url.search = `?proyecto=${encodeURIComponent(projectId)}`;
@@ -938,7 +842,7 @@
             <p class="text-xs text-slate-500 mb-3">${escapeHtml(p.team)}</p>
 
             <div class="w-full bg-[#005C3E] text-white text-xs font-bold py-2 px-3 rounded-xl">
-              Escanea con tu celular para calificar (1 a 5 ★)
+              Escanea con tu celular para votar (1 voto por RUT)
             </div>
             <p class="text-[10px] text-slate-400 mt-2 break-all select-all">${escapeHtml(targetUrl)}</p>
           </div>
@@ -1094,10 +998,16 @@
       try {
         await deleteDoc(doc(projectsCol, id));
         const votesSnap = await getDocs(votesCol);
+        const rutSnap = await getDocs(rutRegistryCol);
         const batch = writeBatch(db);
         votesSnap.forEach(vDoc => {
-          if (vDoc.id.startsWith(`${id}_`)) {
+          if (vDoc.id.startsWith(`${id}_`) || vDoc.data()?.projectId === id) {
             batch.delete(vDoc.ref);
+          }
+        });
+        rutSnap.forEach(rDoc => {
+          if (rDoc.data()?.projectId === id) {
+            batch.delete(rDoc.ref);
           }
         });
         await batch.commit();
@@ -1119,9 +1029,12 @@
         const votesSnap = await getDocs(votesCol);
         votesSnap.forEach(d => batch.delete(d.ref));
 
+        const rutSnap = await getDocs(rutRegistryCol);
+        rutSnap.forEach(d => batch.delete(d.ref));
+
         batch.set(metaDocRef, { initialized: true }, { merge: true });
         await batch.commit();
-        showToast("Todos los proyectos fueron eliminados.", "success");
+        showToast("Todos los proyectos y votos fueron eliminados.", "success");
       } catch (err) {
         console.error(err);
         showToast("Error al vaciar los proyectos.", "error");
@@ -1138,8 +1051,11 @@
         const votesSnap = await getDocs(votesCol);
         votesSnap.forEach(d => batch.delete(d.ref));
 
+        const rutSnap = await getDocs(rutRegistryCol);
+        rutSnap.forEach(d => batch.delete(d.ref));
+
         await batch.commit();
-        showToast("Votos y estrellas reiniciados a 0.", "success");
+        showToast("Votos, estrellas y registros de RUT reiniciados a 0.", "success");
       } catch (err) {
         console.error(err);
         showToast("Error al reiniciar votos.", "error");
@@ -1216,7 +1132,6 @@
       return 5;
     }
 
-    // Soporte suave de deslizamiento con dedo o puntero en las estrellas
     (function initStarDragGesture() {
       const selector = document.getElementById('star-selector');
       if (!selector) return;
@@ -1273,7 +1188,6 @@
       paintStars(selectedStars, false);
     };
 
-    // Animación extra de serpentinas y cotillón detrás de la ventana de votación al dar 5 estrellas
     function launchFiveStarCelebration() {
       const layer = document.getElementById('celebration-layer');
       if (!layer) return;
@@ -1347,7 +1261,7 @@
 
       const rutInput = document.getElementById('voter-rut');
       rutInput.value = '';
-      document.getElementById('rut-feedback').textContent = "Puedes votar una vez en este proyecto y también calificar otros stands.";
+      document.getElementById('rut-feedback').textContent = "Solo puedes emitir un voto en total (en un único proyecto) por RUT.";
       document.getElementById('rut-feedback').className = "text-xs mt-1.5 text-slate-500";
 
       const modal = document.getElementById('vote-modal');
@@ -1399,7 +1313,7 @@
       const feedback = document.getElementById('rut-feedback');
       if (clean.length >= 8) {
         if (validateRut(clean)) {
-          feedback.textContent = "RUT válido listo para registrar calificación.";
+          feedback.textContent = "RUT válido listo para registrar tu único voto.";
           feedback.className = "text-xs mt-1.5 text-emerald-600 font-semibold";
         } else {
           feedback.textContent = "El dígito verificador del RUT no coincide.";
@@ -1438,7 +1352,7 @@
       return dv === expectedDv;
     }
 
-    // Registrar Calificación de 1 a 5 Estrellas
+    // Registrar Calificación de 1 a 5 Estrellas: SOLO 1 VOTO EN TOTAL POR RUT (en 1 solo proyecto)
     window.submitVote = async function(e) {
       e.preventDefault();
       if (!selectedProject) return;
@@ -1459,8 +1373,10 @@
 
       const btn = document.getElementById('confirm-vote-btn');
       btn.disabled = true;
-      btn.innerHTML = `<span>Guardando estrellas...</span>`;
+      btn.innerHTML = `<span>Guardando voto...</span>`;
 
+      // Registro global por RUT para garantizar que el RUT solo pueda votar en UN proyecto en total
+      const rutGlobalRef = doc(rutRegistryCol, cleanRut);
       const voteDocId = `${selectedProject.id}_${cleanRut}`;
       const voteRef = doc(votesCol, voteDocId);
       const projectRef = doc(projectsCol, selectedProject.id);
@@ -1468,9 +1384,15 @@
 
       try {
         await runTransaction(db, async (transaction) => {
+          const rutGlobalSnap = await transaction.get(rutGlobalRef);
+          if (rutGlobalSnap.exists()) {
+            const votedProjId = rutGlobalSnap.data()?.projectId || "otro proyecto";
+            throw new Error(`ALREADY_VOTED_GLOBAL:${votedProjId}`);
+          }
+
           const voteSnap = await transaction.get(voteRef);
           if (voteSnap.exists()) {
-            throw new Error("ALREADY_VOTED");
+            throw new Error(`ALREADY_VOTED_GLOBAL:${selectedProject.id}`);
           }
 
           const projSnap = await transaction.get(projectRef);
@@ -1481,12 +1403,20 @@
           const currentVotes = projSnap.data().votes || 0;
           const currentStars = projSnap.data().starsTotal || 0;
 
+          transaction.set(rutGlobalRef, {
+            rut: cleanRut,
+            projectId: selectedProject.id,
+            stars: starsToAdd,
+            timestamp: Date.now()
+          });
+
           transaction.set(voteRef, {
             projectId: selectedProject.id,
             rut: cleanRut,
             stars: starsToAdd,
             timestamp: Date.now()
           });
+
           transaction.update(projectRef, {
             votes: currentVotes + 1,
             starsTotal: currentStars + starsToAdd
@@ -1500,13 +1430,17 @@
         closeVoteModal();
         showToast(
           starsToAdd === 5
-            ? `¡5 estrellas! Serpentinas y cotillón para "${votedTitle}"!`
-            : `¡Registraste ${starsToAdd} ${starsToAdd === 1 ? 'estrella' : 'estrellas'} para "${votedTitle}"!`,
+            ? `¡5 estrellas! Serpentinas y cotillón para "${votedTitle}". Voto único por RUT registrado.`
+            : `¡Registraste ${starsToAdd} ${starsToAdd === 1 ? 'estrella' : 'estrellas'} para "${votedTitle}"! (1 voto por RUT)`,
           "success"
         );
       } catch (err) {
-        if (err.message === "ALREADY_VOTED") {
-          showToast(`El RUT ${rutInput.value} ya calificó este proyecto. Puedes calificar otros stands.`, "warning");
+        if (err.message && err.message.startsWith("ALREADY_VOTED_GLOBAL:")) {
+          const prevProject = err.message.split(":")[1];
+          showToast(
+            `El RUT ${rutInput.value} ya emitió su único voto permitido (en ${prevProject}). Cada RUT solo puede votar por un proyecto.`,
+            "warning"
+          );
         } else {
           console.error(err);
           showToast("No se pudo registrar el voto. Verifica tu conexión a internet.", "error");
@@ -1541,7 +1475,7 @@
       toastTimer = setTimeout(() => {
         toast.classList.add('hidden');
         toast.classList.remove('flex');
-      }, 4500);
+      }, 4800);
     }
 
     function escapeHtml(str) {
