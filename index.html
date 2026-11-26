@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feria de Proyectos e Innovación | Santo Tomás</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --st-green-dark: #00432D;
+      --st-green-primary: #005C3E;
+      --st-green-vibrant: #008556;
+      --st-green-light: #E6F4EF;
+      --st-gold: #C5A059;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f4f7f6;
+      color: #0f172a;
+      overflow-x: hidden;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes modalScaleIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.94) translateY(14px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.015) translateY(-2px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes modalScaleOut {
+      from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+      }
+    }
+
+    @keyframes subtlePulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 133, 86, 0.35);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(0, 133, 86, 0);
+      }
+    }
+
+    @keyframes starBeat {
+      0% {
+        transform: scale(0.75);
+      }
+      45% {
+        transform: scale(1.32);
+      }
+      72% {
+        transform: scale(0.94);
+      }
+      100% {
+        transform: scale(1.08);
+      }
+    }
+
+    @keyframes confettiFall {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, -24px, 0) rotate(0deg) scale(0.7);
+      }
+      12% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--drift-x, 20px), 105vh, 0) rotate(var(--rot-end, 540deg)) scale(1);
+      }
+    }
+
+    @keyframes streamerSway {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, -30px, 0) rotate(-18deg) scaleX(0.8);
+      }
+      15% {
+        opacity: 0.95;
+      }
+      50% {
+        transform: translate3d(var(--drift-x, -28px), 48vh, 0) rotate(22deg) scaleX(1.1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(calc(var(--drift-x, -28px) * -0.6), 108vh, 0) rotate(-26deg) scaleX(0.9);
+      }
+    }
+
+    .animate-fade-up {
+      animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-modal {
+      animation: modalScaleIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .animate-modal-out {
+      animation: modalScaleOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+    }
+
+    .project-card {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.3s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 32px -10px rgba(0, 92, 62, 0.16);
+      border-color: #008556;
+    }
+
+    .btn-st {
+      background: linear-gradient(135deg, #005C3E 0%, #007A52 100%);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-st:hover:not(:disabled) {
+      background: linear-gradient(135deg, #004A32 0%, #006644 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px -4px rgba(0, 92, 62, 0.35);
+    }
+
+    .btn-st:active:not(:disabled) {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .btn-st:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .pulse-live {
+      animation: subtlePulse 2.4s infinite;
+    }
+
+    #star-selector {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .star-choice {
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .star-choice svg {
+      transition: color 0.18s ease, filter 0.18s ease, transform 0.2s ease;
+    }
+
+    .star-choice.is-active svg {
+      filter: drop-shadow(0 3px 8px rgba(245, 158, 11, 0.45));
+    }
+
+    .star-choice.is-beating {
+      animation: starBeat 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #celebration-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 45;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      top: -20px;
+      border-radius: 3px;
+      animation-name: confettiFall;
+      animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      animation-fill-mode: forwards;
+    }
+
+    .streamer-ribbon {
+      position: absolute;
+      top: -40px;
+      width: 8px;
+      height: 44px;
+      border-radius: 999px;
+      animation-name: streamerSway;
+      animation-timing-function: ease-in-out;
+      animation-fill-mode: forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-fade-up,
+      .animate-modal,
+      .animate-modal-out,
+      .project-card,
+      .btn-st,
+      .pulse-live,
+      .star-choice,
+      .confetti-piece,
+      .streamer-ribbon {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-qr-area, #print-qr-area * {
+        visibility: visible;
+      }
+      #print-qr-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .qr-print-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 2px solid #005C3E !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Capa de serpentinas y cotillón detrás de la ventana de votación -->
+  <div id="celebration-layer" aria-hidden="true"></div>
+
+  <!-- Barra Superior Institucional -->
+  <header class="bg-[#005C3E] text-white sticky top-0 z-30 shadow-lg border-b border-[#00432D] no-print">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-3 cursor-pointer group min-w-0" onclick="switchTab('proyectos')">
+        <div class="bg-white px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl shadow-md transition-transform duration-300 group-hover:scale-105 shrink-0 flex items-center justify-center">
+          <img
+            src="./logo-st.png"
+            alt="Logo Santo Tomás"
+            class="h-7 sm:h-9 w-auto max-w-[105px] sm:max-w-[130px] object-contain"
+            onerror="this.onerror=null; this.src='./Logo-ST.png';"
+          />
+        </div>
+        <div class="leading-tight min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-sm sm:text-lg tracking-tight text-white uppercase truncate">Santo Tomás</span>
+            <span class="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0"></span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-emerald-100/90 font-medium truncate">Feria de Proyectos e Innovación</p>
+        </div>
+      </div>
+
+      <!-- Navegación Responsiva -->
+      <nav class="flex items-center gap-1 sm:gap-2 bg-[#00432D]/70 p-1 rounded-xl border border-white/10 shrink-0">
+        <button id="tab-btn-proyectos" onclick="switchTab('proyectos')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 bg-white text-[#005C3E] shadow-sm flex items-center gap-1.5">
+          <i data-lucide="layout-grid" class="w-4 h-4"></i>
+          <span>Proyectos</span>
+        </button>
+        <button id="tab-btn-qr" onclick="switchTab('qr')" class="tab-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-emerald-100 hover:text-white flex items-center gap-1.5">
+          <i data-lucide="qr-code" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Códigos QR</span>
+          <span class="sm:hidden">QRs</span>
+        </button>
+        <button id="tab-btn-admin" onclick="switchTab('admin')" class="tab-btn hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-emerald-100 hover:text-white items-center gap-1.5">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span>Administrar</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Banner de Estado y Regla Única -->
+  <div class="bg-white border-b border-slate-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2 text-slate-600">
+        <span id="connection-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 pulse-live"></span>
+        <span id="connection-text" class="font-medium">Conectando con base de datos en vivo...</span>
+      </div>
+      <div class="flex items-center gap-3 text-slate-500">
+        <span class="inline-flex items-center gap-1 font-medium text-[#005C3E] bg-[#E6F4EF] px-2.5 py-0.5 rounded-full">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#008556]"></i>
+          1 RUT = 1 único voto en toda la feria (solo puedes votar por 1 proyecto)
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- Banner si este teléfono ya registró un voto -->
+    <div id="device-voted-banner" class="hidden mb-6 bg-emerald-50 border border-emerald-300 text-emerald-950 rounded-2xl p-4 flex items-start gap-3 animate-fade-up">
+      <i data-lucide="check-circle-2" class="w-5 h-5 text-[#008556] shrink-0 mt-0.5"></i>
+      <div class="text-xs sm:text-sm">
+        <p class="font-bold text-[#005C3E]">Ya registraste tu voto en esta feria</p>
+        <p id="device-voted-detail" class="mt-0.5 text-emerald-900">Cada persona (RUT) tiene derecho a un único voto en un solo proyecto.</p>
+      </div>
+    </div>
+
+    <div id="local-warning" class="hidden mb-6 bg-amber-50 border border-amber-300 text-amber-900 rounded-2xl p-4 flex items-start gap-3 animate-fade-up">
+      <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+      <div class="text-xs sm:text-sm">
+        <p class="font-bold">Estás abriendo el archivo localmente</p>
+        <p class="mt-0.5 text-amber-800">Para que los códigos QR funcionen en los celulares de los asistentes, asegúrate de abrir y compartir tu enlace público de GitHub Pages.</p>
+      </div>
+    </div>
+
+    <!-- VISTA 1: CATÁLOGO DE PROYECTOS -->
+    <section id="view-proyectos" class="animate-fade-up">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#008556]">Votación Única por Persona (1 a 5 Estrellas)</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-0.5">Proyectos Participantes</h1>
+          <p class="text-sm text-slate-600 mt-1">Elige tu proyecto favorito. Una vez que votes con tu RUT por un proyecto, no podrás volver a votar por los demás.</p>
+        </div>
+        <div class="relative w-full sm:w-72">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="search-input" oninput="renderProjects()" placeholder="Buscar proyecto, equipo o área..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] focus:border-transparent transition-all shadow-sm" />
+        </div>
+      </div>
+
+      <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6"></div>
+    </section>
+
+    <!-- VISTA 2: CÓDIGOS QR ESTÁTICOS -->
+    <section id="view-qr" class="hidden animate-fade-up">
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-8 mb-6 no-print">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#008556]">Material Imprimible</span>
+            <h2 class="text-2xl font-extrabold text-slate-900 mt-0.5">Códigos QR Estáticos por Stand</h2>
+            <p class="text-sm text-slate-600 mt-1">Cada código apunta de forma permanente a su proyecto. Imprímelos y pégalos en cada stand.</p>
+          </div>
+          <button onclick="window.print()" class="btn-st text-white font-semibold px-5 py-3 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md shrink-0">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Imprimir Tarjetas QR</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="print-qr-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- VISTA 3: ADMINISTRAR PROYECTOS (EXCLUSIVA PARA PC, OCULTA EN CELULARES) -->
+    <section id="view-admin" class="hidden md:block animate-fade-up" style="display: none;">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sticky top-24">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <span id="form-badge" class="text-xs font-bold uppercase tracking-wider text-[#008556]">Nuevo Stand</span>
+                <h2 id="form-title" class="text-xl font-extrabold text-slate-900">Agregar Proyecto</h2>
+              </div>
+              <button type="button" id="cancel-edit-btn" onclick="resetAdminForm()" class="hidden text-xs font-semibold text-slate-500 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">
+                Cancelar edición
+              </button>
+            </div>
+
+            <form id="project-form" onsubmit="handleSaveProject(event)" class="space-y-4">
+              <input type="hidden" id="edit-project-id" value="" />
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Código Fijo (Para QR)</label>
+                <input type="text" id="proj-code" required placeholder="Ej: PROY-01" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold text-[#005C3E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
+                <p class="text-[11px] text-slate-400 mt-1">Este código define la URL estática del QR.</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre del Proyecto</label>
+                <input type="text" id="proj-title" required placeholder="Ej: Sistema de Riego Automatizado IoT" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Área / Carrera</label>
+                <input type="text" id="proj-category" required placeholder="Ej: Ingeniería en Informática" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Integrantes / Equipo</label>
+                <input type="text" id="proj-team" required placeholder="Ej: Camila Soto, Diego Rojas" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Descripción Breve</label>
+                <textarea id="proj-desc" rows="3" required placeholder="Explica en qué consiste el proyecto y qué problema resuelve..." class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#008556] transition-all"></textarea>
+              </div>
+
+              <button type="submit" id="save-project-btn" class="w-full btn-st text-white font-bold py-3 rounded-xl text-sm shadow-md flex items-center justify-center gap-2">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>Guardar Proyecto</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 space-y-5">
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">Proyectos Registrados</h3>
+                <p class="text-xs text-slate-500">Borra los proyectos de prueba, agrega los tuyos o reinicia estrellas y votos.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="resetAllVotes()" class="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors flex items-center gap-1.5">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                  <span>Reiniciar a 0</span>
+                </button>
+                <button onclick="deleteAllProjects()" class="px-3 py-2 rounded-xl text-xs font-bold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-colors flex items-center gap-1.5">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  <span>Borrar Todos</span>
+                </button>
+              </div>
+            </div>
+
+            <div id="admin-projects-list" class="mt-4 divide-y divide-slate-100"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DE VOTACIÓN POR ESTRELLAS (1 A 5) Y RUT ÚNICO -->
+  <div id="vote-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-200">
+    <div id="vote-modal-card" class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-100 animate-modal">
+      <div class="bg-[#005C3E] px-6 py-5 text-white flex items-start justify-between gap-3">
+        <div>
+          <span id="modal-proj-code" class="inline-block text-[11px] font-mono font-bold bg-white/20 px-2.5 py-0.5 rounded-md mb-1.5">PROY-01</span>
+          <h3 id="modal-proj-title" class="text-lg sm:text-xl font-extrabold leading-snug">Título del Proyecto</h3>
+          <p id="modal-proj-team" class="text-xs text-emerald-100 mt-1">Equipo</p>
+        </div>
+        <button onclick="closeVoteModal()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6">
+        <p id="modal-proj-desc" class="text-sm text-slate-600 leading-relaxed mb-5 bg-slate-50 p-3.5 rounded-xl border border-slate-100"></p>
+
+        <!-- Aviso si este RUT o teléfono ya votó previamente -->
+        <div id="already-voted-box" class="hidden mb-4 bg-amber-50 border border-amber-300 text-amber-950 rounded-2xl p-3.5 text-xs leading-relaxed">
+          <p class="font-extrabold text-amber-900 flex items-center gap-1.5">
+            <i data-lucide="lock" class="w-4 h-4 text-amber-600 shrink-0"></i>
+            <span>Voto único ya utilizado</span>
+          </p>
+          <p id="already-voted-box-text" class="mt-1"></p>
+        </div>
+
+        <form id="vote-form" onsubmit="submitVote(event)" class="space-y-5">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+              Tu calificación (1 = Lo peor · 5 = Lo mejor)
+            </label>
+            <div class="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-3.5 flex flex-col items-center">
+              <div id="star-selector" class="flex items-center justify-center gap-2 sm:gap-3 py-1">
+                <button type="button" data-star="1" onclick="selectStar(1, true)" onmouseenter="previewStar(1)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="1 estrella">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
+                  </svg>
+                </button>
+                <button type="button" data-star="2" onclick="selectStar(2, true)" onmouseenter="previewStar(2)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="2 estrellas">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
+                  </svg>
+                </button>
+                <button type="button" data-star="3" onclick="selectStar(3, true)" onmouseenter="previewStar(3)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="3 estrellas">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
+                  </svg>
+                </button>
+                <button type="button" data-star="4" onclick="selectStar(4, true)" onmouseenter="previewStar(4)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="4 estrellas">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
+                  </svg>
+                </button>
+                <button type="button" data-star="5" onclick="selectStar(5, true)" onmouseenter="previewStar(5)" onmouseleave="resetStarPreview()" class="star-choice p-1.5 rounded-xl focus:outline-none" aria-label="5 estrellas">
+                  <svg class="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/>
+                  </svg>
+                </button>
+              </div>
+              <p id="star-label" class="text-xs font-bold text-amber-800 mt-2 transition-all duration-200">5 estrellas — Excelente (Lo mejor)</p>
+              <p class="text-[11px] text-amber-700/80 mt-0.5">Toca una estrella o desliza el dedo para elegir</p>
+            </div>
+          </div>
+
+          <div>
+            <label for="voter-rut" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Ingresa tu RUT para validar tu único voto
+            </label>
+            <div class="relative">
+              <i data-lucide="id-card" class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input
+                type="text"
+                id="voter-rut"
+                required
+                maxlength="12"
+                oninput="handleRutInput(this)"
+                placeholder="Ej: 12.345.678-9"
+                class="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-base font-semibold tracking-wide text-slate-900 focus:outline-none focus:border-[#008556] transition-colors"
+              />
+            </div>
+            <p id="rut-feedback" class="text-xs mt-1.5 text-slate-500">
+              Si ya votaste con tu RUT en este u otro proyecto, no podrás volver a votar.
+            </p>
+          </div>
+
+          <button type="submit" id="confirm-vote-btn" class="w-full btn-st text-white font-bold py-3.5 rounded-xl text-sm sm:text-base shadow-lg flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            <span>Confirmar Voto Único</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de Notificación -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-slate-900 text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-slate-700/80 items-center gap-3 animate-fade-up">
+    <div id="toast-icon" class="shrink-0"></div>
+    <p id="toast-msg" class="text-xs sm:text-sm font-medium leading-snug"></p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200/80 py-5 mt-12 no-print">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+      <p class="font-semibold text-[#005C3E]">Santo Tomás — Sistema de Votación de Proyectos</p>
+      <p>1 Voto por RUT en Toda la Feria · Calificación 1 a 5 Estrellas · QR Estáticos</p>
+    </div>
+  </footer>
+
+  <!-- Lógica Firebase y Aplicación -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      getDoc,
+      deleteDoc,
+      onSnapshot,
+      runTransaction,
+      getDocs,
+      writeBatch
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDis2WFXehN98Q3X1gK3-_ekuySBPChHyg",
+      authDomain: "feria-proyectos-st.firebaseapp.com",
+      projectId: "feria-proyectos-st",
+      storageBucket: "feria-proyectos-st.firebasestorage.app",
+      messagingSenderId: "973437935970",
+      appId: "1:973437935970:web:25cf78ef8678522809cc3b",
+      measurementId: "G-EGL2KWN54X"
+    };
+
+    const appId = "feria-proyectos-st";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const projectsCol = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
+    const votesCol = collection(db, 'artifacts', appId, 'public', 'data', 'votes');
+    const rutRegistryCol = collection(db, 'artifacts', appId, 'public', 'data', 'rut_votes');
+    const metaDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'meta', 'config');
+
+    const LOCAL_VOTE_KEY = 'st_feria_voted_record_v1';
+
+    let projectsList = [];
+    let selectedProject = null;
+    let selectedStars = 5;
+    let lastRenderedStars = 0;
+    let initialDeepLinkHandled = false;
+    let rutCheckRequestId = 0;
+
+    const starDescriptions = {
+      1: "1 estrella — Lo peor / Muy deficiente",
+      2: "2 estrellas — Regular / Mejorable",
+      3: "3 estrellas — Bueno",
+      4: "4 estrellas — Muy bueno",
+      5: "5 estrellas — Excelente (Lo mejor)"
+    };
+
+    const demoProjects = [
+      {
+        id: "PROY-01",
+        title: "EcoSensor: Monitoreo Hídrico Inteligente",
+        category: "Ingeniería en Informática",
+        team: "Valentina Pérez, Martín Muñoz",
+        description: "Sistema con sensores IoT de bajo costo para medir calidad y caudal de agua en comunidades rurales con alertas en tiempo real.",
+        votes: 0,
+        starsTotal: 0
+      },
+      {
+        id: "PROY-02",
+        title: "NutriScan: Asistente Nutricional Inclusivo",
+        category: "Nutrición y Dietética",
+        team: "Sofía Contreras, Lucas Silva",
+        description: "Aplicación móvil accesible que traduce etiquetas nutricionales mediante lectura de voz y alertas personalizadas de alérgenos.",
+        votes: 0,
+        starsTotal: 0
+      },
+      {
+        id: "PROY-03",
+        title: "RehabilitaVR: Terapia Motriz Gamificada",
+        category: "Kinesiología",
+        team: "Matías Rojas, Antonia Vargas",
+        description: "Plataforma interactiva de ejercicios guiados para recuperación post-operatoria de extremidades superiores con seguimiento de progreso.",
+        votes: 0,
+        starsTotal: 0
+      }
+    ];
+
+    function getLocalVoteRecord() {
+      try {
+        const raw = localStorage.getItem(LOCAL_VOTE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function setLocalVoteRecord(record) {
+      try {
+        localStorage.setItem(LOCAL_VOTE_KEY, JSON.stringify(record));
+      } catch (_) {}
+      refreshDeviceVotedBanner();
+    }
+
+    function clearLocalVoteRecord() {
+      try {
+        localStorage.removeItem(LOCAL_VOTE_KEY);
+      } catch (_) {}
+      refreshDeviceVotedBanner();
+    }
+
+    function refreshDeviceVotedBanner() {
+      const banner = document.getElementById('device-voted-banner');
+      const detail = document.getElementById('device-voted-detail');
+      if (!banner || !detail) return;
+      const rec = getLocalVoteRecord();
+      if (rec && rec.projectId) {
+        detail.textContent = `Desde este teléfono/navegador ya se registró el voto único del RUT ${rec.rutFormatted || ''} en el proyecto ${rec.projectId} (${rec.projectTitle || ''}). No se permiten más votos.`;
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    refreshDeviceVotedBanner();
+
+    if (window.location.protocol === 'file:') {
+      document.getElementById('local-warning').classList.remove('hidden');
+    }
+
+    signInAnonymously(auth).catch((err) => {
+      console.error("Error de autenticación:", err);
+      updateConnectionStatus(false, "Error de conexión con Firebase");
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      updateConnectionStatus(true, "Conectado en vivo · Sincronización activa");
+
+      try {
+        const metaSnap = await getDoc(metaDocRef);
+        if (!metaSnap.exists()) {
+          const existingSnap = await getDocs(projectsCol);
+          if (existingSnap.empty) {
+            for (const p of demoProjects) {
+              await setDoc(doc(projectsCol, p.id), p);
+            }
+          }
+          await setDoc(metaDocRef, { initialized: true, createdAt: Date.now() });
+        }
+      } catch (e) {
+        console.warn("Verificación inicial:", e);
+      }
+
+      onSnapshot(projectsCol, (snapshot) => {
+        projectsList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        projectsList.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+
+        renderProjects();
+        renderQRCodes();
+        renderAdminList();
+        suggestNextCode();
+
+        if (!initialDeepLinkHandled && projectsList.length > 0) {
+          initialDeepLinkHandled = true;
+          const params = new URLSearchParams(window.location.search);
+          const targetId = params.get('proyecto');
+          if (targetId) {
+            const found = projectsList.find(p => p.id.toLowerCase() === targetId.toLowerCase());
+            if (found) {
+              openVoteModal(found.id);
+            } else {
+              showToast(`El proyecto "${targetId}" no se encuentra disponible.`, "warning");
+            }
+          }
+        }
+      }, (error) => {
+        console.error("Error en Firestore:", error);
+        updateConnectionStatus(false, "Sin acceso a datos (revisa reglas de Firestore)");
+      });
+    });
+
+    function updateConnectionStatus(online, text) {
+      const dot = document.getElementById('connection-dot');
+      const label = document.getElementById('connection-text');
+      label.textContent = text;
+      if (online) {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-live";
+      } else {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+      }
+    }
+
+    window.switchTab = function(tabName) {
+      if (tabName === 'admin' && window.innerWidth < 768) {
+        tabName = 'proyectos';
+      }
+
+      const views = ['proyectos', 'qr', 'admin'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`tab-btn-${v}`);
+        if (!el || !btn) return;
+
+        if (v === tabName) {
+          el.classList.remove('hidden');
+          el.classList.remove('animate-fade-up');
+          void el.offsetWidth;
+          el.classList.add('animate-fade-up');
+          if (v === 'admin') el.style.display = '';
+          btn.classList.remove('text-emerald-100', 'hover:text-white');
+          btn.classList.add('bg-white', 'text-[#005C3E]', 'shadow-sm');
+        } else {
+          el.classList.add('hidden');
+          if (v === 'admin') el.style.display = 'none';
+          btn.classList.add('text-emerald-100', 'hover:text-white');
+          btn.classList.remove('bg-white', 'text-[#005C3E]', 'shadow-sm');
+        }
+      });
+
+      if (tabName === 'qr') {
+        renderQRCodes();
+      }
+      lucide.createIcons();
+    };
+
+    window.addEventListener('resize', () => {
+      const adminView = document.getElementById('view-admin');
+      if (window.innerWidth < 768 && adminView && !adminView.classList.contains('hidden')) {
+        switchTab('proyectos');
+      }
+    });
+
+    function getAverageStars(project) {
+      const votes = project.votes || 0;
+      const stars = project.starsTotal || 0;
+      if (votes === 0) return "0.0";
+      return (stars / votes).toFixed(1);
+    }
+
+    window.renderProjects = function() {
+      const grid = document.getElementById('projects-grid');
+      const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+      const localRec = getLocalVoteRecord();
+
+      const filtered = projectsList.filter(p =>
+        p.title.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query) ||
+        p.team.toLowerCase().includes(query) ||
+        p.id.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-10 text-center">
+            <i data-lucide="folder-open" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+            <p class="font-bold text-slate-700">No se encontraron proyectos</p>
+            <p class="text-xs text-slate-500 mt-1">Intenta con otro término o agrega nuevos proyectos desde un computador.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const starsTotal = p.starsTotal || 0;
+        const votes = p.votes || 0;
+        const avg = getAverageStars(p);
+        const isVotedByThisDevice = localRec && localRec.projectId === p.id;
+
+        return `
+          <article class="project-card bg-white rounded-2xl border ${isVotedByThisDevice ? 'border-emerald-400 ring-2 ring-emerald-500/20' : 'border-slate-200/90'} p-5 sm:p-6 flex flex-col justify-between shadow-sm">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="font-mono text-xs font-extrabold text-[#005C3E] bg-[#E6F4EF] px-2.5 py-1 rounded-lg border border-[#008556]/20">
+                  ${escapeHtml(p.id)}
+                </span>
+                <div class="flex items-center gap-1.5">
+                  ${isVotedByThisDevice ? '<span class="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Tu voto</span>' : ''}
+                  <span class="inline-flex items-center gap-1 text-xs font-extrabold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-full border border-amber-200">
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-500"></i>
+                    ${starsTotal} pts (${avg}★)
+                  </span>
+                </div>
+              </div>
+
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[#008556] block mb-1">
+                ${escapeHtml(p.category)}
+              </span>
+              <h3 class="text-lg font-extrabold text-slate-900 leading-snug mb-2">
+                ${escapeHtml(p.title)}
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed mb-4">
+                ${escapeHtml(p.description)}
+              </p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100">
+              <div class="flex items-center justify-between gap-2 text-xs text-slate-500 mb-3.5">
+                <span class="flex items-center gap-1.5 min-w-0">
+                  <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                  <span class="truncate font-medium">${escapeHtml(p.team)}</span>
+                </span>
+                <span class="font-semibold text-slate-600 shrink-0">${votes} ${votes === 1 ? 'voto' : 'votos'}</span>
+              </div>
+              <button onclick="openVoteModal('${escapeHtml(p.id)}')" class="w-full btn-st text-white font-bold py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
+                <i data-lucide="star" class="w-4 h-4"></i>
+                <span>Calificar con Estrellas (1 a 5)</span>
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    };
+
+    function getStaticProjectUrl(projectId) {
+      const url = new URL(window.location.href);
+      url.search = `?proyecto=${encodeURIComponent(projectId)}`;
+      url.hash = '';
+      return url.toString();
+    }
+
+    function renderQRCodes() {
+      const container = document.getElementById('print-qr-area');
+      if (!container) return;
+
+      if (projectsList.length === 0) {
+        container.innerHTML = `<div class="col-span-full bg-white p-8 rounded-2xl text-center text-sm text-slate-500">No hay proyectos para generar códigos QR.</div>`;
+        return;
+      }
+
+      container.innerHTML = projectsList.map(p => {
+        const targetUrl = getStaticProjectUrl(p.id);
+        return `
+          <div class="qr-print-card bg-white rounded-2xl border-2 border-slate-200 p-6 flex flex-col items-center text-center shadow-sm">
+            <div class="w-full flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-[#005C3E]">Santo Tomás</span>
+              <span class="font-mono text-xs font-extrabold bg-[#E6F4EF] text-[#005C3E] px-2.5 py-0.5 rounded-md">${escapeHtml(p.id)}</span>
+            </div>
+
+            <div id="qr-canvas-${escapeHtml(p.id)}" class="p-3 bg-white rounded-xl border border-slate-200 shadow-inner mb-4 flex items-center justify-center"></div>
+
+            <h3 class="font-extrabold text-slate-900 text-base leading-snug mb-1">${escapeHtml(p.title)}</h3>
+            <p class="text-xs text-slate-500 mb-3">${escapeHtml(p.team)}</p>
+
+            <div class="w-full bg-[#005C3E] text-white text-xs font-bold py-2 px-3 rounded-xl">
+              Escanea con tu celular para votar (1 voto por RUT)
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 break-all select-all">${escapeHtml(targetUrl)}</p>
+          </div>
+        `;
+      }).join('');
+
+      projectsList.forEach(p => {
+        const targetEl = document.getElementById(`qr-canvas-${p.id}`);
+        if (targetEl) {
+          targetEl.innerHTML = '';
+          new QRCode(targetEl, {
+            text: getStaticProjectUrl(p.id),
+            width: 176,
+            height: 176,
+            colorDark: "#00432D",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        }
+      });
+    }
+
+    function renderAdminList() {
+      const container = document.getElementById('admin-projects-list');
+      if (!container) return;
+
+      if (projectsList.length === 0) {
+        container.innerHTML = `
+          <div class="py-10 text-center">
+            <p class="text-sm font-bold text-slate-700">No hay proyectos registrados</p>
+            <p class="text-xs text-slate-500 mt-1">Usa el formulario de la izquierda para agregar los stands reales de tu feria.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = projectsList.map(p => `
+        <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-mono text-xs font-extrabold text-[#005C3E] bg-[#E6F4EF] px-2 py-0.5 rounded">${escapeHtml(p.id)}</span>
+              <span class="text-xs font-bold text-amber-700">${p.starsTotal || 0} estrellas</span>
+              <span class="text-xs font-semibold text-slate-500">· ${p.votes || 0} votos</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm mt-1 truncate">${escapeHtml(p.title)}</h4>
+            <p class="text-xs text-slate-500 truncate">${escapeHtml(p.category)} · ${escapeHtml(p.team)}</p>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="editProject('${escapeHtml(p.id)}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors flex items-center gap-1">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+              <span>Editar</span>
+            </button>
+            <button onclick="deleteSingleProject('${escapeHtml(p.id)}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors flex items-center gap-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function suggestNextCode() {
+      const editId = document.getElementById('edit-project-id').value;
+      if (editId) return;
+      const nextNum = projectsList.length + 1;
+      const padded = String(nextNum).padStart(2, '0');
+      document.getElementById('proj-code').value = `PROY-${padded}`;
+    }
+
+    window.handleSaveProject = async function(e) {
+      e.preventDefault();
+      const editId = document.getElementById('edit-project-id').value.trim();
+      const rawCode = document.getElementById('proj-code').value.trim().toUpperCase().replace(/[^A-Z0-9-_]/g, '');
+      const title = document.getElementById('proj-title').value.trim();
+      const category = document.getElementById('proj-category').value.trim();
+      const team = document.getElementById('proj-team').value.trim();
+      const description = document.getElementById('proj-desc').value.trim();
+
+      if (!rawCode || !title) return;
+
+      const btn = document.getElementById('save-project-btn');
+      btn.disabled = true;
+
+      try {
+        const docId = editId || rawCode;
+        const existing = projectsList.find(p => p.id === docId);
+        const currentVotes = existing ? (existing.votes || 0) : 0;
+        const currentStars = existing ? (existing.starsTotal || 0) : 0;
+
+        await setDoc(doc(projectsCol, docId), {
+          id: docId,
+          title,
+          category,
+          team,
+          description,
+          votes: currentVotes,
+          starsTotal: currentStars
+        });
+
+        await setDoc(metaDocRef, { initialized: true }, { merge: true });
+        showToast(editId ? "Proyecto actualizado correctamente." : "Proyecto agregado y QR listo.", "success");
+        resetAdminForm();
+      } catch (err) {
+        console.error(err);
+        showToast("No se pudo guardar el proyecto. Revisa tu conexión.", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.editProject = function(id) {
+      const p = projectsList.find(item => item.id === id);
+      if (!p) return;
+
+      document.getElementById('edit-project-id').value = p.id;
+      const codeInput = document.getElementById('proj-code');
+      codeInput.value = p.id;
+      codeInput.readOnly = true;
+      codeInput.classList.add('opacity-70', 'cursor-not-allowed');
+
+      document.getElementById('proj-title').value = p.title;
+      document.getElementById('proj-category').value = p.category;
+      document.getElementById('proj-team').value = p.team;
+      document.getElementById('proj-desc').value = p.description;
+
+      document.getElementById('form-badge').textContent = `Editando ${p.id}`;
+      document.getElementById('form-title').textContent = "Modificar Stand";
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      document.getElementById('save-project-btn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i><span>Guardar Cambios</span>`;
+      lucide.createIcons();
+    };
+
+    window.resetAdminForm = function() {
+      document.getElementById('project-form').reset();
+      document.getElementById('edit-project-id').value = '';
+      const codeInput = document.getElementById('proj-code');
+      codeInput.readOnly = false;
+      codeInput.classList.remove('opacity-70', 'cursor-not-allowed');
+
+      document.getElementById('form-badge').textContent = "Nuevo Stand";
+      document.getElementById('form-title').textContent = "Agregar Proyecto";
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      document.getElementById('save-project-btn').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i><span>Guardar Proyecto</span>`;
+      suggestNextCode();
+      lucide.createIcons();
+    };
+
+    window.deleteSingleProject = async function(id) {
+      if (!confirm(`¿Seguro que deseas eliminar el proyecto ${id} y liberar los RUT que votaron en él?`)) return;
+      try {
+        await deleteDoc(doc(projectsCol, id));
+        const votesSnap = await getDocs(votesCol);
+        const rutSnap = await getDocs(rutRegistryCol);
+        const batch = writeBatch(db);
+        votesSnap.forEach(vDoc => {
+          if (vDoc.id.startsWith(`${id}_`) || vDoc.data()?.projectId === id) {
+            batch.delete(vDoc.ref);
+          }
+        });
+        rutSnap.forEach(rDoc => {
+          if (rDoc.data()?.projectId === id) {
+            batch.delete(rDoc.ref);
+          }
+        });
+        await batch.commit();
+        const localRec = getLocalVoteRecord();
+        if (localRec && localRec.projectId === id) clearLocalVoteRecord();
+        await setDoc(metaDocRef, { initialized: true }, { merge: true });
+        showToast(`Proyecto ${id} eliminado.`, "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Error al eliminar el proyecto.", "error");
+      }
+    };
+
+    window.deleteAllProjects = async function() {
+      if (!confirm("¿Estás seguro de borrar TODOS los proyectos y registros de votos para empezar desde cero?")) return;
+      try {
+        const batch = writeBatch(db);
+        const projSnap = await getDocs(projectsCol);
+        projSnap.forEach(d => batch.delete(d.ref));
+
+        const votesSnap = await getDocs(votesCol);
+        votesSnap.forEach(d => batch.delete(d.ref));
+
+        const rutSnap = await getDocs(rutRegistryCol);
+        rutSnap.forEach(d => batch.delete(d.ref));
+
+        batch.set(metaDocRef, { initialized: true }, { merge: true });
+        await batch.commit();
+        clearLocalVoteRecord();
+        showToast("Todos los proyectos y votos fueron eliminados.", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Error al vaciar los proyectos.", "error");
+      }
+    };
+
+    window.resetAllVotes = async function() {
+      if (!confirm("¿Deseas reiniciar a 0 los votos y estrellas de todos los proyectos y liberar todos los RUT?")) return;
+      try {
+        const batch = writeBatch(db);
+        const projSnap = await getDocs(projectsCol);
+        projSnap.forEach(d => batch.update(d.ref, { votes: 0, starsTotal: 0 }));
+
+        const votesSnap = await getDocs(votesCol);
+        votesSnap.forEach(d => batch.delete(d.ref));
+
+        const rutSnap = await getDocs(rutRegistryCol);
+        rutSnap.forEach(d => batch.delete(d.ref));
+
+        await batch.commit();
+        clearLocalVoteRecord();
+        showToast("Votos, estrellas y registros de RUT reiniciados a 0.", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Error al reiniciar votos.", "error");
+      }
+    };
+
+    // Control de Estrellas (1 a 5) con animación de palpitar
+    function triggerBeatOnNewlyFilled(prevCount, newCount) {
+      if (newCount <= prevCount) return;
+      const buttons = document.querySelectorAll('#star-selector button[data-star]');
+      let step = 0;
+      buttons.forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-star'), 10);
+        if (val > prevCount && val <= newCount) {
+          const delay = step * 55;
+          step++;
+          setTimeout(() => {
+            btn.classList.remove('is-beating');
+            void btn.offsetWidth;
+            btn.classList.add('is-beating');
+            setTimeout(() => btn.classList.remove('is-beating'), 450);
+          }, delay);
+        }
+      });
+    }
+
+    function paintStars(count, animateNewlyFilled = true) {
+      const buttons = document.querySelectorAll('#star-selector button[data-star]');
+      if (animateNewlyFilled && count > lastRenderedStars) {
+        triggerBeatOnNewlyFilled(lastRenderedStars, count);
+      }
+      lastRenderedStars = count;
+
+      buttons.forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-star'), 10);
+        const svg = btn.querySelector('svg');
+        if (val <= count) {
+          btn.classList.add('is-active');
+          svg.classList.remove('text-slate-300');
+          svg.classList.add('text-amber-400');
+        } else {
+          btn.classList.remove('is-active');
+          svg.classList.remove('text-amber-400');
+          svg.classList.add('text-slate-300');
+        }
+      });
+
+      const label = document.getElementById('star-label');
+      label.textContent = starDescriptions[count] || starDescriptions[5];
+      label.classList.remove('scale-105');
+      void label.offsetWidth;
+      label.classList.add('scale-105');
+      setTimeout(() => label.classList.remove('scale-105'), 180);
+    }
+
+    function computeStarFromPointerX(clientX) {
+      const selector = document.getElementById('star-selector');
+      if (!selector) return selectedStars;
+      const buttons = Array.from(selector.querySelectorAll('button[data-star]'));
+      if (buttons.length === 0) return selectedStars;
+
+      const firstRect = buttons[0].getBoundingClientRect();
+      const lastRect = buttons[buttons.length - 1].getBoundingClientRect();
+
+      if (clientX <= firstRect.left + firstRect.width * 0.2) return 1;
+      if (clientX >= lastRect.right - lastRect.width * 0.1) return 5;
+
+      for (let i = 0; i < buttons.length; i++) {
+        const rect = buttons[i].getBoundingClientRect();
+        if (clientX <= rect.right) {
+          return i + 1;
+        }
+      }
+      return 5;
+    }
+
+    (function initStarDragGesture() {
+      const selector = document.getElementById('star-selector');
+      if (!selector) return;
+      let isDragging = false;
+
+      selector.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        try {
+          selector.setPointerCapture(e.pointerId);
+        } catch (_) {}
+        const starVal = computeStarFromPointerX(e.clientX);
+        if (starVal !== selectedStars) {
+          selectedStars = starVal;
+          paintStars(selectedStars, true);
+        } else {
+          paintStars(selectedStars, true);
+        }
+      });
+
+      selector.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const starVal = computeStarFromPointerX(e.clientX);
+        if (starVal !== selectedStars) {
+          selectedStars = starVal;
+          paintStars(selectedStars, true);
+        }
+      });
+
+      const endDrag = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        try {
+          if (e && selector.hasPointerCapture(e.pointerId)) {
+            selector.releasePointerCapture(e.pointerId);
+          }
+        } catch (_) {}
+      };
+
+      selector.addEventListener('pointerup', endDrag);
+      selector.addEventListener('pointercancel', endDrag);
+    })();
+
+    window.selectStar = function(val, withBeat = true) {
+      selectedStars = val;
+      paintStars(selectedStars, withBeat);
+    };
+
+    window.previewStar = function(val) {
+      paintStars(val, true);
+    };
+
+    window.resetStarPreview = function() {
+      lastRenderedStars = Math.min(lastRenderedStars, selectedStars);
+      paintStars(selectedStars, false);
+    };
+
+    function launchFiveStarCelebration() {
+      const layer = document.getElementById('celebration-layer');
+      if (!layer) return;
+      layer.innerHTML = '';
+
+      const palette = ['#008556', '#C5A059', '#F59E0B', '#10B981', '#38BDF8', '#F43F5E', '#A855F7'];
+      const totalConfetti = 52;
+      const totalStreamers = 14;
+
+      for (let i = 0; i < totalConfetti; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        const isCircle = i % 3 === 0;
+        const width = isCircle ? 9 : 7 + (i % 5);
+        const height = isCircle ? 9 : 11 + (i % 7);
+        const leftPct = Math.random() * 100;
+        const driftX = (Math.random() - 0.5) * 180;
+        const rotEnd = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 540);
+        const duration = 1.6 + Math.random() * 1.1;
+        const delay = Math.random() * 0.35;
+
+        piece.style.left = `${leftPct}%`;
+        piece.style.width = `${width}px`;
+        piece.style.height = `${height}px`;
+        piece.style.borderRadius = isCircle ? '999px' : '3px';
+        piece.style.backgroundColor = palette[i % palette.length];
+        piece.style.setProperty('--drift-x', `${driftX}px`);
+        piece.style.setProperty('--rot-end', `${rotEnd}deg`);
+        piece.style.animationDuration = `${duration}s`;
+        piece.style.animationDelay = `${delay}s`;
+
+        layer.appendChild(piece);
+      }
+
+      for (let j = 0; j < totalStreamers; j++) {
+        const ribbon = document.createElement('span');
+        ribbon.className = 'streamer-ribbon';
+        const leftPct = 4 + (j * (92 / totalStreamers)) + (Math.random() - 0.5) * 4;
+        const driftX = (Math.random() - 0.5) * 90;
+        const duration = 1.9 + Math.random() * 0.9;
+        const delay = Math.random() * 0.25;
+
+        ribbon.style.left = `${leftPct}%`;
+        ribbon.style.background = `linear-gradient(180deg, ${palette[j % palette.length]} 0%, ${palette[(j + 2) % palette.length]} 100%)`;
+        ribbon.style.setProperty('--drift-x', `${driftX}px`);
+        ribbon.style.animationDuration = `${duration}s`;
+        ribbon.style.animationDelay = `${delay}s`;
+
+        layer.appendChild(ribbon);
+      }
+
+      setTimeout(() => {
+        if (layer) layer.innerHTML = '';
+      }, 3200);
+    }
+
+    function setAlreadyVotedWarning(messageOrNull) {
+      const box = document.getElementById('already-voted-box');
+      const boxText = document.getElementById('already-voted-box-text');
+      const btn = document.getElementById('confirm-vote-btn');
+      if (!box || !boxText || !btn) return;
+
+      if (messageOrNull) {
+        boxText.textContent = messageOrNull;
+        box.classList.remove('hidden');
+        btn.disabled = true;
+        lucide.createIcons();
+      } else {
+        box.classList.add('hidden');
+        boxText.textContent = '';
+        btn.disabled = false;
+      }
+    }
+
+    // Modal de Votación
+    window.openVoteModal = function(projectId) {
+      const p = projectsList.find(item => item.id === projectId);
+      if (!p) return;
+
+      selectedProject = p;
+      selectedStars = 5;
+      lastRenderedStars = 0;
+      paintStars(selectedStars, true);
+
+      document.getElementById('modal-proj-code').textContent = p.id;
+      document.getElementById('modal-proj-title').textContent = p.title;
+      document.getElementById('modal-proj-team').textContent = `${p.category} · ${p.team}`;
+      document.getElementById('modal-proj-desc').textContent = p.description;
+
+      const rutInput = document.getElementById('voter-rut');
+      rutInput.value = '';
+      document.getElementById('rut-feedback').textContent = "Si ya votaste con tu RUT en este u otro proyecto, no podrás volver a votar.";
+      document.getElementById('rut-feedback').className = "text-xs mt-1.5 text-slate-500";
+
+      const localRec = getLocalVoteRecord();
+      if (localRec && localRec.projectId) {
+        setAlreadyVotedWarning(
+          `Este dispositivo ya registró el voto del RUT ${localRec.rutFormatted || ''} en el proyecto ${localRec.projectId} (${localRec.projectTitle || ''}). Cada persona solo puede votar por 1 proyecto.`
+        );
+      } else {
+        setAlreadyVotedWarning(null);
+      }
+
+      const modal = document.getElementById('vote-modal');
+      const card = document.getElementById('vote-modal-card');
+      card.classList.remove('animate-modal-out');
+      card.classList.remove('animate-modal');
+      void card.offsetWidth;
+      card.classList.add('animate-modal');
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (!localRec) {
+        setTimeout(() => rutInput.focus(), 120);
+      }
+    };
+
+    window.closeVoteModal = function() {
+      const modal = document.getElementById('vote-modal');
+      const card = document.getElementById('vote-modal-card');
+
+      card.classList.remove('animate-modal');
+      card.classList.add('animate-modal-out');
+
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        card.classList.remove('animate-modal-out');
+        selectedProject = null;
+
+        if (window.location.search.includes('proyecto=')) {
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+      }, 200);
+    };
+
+    // RUT Chileno (Módulo 11) + Verificación en tiempo real si ya votó en otro proyecto
+    window.handleRutInput = async function(input) {
+      let clean = input.value.replace(/[^0-9kK]/g, '').toUpperCase();
+      if (clean.length > 9) clean = clean.slice(0, 9);
+
+      if (clean.length > 1) {
+        const body = clean.slice(0, -1);
+        const dv = clean.slice(-1);
+        const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        input.value = `${formattedBody}-${dv}`;
+      } else {
+        input.value = clean;
+      }
+
+      const feedback = document.getElementById('rut-feedback');
+      const localRec = getLocalVoteRecord();
+
+      if (clean.length >= 8) {
+        if (validateRut(clean)) {
+          feedback.textContent = "Verificando disponibilidad del RUT...";
+          feedback.className = "text-xs mt-1.5 text-slate-600 font-semibold";
+
+          const currentReq = ++rutCheckRequestId;
+          try {
+            const rutSnap = await getDoc(doc(rutRegistryCol, clean));
+            if (currentReq !== rutCheckRequestId) return;
+
+            if (rutSnap.exists()) {
+              const prevProjId = rutSnap.data()?.projectId || "otro proyecto";
+              const prevProjObj = projectsList.find(item => item.id === prevProjId);
+              const prevProjName = prevProjObj ? ` (${prevProjObj.title})` : "";
+              feedback.textContent = `Este RUT ya votó en ${prevProjId}${prevProjName}. No puede votar por otro proyecto.`;
+              feedback.className = "text-xs mt-1.5 text-red-600 font-bold";
+              setAlreadyVotedWarning(
+                `El RUT ${input.value} ya utilizó su único voto en el proyecto ${prevProjId}${prevProjName}. No es posible votar por ningún otro proyecto.`
+              );
+            } else if (!localRec) {
+              setAlreadyVotedWarning(null);
+              feedback.textContent = "RUT disponible para emitir tu único voto en este proyecto.";
+              feedback.className = "text-xs mt-1.5 text-emerald-600 font-semibold";
+            }
+          } catch (_) {
+            if (!localRec) {
+              setAlreadyVotedWarning(null);
+              feedback.textContent = "RUT válido listo para registrar tu único voto.";
+              feedback.className = "text-xs mt-1.5 text-emerald-600 font-semibold";
+            }
+          }
+        } else {
+          feedback.textContent = "El dígito verificador del RUT no coincide.";
+          feedback.className = "text-xs mt-1.5 text-red-600 font-semibold";
+          if (!localRec) setAlreadyVotedWarning(null);
+        }
+      } else {
+        feedback.textContent = "Ingresa tu RUT sin espacios (ej: 19.456.789-K).";
+        feedback.className = "text-xs mt-1.5 text-slate-500";
+        if (!localRec) setAlreadyVotedWarning(null);
+      }
+    };
+
+    function cleanRutString(rut) {
+      return rut.replace(/[^0-9kK]/g, '').toUpperCase();
+    }
+
+    function validateRut(rutRaw) {
+      const clean = cleanRutString(rutRaw);
+      if (clean.length < 8 || clean.length > 9) return false;
+
+      const body = clean.slice(0, -1);
+      const dv = clean.slice(-1);
+
+      if (/^(\d)\1+$/.test(body)) return false;
+
+      let sum = 0;
+      let multiplier = 2;
+
+      for (let i = body.length - 1; i >= 0; i--) {
+        sum += parseInt(body[i], 10) * multiplier;
+        multiplier = multiplier === 7 ? 2 : multiplier + 1;
+      }
+
+      const expectedMod = 11 - (sum % 11);
+      const expectedDv = expectedMod === 11 ? '0' : expectedMod === 10 ? 'K' : String(expectedMod);
+
+      return dv === expectedDv;
+    }
+
+    // Registrar Voto Único por RUT en toda la feria
+    window.submitVote = async function(e) {
+      e.preventDefault();
+      if (!selectedProject) return;
+
+      const localRec = getLocalVoteRecord();
+      if (localRec && localRec.projectId) {
+        showToast(
+          `Este dispositivo ya votó en ${localRec.projectId} con el RUT ${localRec.rutFormatted || ''}. Solo se permite 1 voto.`,
+          "warning"
+        );
+        return;
+      }
+
+      const rutInput = document.getElementById('voter-rut');
+      const formattedRut = rutInput.value.trim();
+      const cleanRut = cleanRutString(formattedRut);
+
+      if (!validateRut(cleanRut)) {
+        showToast("Por favor ingresa un RUT chileno válido.", "error");
+        rutInput.focus();
+        return;
+      }
+
+      if (selectedStars < 1 || selectedStars > 5) {
+        showToast("Selecciona entre 1 y 5 estrellas.", "warning");
+        return;
+      }
+
+      const btn = document.getElementById('confirm-vote-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Validando y guardando voto...</span>`;
+
+      const rutGlobalRef = doc(rutRegistryCol, cleanRut);
+      const voteDocId = `${selectedProject.id}_${cleanRut}`;
+      const voteRef = doc(votesCol, voteDocId);
+      const projectRef = doc(projectsCol, selectedProject.id);
+      const starsToAdd = selectedStars;
+      const targetProjId = selectedProject.id;
+      const targetProjTitle = selectedProject.title;
+
+      try {
+        await runTransaction(db, async (transaction) => {
+          const rutGlobalSnap = await transaction.get(rutGlobalRef);
+          if (rutGlobalSnap.exists()) {
+            const votedProjId = rutGlobalSnap.data()?.projectId || "otro proyecto";
+            throw new Error(`ALREADY_VOTED_GLOBAL:${votedProjId}`);
+          }
+
+          const voteSnap = await transaction.get(voteRef);
+          if (voteSnap.exists()) {
+            throw new Error(`ALREADY_VOTED_GLOBAL:${targetProjId}`);
+          }
+
+          const projSnap = await transaction.get(projectRef);
+          if (!projSnap.exists()) {
+            throw new Error("PROJECT_NOT_FOUND");
+          }
+
+          const currentVotes = projSnap.data().votes || 0;
+          const currentStars = projSnap.data().starsTotal || 0;
+
+          transaction.set(rutGlobalRef, {
+            rut: cleanRut,
+            rutFormatted: formattedRut,
+            projectId: targetProjId,
+            projectTitle: targetProjTitle,
+            stars: starsToAdd,
+            timestamp: Date.now()
+          });
+
+          transaction.set(voteRef, {
+            projectId: targetProjId,
+            rut: cleanRut,
+            stars: starsToAdd,
+            timestamp: Date.now()
+          });
+
+          transaction.update(projectRef, {
+            votes: currentVotes + 1,
+            starsTotal: currentStars + starsToAdd
+          });
+        });
+
+        setLocalVoteRecord({
+          rut: cleanRut,
+          rutFormatted: formattedRut,
+          projectId: targetProjId,
+          projectTitle: targetProjTitle,
+          stars: starsToAdd,
+          timestamp: Date.now()
+        });
+
+        renderProjects();
+
+        if (starsToAdd === 5) {
+          launchFiveStarCelebration();
+        }
+        closeVoteModal();
+        showToast(
+          starsToAdd === 5
+            ? `¡5 estrellas para "${targetProjTitle}"! Tu voto único con RUT ${formattedRut} quedó registrado.`
+            : `¡Registraste ${starsToAdd} ${starsToAdd === 1 ? 'estrella' : 'estrellas'} para "${targetProjTitle}"! Tu RUT ya no podrá votar por otros proyectos.`,
+          "success"
+        );
+      } catch (err) {
+        if (err.message && err.message.startsWith("ALREADY_VOTED_GLOBAL:")) {
+          const prevProject = err.message.split(":")[1];
+          const prevObj = projectsList.find(item => item.id === prevProject);
+          const prevLabel = prevObj ? `${prevProject} (${prevObj.title})` : prevProject;
+          setAlreadyVotedWarning(
+            `El RUT ${formattedRut} ya votó en ${prevLabel}. Cada persona solo puede votar por un único proyecto en toda la feria.`
+          );
+          showToast(
+            `El RUT ${formattedRut} ya votó en ${prevLabel}. No puede votar por otros proyectos.`,
+            "warning"
+          );
+        } else {
+          console.error(err);
+          showToast("No se pudo registrar el voto. Verifica tu conexión a internet.", "error");
+        }
+      } finally {
+        btn.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i><span>Confirmar Voto Único</span>`;
+        lucide.createIcons();
+      }
+    };
+
+    let toastTimer;
+    function showToast(message, type = "success") {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toast-icon');
+      const msg = document.getElementById('toast-msg');
+
+      msg.textContent = message;
+      if (type === "success") {
+        icon.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>`;
+      } else if (type === "warning") {
+        icon.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-amber-400"></i>`;
+      } else {
+        icon.innerHTML = `<i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i>`;
+      }
+
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      lucide.createIcons();
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 5000);
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
